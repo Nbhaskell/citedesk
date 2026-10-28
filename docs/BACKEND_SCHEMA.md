@@ -219,6 +219,8 @@ CREATE TABLE settings (
 [{"intent": "booking_request", "confidence": "high"}, {"intent": "pricing_question", "confidence": "medium"}]
 ```
 
+**`classifications.raw_response`** is the model's accepted reply exactly as it came (a JSON object). Besides the values copied into the columns above it holds `summary`, `sentiment`, `escalation_signals` (the codes the model flagged: `REFUND_OR_DISPUTE`, `LEGAL_THREAT`, `POLICY_EXCEPTION_REQUEST`) and the model's own `urgency` before the emergency net. The route stage reads `escalation_signals` from here (D-041).
+
 **`extractions.fields`** (every key present; unknown values are `null` or `"unknown"`)
 ```json
 {

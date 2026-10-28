@@ -16,6 +16,15 @@ Labelled inquiries for the invented plumbing company in `universe/`. They are th
 .\.venv\Scripts\python.exe -m tools.golden schema     # regenerate golden.schema.json
 ```
 
+To load the messages into the running app (from Phase 3, when `POST /api/inquiries` exists):
+
+```powershell
+.\.venv\Scripts\python.exe -m tools.import_inquiries --dry-run   # validate and count; sends nothing
+.\.venv\Scripts\python.exe -m tools.import_inquiries             # the tuned split, to 127.0.0.1:8100
+```
+
+Only `external_id`, `channel`, `sender_name`, `sender_email`, `subject` and `body` are sent. Labels, notes, categories and evidence never leave this folder, so the system under test is not shown the answers. The tool refuses any address that is not loopback and prints ids and counts only.
+
 The validator checks the schema; that `expected_route` and `should_escalate` agree with the routing rules applied to the labels; that every `evidence` anchor really appears in the named document; that the file's document hash matches the current documents; and the synthetic-data rules. If the documents are regenerated, `validate` fails until the anchors are re-checked and `build` is run.
 
 ## Who wrote it, and what that means

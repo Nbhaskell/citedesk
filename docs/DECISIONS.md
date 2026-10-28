@@ -108,5 +108,10 @@ Two findings from writing it that need an owner decision, neither changed unilat
 
 Small counts per label (for example 8 safety items, 2 legal threats) mean per-reason scores will be noisy; the evaluation report must say so.
 
+### D-024. `tools/import_inquiries.py` and the intake payload it assumes
+`docs/TRD.md` section 6 names `POST /api/inquiries` but gives no request shape. The import tool posts `external_id`, `channel`, `sender_name`, `body`, and optionally `sender_email` and `subject`, as JSON. **This is an assumption**: Phase 3 builds the endpoint and should either accept this payload or change the tool. It was tested against a stand-in HTTP server on loopback and a fake transport, not against the real API, which does not exist yet. It treats HTTP 200 and 201 as created, 409 as already imported (the schema's unique index on `channel` plus `external_id` suggests the endpoint will say so), and anything else, or no connection, as a failure.
+
+Rules built into the tool and covered by tests: labels, notes, categories and evidence are never sent; any address other than `127.0.0.1`, `localhost` or `[::1]` over `http` is refused; output contains ids and counts, never message text (rule 4 in `CLAUDE.md`); an inbox line with an unknown field is rejected, so a labelled file cannot be posted by mistake.
+
 ### D-018. Safety advice is a closed list in the fact sheet
 `universe/facts.json` has a `safety_instructions` block (shut off the main water valve; gas smell; sewage backup; carbon monoxide alarm). It is the only advice a reply may contain. Anything else about fixing a problem goes to a person. How these replies are produced (a fixed template or a checked draft) is to be decided in Phase 4 or 5 when routing and drafting are built.

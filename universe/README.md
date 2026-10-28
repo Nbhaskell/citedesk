@@ -10,7 +10,7 @@ This folder holds the fictional plumbing company that Citedesk is built and meas
 | `docs/` | The knowledge-base documents, generated from `facts.json`. |
 | `manifest.json` | Hashes of the fact sheet and each document, and how they were generated. |
 
-Inquiries and their labels will be added here in a later step.
+The labelled inquiries are in `eval/golden/` (see its README).
 
 ## Rebuild and check
 

@@ -104,13 +104,14 @@ Required fields per intent are a table in `routing.py`. Rules and thresholds are
 `KnowledgeBase.ask(question) -> KBResult` where `KBResult = {answer, declined, sources: [{file, section, page, text}], raw}`.
 
 - Build a standalone question from the primary intent and the extracted fields plus the customer's own question text. For multi-intent inquiries, ask one question per intent and merge sources.
-- If `declined` is true or there are no sources, add reason `NOT_IN_KNOWLEDGE_BASE` and route to `escalate` with a short draft "holding reply" suggestion (optional, flagged as not grounded).
+- If `declined` is true or there are no sources, add reason `NOT_IN_KNOWLEDGE_BASE` and route to `escalate` with a short draft "holding reply" suggestion (optional, flagged as not grounded). `declined` is decided by the adapter, and live availability is never asked (D-045).
 - Store the retrieved passages (`retrievals`) so the reviewer sees what the draft was built from.
 - `RagProjectKB` calls `POST /api/ask` on `RAG_URL` (default `http://127.0.0.1:8000`). Confirm the request and response shape in `rag-project/guides/api.md` before coding and write one contract test against a recorded response.
 
 ### 4.5 Draft (LLM)
 
 - Inputs: the cleaned inquiry, extracted fields, the retrieved sources, a short style guide (greeting, sign-off, length limit, tone), and the list of things the draft must not do.
+- A `request_details` reply with nothing to answer, and the holding reply, are plain templates with no model (D-047).
 - Instructions: answer only from the sources; if a source does not cover something, say a staff member will follow up on it; ask for the missing fields when route is `request_details`; never confirm a booking, quote a price not in the sources, offer a refund or discount, or give health advice.
 - Output: JSON `{subject, body, claims: [{text, source_index}]}`. The `claims` list is internal, shown to the reviewer, and used by checks. Customer-facing text is `subject` and `body` only.
 - Temperature 0.2 at most for style; token cap 800.

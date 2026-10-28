@@ -42,6 +42,8 @@ select = ["E", "F", "I", "B", "UP", "SIM", "S"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101"]
+# Sample customer messages are kept on one line so they read as the customer wrote them.
+"tests/test_screening.py" = ["E501"]
 
 [tool.mypy]
 python_version = "3.13"

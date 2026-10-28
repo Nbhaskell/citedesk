@@ -12,5 +12,5 @@ def normalise(text: str) -> str:
 
     Used before matching patterns, so that "Sm​ell  GAS" is read as "smell gas".
     """
-    folded = unicodedata.normalize("NFKC", text)
+    folded = unicodedata.normalize("NFKC", text).replace("’", "'").replace("‘", "'")
     return WHITESPACE.sub(" ", ZERO_WIDTH.sub("", folded)).strip().lower()

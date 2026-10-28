@@ -115,3 +115,32 @@ Rules built into the tool and covered by tests: labels, notes, categories and ev
 
 ### D-018. Safety advice is a closed list in the fact sheet
 `universe/facts.json` has a `safety_instructions` block (shut off the main water valve; gas smell; sewage backup; carbon monoxide alarm). It is the only advice a reply may contain. Anything else about fixing a problem goes to a person. How these replies are produced (a fixed template or a checked draft) is to be decided in Phase 4 or 5 when routing and drafting are built.
+
+## Process
+
+### D-025. One branch and one pull request per phase, from Phase 2
+Phases 0 and 1 were committed directly to `main` and stay there. From Phase 2, each phase is built on its own branch (`phase-2-data-layer`, `phase-3-intake-screening`, and so on) with the usual small commits, one per task. At the phase's acceptance check the branch is pushed and a pull request is opened. Its description lists what was built, what passed, and anything unverified or assumed. CI must be green, and the owner merges. Why: CI then runs before code reaches `main`, and each phase becomes one page to review, with its acceptance check written down. Nothing is pushed and no pull request is opened until the owner asks. The branch only exists to hold the work; `main` is unchanged until the merge.
+
+## Phase 2
+
+### D-026. Database conventions and what the migration runner cannot do
+`citedesk.db.connect` opens SQLite in autocommit mode (`isolation_level=None`) with foreign keys on, rows as mappings, and WAL for file databases. Grouped statements use `transaction()`, which commits on success, rolls back on any exception, and joins an open transaction. Each migration runs in its own transaction together with its `schema_migrations` row, so a failure leaves nothing half applied. `0001_init.sql` is extracted from the SQL block in `BACKEND_SCHEMA.md` and a test compares them character for character.
+
+Limits worth knowing: `schema_migrations` has no checksum column (the schema document defines it exactly), so editing an already-applied migration is **not detected**; "never edit an applied migration" stays a convention. The runner refuses a gap in numbering, a duplicate number, a badly named file, and a database newer than the code. Connections use SQLite's default `check_same_thread`, so Phase 3 must open one connection per request or worker rather than share one across FastAPI threads.
+
+### D-027. Models and the enum checks
+`citedesk/models.py` holds every enum and one row model per table. Four enums are not in the schema's section 1 table but are needed: `ScreeningResult`, `EscalationSource` and `ExportMethod` (values from `CHECK` constraints) and `AuditEventType` (from a comment on `audit_events.event_type`, which has no `CHECK`). Tests read the `CHECK` constraints back out of a migrated database and compare them with the enums, compare the enums with the schema document's table, require a row model for every table whose fields equal its columns, and fail if an enum exists that none of those sources accounts for. `Channel.import_` has a trailing underscore because `import` is a Python keyword; its value is still `"import"`. `tools/golden.py` now takes its enums from here.
+
+### D-028. Repository rules that go beyond the schema
+- `update_inquiry` cannot change `status` (or the message); only `state.transition` does, and a test fails if any other module writes `inquiries.status`.
+- A new draft starts as **`blocked`**, not the database default `ready`: a draft is not ready until its checks have run. `set_draft_status` refuses `ready` or `approved` while any blocking check has failed, raising `DraftBlocked`. This enforces "no draft with a failed blocking check is ever marked ready" at the data layer, as a floor under whatever the Phase 5 pipeline does.
+- Re-running a stage is safe: screenings and draft checks are upserts, and an open escalation with the same reason is reused instead of duplicated.
+- An extraction must belong to a classification of the same inquiry; an escalation `detail` is capped at 200 characters.
+
+### D-029. State machine details, and two gaps in the schema's table
+`citedesk/state.py` holds the 20 allowed moves, written out in code and compared in a test with the table in `BACKEND_SCHEMA.md` section 5; every one of the 169 status pairs is tested. The "failed returns to the prior stage's input status" row needs a mapping, chosen here: failed at `screen` returns to `received`, `understand` to `screened`, `retrieve` or `draft` to `routed`. Each status may fail only at its own stages. A failure message is capped at 300 characters and may not contain a 20-character run of the customer's own words. `transition()` updates the status, sets or clears the failure fields, and writes the `status_changed` event in one transaction.
+
+**Gap for Phases 4 and 5:** the table has no way to fail from `classified` (so a crash in the route stage) or from `drafted` (a crash in the check stage). If the pipeline needs either, `BACKEND_SCHEMA.md` section 5 and `state.py` must change together; do not catch the error and leave the inquiry stuck.
+
+### D-030. Audit events: what counts as message text, and what this cannot catch
+`events.record_event` is the only writer of `audit_events` (a test enforces it). A payload must be flat; keys are snake_case names; values are numbers, booleans, null, or short code-like tokens (no spaces, at most 64 characters, no `@` or `/`, no phone-like digits) or flat lists of those. A token that appears as a whole word in that inquiry's own body, subject, sender name or email is refused unless it is a known code from the enums. A rejection never repeats the rejected value, because the exception may be logged. This blocks sentences and single words lifted from the message. It cannot catch a paraphrase, a word from a different inquiry, or a harmless-looking token that happens to be sensitive. The structured log helper in the TRD's `events.py` is not written yet; it should reuse `validate_payload` when the pipeline needs it (Phase 3), and Phase 8 verifies logs.

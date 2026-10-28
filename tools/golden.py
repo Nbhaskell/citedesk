@@ -6,8 +6,8 @@ Run:
     python -m tools.golden report     counts per intent, category, route and reason
     python -m tools.golden schema     write eval/golden/golden.schema.json
 
-Names and values come from docs/BACKEND_SCHEMA.md (read at import time). Phase 2 moves them to
-citedesk/models.py; switch the import then.
+Names and values come from citedesk/models.py, which tests keep in step with
+docs/BACKEND_SCHEMA.md and the database CHECK constraints.
 """
 
 import hashlib
@@ -20,6 +20,8 @@ from pathlib import Path
 from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+
+from citedesk import models
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 GOLDEN_DIR = REPO_ROOT / "eval/golden"
@@ -72,12 +74,20 @@ PHONE_RE = re.compile(r"\b(\d{3})[-. ](\d{4})\b")
 ISO_DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 
+ENUMS = {
+    "channel": models.Channel,
+    "intent": models.Intent,
+    "urgency": models.Urgency,
+    "route": models.Route,
+    "reason_code": models.ReasonCode,
+    "service_type": models.ServiceType,
+    "property_type": models.PropertyType,
+}
+
+
 def schema_enum(name: str) -> tuple[str, ...]:
-    """Values of an enumeration row in docs/BACKEND_SCHEMA.md section 1, in document order."""
-    for line in (REPO_ROOT / "docs/BACKEND_SCHEMA.md").read_text("utf-8").splitlines():
-        if line.startswith(f"| `{name}`"):
-            return tuple(re.findall(r"`([^`]+)`", line.split("|")[2]))
-    raise ValueError(f"enum {name!r} not found in BACKEND_SCHEMA.md")
+    """The values of a schema enumeration, in the order of docs/BACKEND_SCHEMA.md section 1."""
+    return tuple(member.value for member in ENUMS[name])
 
 
 Intent = Literal[schema_enum("intent")]  # type: ignore[valid-type]

@@ -72,5 +72,15 @@ Why plumbing: it has clearly bounded safety cases (gas smell, flooding, sewage, 
 ### D-017. Only documents and inquiries are generated from the universe
 The `synthetic-business-universe` skill also describes invoices, bookings and reviews. Citedesk needs none of them, so only `universe/facts.json`, the knowledge-base documents and the labelled inquiries are generated.
 
+### D-019. Knowledge-base documents are generated and checked, never hand-edited
+`tools/generate_kb_docs.py` renders eight documents (`about`, `emergencies`, `faq`, `hours`, `policies`, `pricing`, `service-area`, `services`) from `universe/facts.json`. They are deterministic, so there is no seed. `tools/check_consistency.py` fails if any dollar amount, percentage, time, date, phone number or email in a document is not in the fact sheet, and if any priced fact, service, closed date, staff name or not-offered item is missing from its document. Other numbers must at least appear somewhere in the fact sheet (a weak check; it catches invented figures such as "48 hours" but not a wrong-but-existing number). The generator refuses to write files if the check fails. Tests cover the generator and include deliberately wrong documents (wrong price, wrong time, wrong date, invented total, unknown phone and email, dropped items) to prove the checker catches them. The committed documents are also tested against a fresh render so they cannot drift.
+
+Documents never refer to themselves ("see the Pricing document"), because that would teach the drafting model to write "according to the documents", which the `STRUCTURE` check bans. Headings follow the schema example (`pricing.md > Drain cleaning`).
+
+Reading the output as a customer found fragments and a duplicated sentence caused by pasting fact-sheet text into sentences. Those were fixed in the generator, and the gas-smell instruction in the fact sheet was shortened so it no longer repeats "does not do gas work".
+
+### D-020. No PDF document yet
+The skill suggests one short PDF. It is skipped until `rag-project`'s supported file types are confirmed (Phase 1, task 2).
+
 ### D-018. Safety advice is a closed list in the fact sheet
 `universe/facts.json` has a `safety_instructions` block (shut off the main water valve; gas smell; sewage backup; carbon monoxide alarm). It is the only advice a reply may contain. Anything else about fixing a problem goes to a person. How these replies are produced (a fixed template or a checked draft) is to be decided in Phase 4 or 5 when routing and drafting are built.

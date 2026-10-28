@@ -71,6 +71,14 @@ def _clean_note(note: str | None, *, required: bool, what: str) -> str | None:
     return text
 
 
+def clean_guidance(guidance: str | None) -> str:
+    """The reviewer's guidance for a redraft: required, at most 500 characters."""
+    text = _clean_note(guidance, required=True, what="guidance")
+    if text is None:
+        raise InvalidReview("A guidance is required.")
+    return text
+
+
 def _check_seconds(seconds: int | None) -> None:
     if seconds is not None and not 0 <= seconds <= MAX_REVIEW_SECONDS:
         raise InvalidReview("The review time is out of range.")

@@ -30,9 +30,10 @@ import sqlite3
 import threading
 import time
 from collections.abc import Callable
+from dataclasses import dataclass
 from typing import Any
 
-from citedesk import checks, drafting, events, repo, retrieval, routing, understand
+from citedesk import checks, drafting, events, repo, retrieval, review, routing, understand
 from citedesk.business import Business
 from citedesk.config import Settings
 from citedesk.db import connect, transaction
@@ -54,13 +55,14 @@ from citedesk.models import (
     Route,
     Screening,
     ScreeningResult,
+    Source,
     Stage,
     Urgency,
 )
 from citedesk.providers import LLMProvider, LLMStepFailed
 from citedesk.safety import emergency_hits
 from citedesk.screening import screen
-from citedesk.state import transition
+from citedesk.state import RETRY_TARGET, transition
 
 logger = logging.getLogger("citedesk.pipeline")
 
@@ -588,6 +590,40 @@ def retrieve_stage(
         return final
 
 
+@dataclass(frozen=True)
+class _DraftInputs:
+    screening: Screening
+    sources: list[Source]
+    unanswered: list[Intent]
+    asking: bool
+    missing: list[str]
+
+
+def _draft_inputs(
+    conn: sqlite3.Connection, inquiry: Inquiry, settings: Settings, now: str | None
+) -> _DraftInputs:
+    """What the model is told when it writes a reply, from what the earlier stages stored."""
+    classification = repo.latest_classification(conn, inquiry.id)
+    extraction = repo.latest_extraction(conn, inquiry.id)
+    screening = _screening_for(conn, inquiry.id, settings, now)
+    if classification is None or extraction is None:
+        raise LookupError(f"inquiry {inquiry.id} has no stored result")
+    rows = repo.list_retrievals(conn, inquiry.id)
+    questions = _questions_for(inquiry, classification, extraction)
+    unanswered = (
+        [q.intent for q, row in zip(questions, rows, strict=True) if row.declined]
+        if len(questions) == len(rows)
+        else []
+    )
+    asking = inquiry.route is Route.request_details
+    missing = (
+        routing.missing_fields(_ordered_intents(classification), extraction.fields)
+        if asking
+        else []
+    )
+    return _DraftInputs(screening, retrieval.merged_sources(rows), unanswered, asking, missing)
+
+
 def draft_stage(
     conn: sqlite3.Connection,
     inquiry_id: int,
@@ -615,25 +651,9 @@ def draft_stage(
         return inquiry.status
     if repo.latest_draft(conn, inquiry_id) is not None:
         return inquiry.status
-    classification = repo.latest_classification(conn, inquiry_id)
-    extraction = repo.latest_extraction(conn, inquiry_id)
-    screening = _screening_for(conn, inquiry_id, settings, now)
-    if classification is None or extraction is None:
-        raise LookupError(f"inquiry {inquiry_id} is routed but has no stored result")
-    rows = repo.list_retrievals(conn, inquiry_id)
-    sources = retrieval.merged_sources(rows)
-    questions = _questions_for(inquiry, classification, extraction)
-    unanswered = (
-        [q.intent for q, row in zip(questions, rows, strict=True) if row.declined]
-        if len(questions) == len(rows)
-        else []
-    )
-    asking = inquiry.route is Route.request_details
-    missing = (
-        routing.missing_fields(_ordered_intents(classification), extraction.fields)
-        if asking
-        else []
-    )
+    inputs = _draft_inputs(conn, inquiry, settings, now)
+    screening, sources, unanswered = inputs.screening, inputs.sources, inputs.unanswered
+    asking, missing = inputs.asking, inputs.missing
     events.record_event(
         conn,
         event_type=AuditEventType.stage_started,
@@ -910,6 +930,148 @@ def _run_stage(
         attempts=2,
         request_id=request_id,
     )
+
+
+def redraft_stage(
+    conn: sqlite3.Connection,
+    draft_id: int,
+    guidance: str | None,
+    settings: Settings,
+    llm: LLMProvider,
+    business: Business,
+    *,
+    now: str | None = None,
+    request_id: str | None = None,
+) -> InquiryStatus:
+    """Write the next version of a rejected draft, following the reviewer's guidance, and check it.
+
+    Only the latest draft of a `rejected` inquiry can be redrafted. The passages are the ones
+    already stored, so the knowledge base is not asked again, and with none there is nothing to
+    write from (CLAUDE.md rule 6). The model is called with no transaction open; if the inquiry
+    changed meanwhile nothing is written. A model that gives no usable draft raises `DraftFailed`
+    and leaves the inquiry `rejected`, so the reviewer can try again.
+    """
+    note = review.clean_guidance(guidance)
+    started = time.monotonic()
+    old = repo.get_draft(conn, draft_id)
+    inquiry = None if old is None else repo.get_inquiry(conn, old.inquiry_id)
+    if old is None or inquiry is None:
+        raise review.NotFound("No draft has that id.")
+    latest = repo.latest_draft(conn, inquiry.id)
+    if (
+        inquiry.status is not InquiryStatus.rejected
+        or latest is None
+        or latest.id != old.id
+        or old.status is not DraftStatus.rejected
+    ):
+        raise review.WrongState("Only the latest rejected draft can be redrafted.")
+    inputs = _draft_inputs(conn, inquiry, settings, now)
+    if not inputs.sources:
+        raise review.WrongState("There are no passages to write a new draft from. Close this item.")
+    events.record_event(
+        conn,
+        event_type=AuditEventType.stage_started,
+        inquiry_id=inquiry.id,
+        stage=Stage.draft,
+        request_id=request_id,
+        now=now,
+    )
+    try:
+        written = drafting.draft(
+            llm,
+            business=business,
+            sender_name=inquiry.sender_name,
+            subject=inquiry.subject,
+            body=inquiry.body,
+            sources=inputs.sources,
+            missing_fields=inputs.missing,
+            unanswered=inputs.unanswered,
+            sensitive_data_masked=inputs.screening.sensitive_data_masked,
+            max_words=settings.draft_max_words,
+            guidance=note,
+        )
+    except drafting.DraftFailed as error:
+        events.record_event(
+            conn,
+            event_type=AuditEventType.stage_failed,
+            inquiry_id=inquiry.id,
+            stage=Stage.draft,
+            payload={"reason": error.reason, "attempts": error.attempts},
+            request_id=request_id,
+            now=now,
+        )
+        raise
+    with transaction(conn):
+        current = repo.get_inquiry(conn, inquiry.id)
+        if current is None or current.status is not InquiryStatus.rejected:
+            raise review.WrongState("The inquiry changed while the new draft was written.")
+        new_id = repo.insert_draft(
+            conn,
+            inquiry_id=inquiry.id,
+            kind=DraftKind.request_details if inputs.asking else DraftKind.reply,
+            subject=written.output.subject or drafting.reply_subject(inquiry.subject),
+            body=written.output.body,
+            claims=written.output.claims,
+            model=written.model,
+            prompt_version=drafting.PROMPT_VERSION,
+            guidance=note,
+            duration_ms=written.duration_ms,
+            now=now,
+        )
+        transition(
+            conn,
+            inquiry.id,
+            InquiryStatus.drafted,
+            stage=Stage.draft,
+            request_id=request_id,
+            now=now,
+        )
+        new = repo.get_draft(conn, new_id)
+        events.record_event(
+            conn,
+            event_type=AuditEventType.stage_finished,
+            inquiry_id=inquiry.id,
+            stage=Stage.draft,
+            payload={
+                "kind": DraftKind.request_details if inputs.asking else DraftKind.reply,
+                "version": 0 if new is None else new.version,
+                "attempts": written.attempts,
+                "claims": len(written.output.claims),
+                "words": len(written.output.body.split()),
+                "redraft": True,
+            },
+            request_id=request_id,
+            duration_ms=int((time.monotonic() - started) * 1000),
+            now=now,
+        )
+    return _run_stage(
+        conn,
+        inquiry.id,
+        Stage.check,
+        lambda: check_stage(conn, inquiry.id, settings, business, now=now, request_id=request_id),
+        request_id,
+    )
+
+
+def retry_failed(
+    conn: sqlite3.Connection,
+    inquiry_id: int,
+    *,
+    now: str | None = None,
+    request_id: str | None = None,
+) -> InquiryStatus:
+    """Put a `failed` inquiry back where its failed stage started, so the worker runs it again.
+
+    The failure is cleared and an event records which stage is being retried."""
+    with transaction(conn):
+        inquiry = repo.get_inquiry(conn, inquiry_id)
+        if inquiry is None:
+            raise review.NotFound("No inquiry has that id.")
+        if inquiry.status is not InquiryStatus.failed or inquiry.failure_stage is None:
+            raise review.WrongState("Only a failed inquiry can be retried.")
+        target = RETRY_TARGET[inquiry.failure_stage]
+        transition(conn, inquiry_id, target, request_id=request_id, now=now)
+    return target
 
 
 def process(

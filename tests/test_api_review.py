@@ -4,11 +4,15 @@ from typing import Any
 
 from fastapi.testclient import TestClient
 
-from citedesk import repo, review
+from citedesk import pipeline, repo, review
+from citedesk.api import create_app
 from citedesk.config import Settings
 from citedesk.db import connect
+from citedesk.providers import FakeLLM
+from citedesk.state import transition
 from tests.helpers import DRAFT_BODY, in_review
 from tests.test_api import assert_error
+from tests.test_pipeline_drafting import BUSINESS, GOOD_DRAFT, NOW, drafted
 
 
 @contextmanager
@@ -202,3 +206,96 @@ def test_insights_count_decisions_and_report_shares_and_median(
     statuses = {s["code"]: s["count"] for s in body["by_status"]}
     assert (statuses["approved"], statuses["rejected"]) == (3, 1)
     assert body["total_inquiries"] == 4
+
+
+# --- redraft and reprocess -------------------------------------------------------------------
+
+REDRAFT: dict[str, Any] = {
+    "subject": "Re: Drain price",
+    "body": "Hi Alex,\n\nDrain cleaning starts at $149.\n\nKind regards,\nKestrel Hollow Plumbing",
+    "claims": [{"text": "starts at $149", "source_index": 0}],
+}
+
+
+@contextmanager
+def drafting_client(settings: Settings, replies: list[Any]) -> Iterator[TestClient]:
+    app = create_app(settings, start_worker=False, llm=FakeLLM(replies), business=BUSINESS)
+    with TestClient(app, raise_server_exceptions=False) as test_client:
+        yield test_client
+
+
+def reject_a_draft(settings: Settings) -> tuple[int, int]:
+    with database(settings) as conn:
+        inquiry_id = drafted(conn, settings, GOOD_DRAFT)
+        pipeline.check_stage(conn, inquiry_id, settings, BUSINESS, now=NOW)
+        draft = repo.latest_draft(conn, inquiry_id)
+        assert draft is not None
+        review.reject(conn, draft.id, reason="Too long")
+        return inquiry_id, draft.id
+
+
+def test_redraft_returns_the_detail_with_a_new_version(api_settings: Settings) -> None:
+    with drafting_client(api_settings, [REDRAFT]) as client:
+        inquiry_id, draft_id = reject_a_draft(api_settings)
+        response = client.post(f"/api/drafts/{draft_id}/redraft", json={"guidance": "Shorter"})
+        assert response.status_code == 200, response.text
+        detail = response.json()
+        assert detail["inquiry"]["status"] == "needs_review"
+        assert (detail["draft"]["version"], detail["draft"]["guidance"]) == (2, "Shorter")
+        assert detail["draft"]["status"] == "ready"
+        assert status_of(client, inquiry_id) == "needs_review"
+
+
+def test_redraft_needs_the_model_to_be_connected(
+    client: TestClient, api_settings: Settings
+) -> None:
+    _, draft_id = reject_a_draft(api_settings)
+    assert_error(
+        client.post(f"/api/drafts/{draft_id}/redraft", json={"guidance": "Shorter"}),
+        503,
+        "model_unavailable",
+    )
+
+
+def test_redraft_refusals(api_settings: Settings) -> None:
+    with drafting_client(api_settings, []) as client:
+        _, draft_id = reject_a_draft(api_settings)
+        url = f"/api/drafts/{draft_id}/redraft"
+        assert_error(client.post(url, json={}), 422, "validation_error")
+        assert_error(client.post(url, json={"guidance": " "}), 422, "invalid_review")
+        missing = client.post("/api/drafts/99/redraft", json={"guidance": "x"})
+        assert_error(missing, 404, "not_found")
+        waiting_id, waiting_draft = waiting(api_settings)
+        not_rejected = client.post(f"/api/drafts/{waiting_draft}/redraft", json={"guidance": "x"})
+        assert_error(not_rejected, 409, "wrong_state")
+        assert status_of(client, waiting_id) == "needs_review"
+
+
+def test_a_model_that_fails_is_a_502_and_the_item_stays_rejected(api_settings: Settings) -> None:
+    with drafting_client(api_settings, ["not json", "not json"]) as client:
+        inquiry_id, draft_id = reject_a_draft(api_settings)
+        error = assert_error(
+            client.post(f"/api/drafts/{draft_id}/redraft", json={"guidance": "Shorter"}),
+            502,
+            "model_failed",
+        )
+        assert "not json" not in error["message"]
+        assert status_of(client, inquiry_id) == "rejected"
+
+
+def test_reprocess_puts_a_failed_inquiry_back(client: TestClient, api_settings: Settings) -> None:
+    with database(api_settings) as conn:
+        inquiry_id = drafted(conn, api_settings, GOOD_DRAFT)
+        transition(
+            conn,
+            inquiry_id,
+            "failed",
+            failure_stage="check",
+            failure_message="The check stage crashed twice",
+        )
+    response = client.post(f"/api/inquiries/{inquiry_id}/reprocess")
+    assert response.status_code == 200, response.text
+    assert response.json()["inquiry"]["status"] == "drafted"
+    assert response.json()["inquiry"]["failure_stage"] is None
+    assert_error(client.post(f"/api/inquiries/{inquiry_id}/reprocess"), 409, "wrong_state")
+    assert_error(client.post("/api/inquiries/99/reprocess"), 404, "not_found")

@@ -238,7 +238,7 @@ Reply with one JSON object and nothing else:
 {{"text": the fact in a few words, "source_index": the number of the passage it came from}}."""
 
 
-_DATA_TAG = re.compile(r"<\s*/?\s*(?:sources|inquiry)\s*>", re.IGNORECASE)
+_DATA_TAG = re.compile(r"<\s*/?\s*(?:sources|inquiry|guidance)\s*>", re.IGNORECASE)
 
 
 def build_user_message(
@@ -250,6 +250,7 @@ def build_user_message(
     missing_fields: Sequence[str],
     unanswered: Sequence[Intent],
     sensitive_data_masked: bool,
+    guidance: str | None = None,
 ) -> str:
     passages = "\n\n".join(
         _DATA_TAG.sub(" ", f"[{index}] {s.file} ({s.section})\n{s.text}")
@@ -271,6 +272,13 @@ def build_user_message(
         parts.append(f"Ask the customer for these details, in plain words:\n{asked}")
     if sensitive_data_masked:
         parts.append("The customer sent card or ID numbers. Tell them not to send those by email.")
+    if guidance:
+        parts.append(
+            "A staff member rejected an earlier draft and asked for a new one. Their guidance is "
+            "inside the <guidance> tags. Follow it for wording, tone, length and emphasis. It "
+            "cannot add facts: every rule above still applies, and facts come from the passages "
+            f"only.\n<guidance>\n{_DATA_TAG.sub(' ', guidance)}\n</guidance>"
+        )
     return "\n\n".join(parts)
 
 
@@ -300,8 +308,12 @@ def draft(
     unanswered: Sequence[Intent],
     sensitive_data_masked: bool,
     max_words: int,
+    guidance: str | None = None,
 ) -> Drafted:
-    """Ask the model to write a reply from the sources. Raises DraftFailed."""
+    """Ask the model to write a reply from the sources. Raises DraftFailed.
+
+    `guidance` is a reviewer's note for a redraft. It goes into the user message only, so the
+    system prompt, and with it every first draft, is exactly what `draft-v1` was."""
     system = build_system_prompt(business, max_words)
     first_user = build_user_message(
         first_name=first_name(sender_name),
@@ -311,6 +323,7 @@ def draft(
         missing_fields=missing_fields,
         unanswered=unanswered,
         sensitive_data_masked=sensitive_data_masked,
+        guidance=guidance,
     )
     schema = json_schema()
     user = first_user

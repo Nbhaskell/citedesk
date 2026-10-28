@@ -7,6 +7,8 @@
     GET  /api/inquiries/{id}         everything known about one inquiry
     POST /api/drafts/{id}/approve    approve a draft, optionally with the reviewer's edit
     POST /api/drafts/{id}/reject     reject a draft (a reason is required)
+    POST /api/drafts/{id}/redraft    write the next version of a rejected draft from guidance
+    POST /api/inquiries/{id}/reprocess  put a failed inquiry back to where its stage started
     POST /api/inquiries/{id}/escalate   send an item waiting for review to the owner (note required)
     POST /api/inquiries/{id}/resolve    close an escalated or rejected item
     GET  /api/drafts/{id}/export     the approved text; changes nothing
@@ -35,7 +37,7 @@ from pydantic import BaseModel, ConfigDict
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from citedesk import __version__, events, insights, intake, repo, review
+from citedesk import __version__, events, insights, intake, pipeline, repo, review
 from citedesk.business import Business
 from citedesk.config import Settings
 from citedesk.db import connect, migrate
@@ -65,7 +67,7 @@ from citedesk.models import (
     Urgency,
 )
 from citedesk.pipeline import PipelineWorker
-from citedesk.providers import LLMProvider
+from citedesk.providers import LLMProvider, LLMStepFailed
 
 logger = logging.getLogger("citedesk.api")
 
@@ -153,6 +155,11 @@ class RejectBody(BaseModel):
     model_config = ConfigDict(extra="forbid")
     reason: str
     review_seconds: int | None = None
+
+
+class RedraftBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    guidance: str
 
 
 class EscalateBody(BaseModel):
@@ -358,6 +365,16 @@ def create_app(
     @app.exception_handler(review.InvalidReview)
     async def handle_invalid_review(request: Request, error: review.InvalidReview) -> JSONResponse:
         return error_response(request, 422, "invalid_review", str(error))
+
+    @app.exception_handler(LLMStepFailed)
+    async def handle_model_failed(request: Request, error: LLMStepFailed) -> JSONResponse:
+        logger.warning("model step failed: %s", error.reason)
+        return error_response(
+            request,
+            502,
+            "model_failed",
+            "The model gave no usable reply. Nothing was changed; try again.",
+        )
 
     @app.exception_handler(DuplicateExternalId)
     async def handle_duplicate(request: Request, error: DuplicateExternalId) -> JSONResponse:
@@ -574,6 +591,31 @@ def create_app(
         with db() as conn:
             review.resolve(conn, inquiry_id, note=body.note, request_id=request_id_of(request))
             return detail_of(conn, inquiry_id)
+
+    @app.post("/api/drafts/{draft_id}/redraft", response_model=InquiryDetail)
+    def redraft_draft(draft_id: int, request: Request, body: RedraftBody) -> InquiryDetail:
+        if llm is None or business is None:
+            raise ApiError(503, "model_unavailable", "Redrafting needs the model, which is off.")
+        with db() as conn:
+            pipeline.redraft_stage(
+                conn,
+                draft_id,
+                body.guidance,
+                settings,
+                llm,
+                business,
+                request_id=request_id_of(request),
+            )
+            draft = repo.get_draft(conn, draft_id)
+            return detail_of(conn, draft.inquiry_id if draft else 0)
+
+    @app.post("/api/inquiries/{inquiry_id}/reprocess", response_model=InquiryDetail)
+    def reprocess_inquiry(inquiry_id: int, request: Request) -> InquiryDetail:
+        with db() as conn:
+            pipeline.retry_failed(conn, inquiry_id, request_id=request_id_of(request))
+            detail = detail_of(conn, inquiry_id)
+        wake_worker()
+        return detail
 
     @app.get("/api/drafts/{draft_id}/export", response_model=ExportText)
     def read_export(draft_id: int) -> ExportText:

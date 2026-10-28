@@ -1,0 +1,44 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Assistant-instruction and local notes files: untracked unless the owner decides otherwise
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+
+# Database files (never commit real or demo data stores)
+data/
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# Node
+node_modules/
+web/dist/
+
+# Evaluation: raw run outputs stay local; golden sets and reports are published
+eval/runs/*
+!eval/runs/.gitkeep
+
+# Editor and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

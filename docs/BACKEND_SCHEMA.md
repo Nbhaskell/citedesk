@@ -1,0 +1,336 @@
+# Backend Schema: Citedesk
+
+Version 0.1. This file is the single source of truth for enum values, statuses, reason codes and table names. The PRD, TRD, AppFlow and UI brief refer to these exact strings.
+
+Database: SQLite in WAL mode with foreign keys on (`PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL;`). SQL is kept portable so a move to PostgreSQL is a small change (replace `INTEGER PRIMARY KEY AUTOINCREMENT` with `BIGSERIAL`, `TEXT` timestamps with `TIMESTAMPTZ`, JSON `TEXT` with `JSONB`).
+
+Conventions: ids are integers; timestamps are ISO 8601 UTC strings; JSON columns hold JSON text validated by Pydantic in code; booleans are `0/1`; every table has `created_at`.
+
+## 1. Enumerations
+
+| Name | Values |
+|---|---|
+| `channel` | `web_form`, `email`, `import`, `webhook` |
+| `intent` | `pricing_question`, `availability_question`, `booking_request`, `booking_change`, `cancellation`, `policy_question`, `service_question`, `complaint`, `health_or_safety`, `billing_question`, `partnership_or_sales`, `spam`, `other` |
+| `urgency` | `low`, `normal`, `high`, `urgent` |
+| `sentiment` | `positive`, `neutral`, `negative`, `angry` |
+| `confidence` | `low`, `medium`, `high` |
+| `route` | `draft_reply`, `request_details`, `escalate`, `archive` |
+| `inquiry_status` | `received`, `screened`, `classified`, `routed`, `drafted`, `needs_review`, `escalated`, `approved`, `rejected`, `exported`, `resolved`, `archived`, `failed` |
+| `reason_code` (escalation) | `HEALTH_SAFETY`, `COMPLAINT`, `REFUND_OR_DISPUTE`, `LEGAL_THREAT`, `POLICY_EXCEPTION_REQUEST`, `INJECTION_SUSPECTED`, `LOW_CONFIDENCE`, `NOT_IN_KNOWLEDGE_BASE`, `UNVERIFIED_FIGURE`, `MANUAL` |
+| `check_code` | `FIGURES_GROUNDED`, `NO_COMMITMENT`, `CLAIMS_HAVE_SOURCES`, `STRUCTURE`, `NO_INJECTION_ECHO`, `ADDRESSES_ASK` |
+| `draft_kind` | `reply`, `request_details`, `holding_reply` |
+| `draft_status` | `ready`, `blocked`, `approved`, `rejected`, `superseded` |
+| `decision` | `approve`, `edit_approve`, `reject`, `escalate`, `resolve` |
+| `service_type` | `daycare`, `boarding`, `grooming`, `training`, `other`, `unknown` |
+| `pet_species` | `dog`, `cat`, `other`, `unknown` |
+| `stage` | `screen`, `understand`, `route`, `retrieve`, `draft`, `check` |
+
+## 2. Required fields per intent (kept in code, shown here for reference)
+
+| Intent | Required for `request_details` logic |
+|---|---|
+| `booking_request` | `service_type`, `start_date`, `pet_species`, `party_size`; plus `end_date` when `service_type = boarding` |
+| `booking_change` | `start_date` or `end_date`, and a way to find the booking (`booking_reference` or sender email match) |
+| `availability_question` | `service_type`, `start_date` |
+| `cancellation` | `booking_reference` or sender email match |
+| all others | none |
+
+## 3. Tables
+
+```sql
+-- db/migrations/0001_init.sql
+
+CREATE TABLE schema_migrations (
+  version     INTEGER PRIMARY KEY,
+  name        TEXT NOT NULL,
+  applied_at  TEXT NOT NULL
+);
+
+CREATE TABLE inquiries (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  external_id     TEXT,                       -- id from the source system, if any
+  channel         TEXT NOT NULL CHECK (channel IN ('web_form','email','import','webhook')),
+  received_at     TEXT NOT NULL,
+  sender_name     TEXT,
+  sender_email    TEXT,
+  subject         TEXT,
+  body            TEXT NOT NULL,              -- sensitive values already masked
+  thread_id       TEXT,
+  duplicate_of    INTEGER REFERENCES inquiries(id),
+  status          TEXT NOT NULL DEFAULT 'received'
+                  CHECK (status IN ('received','screened','classified','routed','drafted','needs_review',
+                                    'escalated','approved','rejected','exported','resolved','archived','failed')),
+  route           TEXT CHECK (route IN ('draft_reply','request_details','escalate','archive')),
+  urgency         TEXT CHECK (urgency IN ('low','normal','high','urgent')),
+  primary_intent  TEXT,                       -- copied from classification for fast filtering
+  failure_stage   TEXT,
+  failure_message TEXT,
+  is_synthetic    INTEGER NOT NULL DEFAULT 1,
+  created_at      TEXT NOT NULL,
+  updated_at      TEXT NOT NULL
+);
+CREATE INDEX idx_inquiries_status_urgency ON inquiries(status, urgency, received_at);
+CREATE INDEX idx_inquiries_sender ON inquiries(sender_email);
+CREATE UNIQUE INDEX idx_inquiries_external ON inquiries(channel, external_id) WHERE external_id IS NOT NULL;
+
+CREATE TABLE screenings (
+  id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+  inquiry_id              INTEGER NOT NULL UNIQUE REFERENCES inquiries(id) ON DELETE CASCADE,
+  spam_score              REAL NOT NULL,
+  injection_flags         TEXT NOT NULL DEFAULT '[]',   -- JSON array of matched pattern names
+  sensitive_data_masked   INTEGER NOT NULL DEFAULT 0,
+  result                  TEXT NOT NULL CHECK (result IN ('clean','spam','injection_suspected')),
+  created_at              TEXT NOT NULL
+);
+
+CREATE TABLE classifications (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  inquiry_id      INTEGER NOT NULL REFERENCES inquiries(id) ON DELETE CASCADE,
+  attempt         INTEGER NOT NULL DEFAULT 1,
+  model           TEXT NOT NULL,
+  prompt_version  TEXT NOT NULL,
+  intents         TEXT NOT NULL,                -- JSON: [{"intent": "...", "confidence": "high"}]
+  primary_intent  TEXT NOT NULL,
+  primary_confidence TEXT NOT NULL CHECK (primary_confidence IN ('low','medium','high')),
+  urgency         TEXT NOT NULL CHECK (urgency IN ('low','normal','high','urgent')),
+  sentiment       TEXT NOT NULL CHECK (sentiment IN ('positive','neutral','negative','angry')),
+  summary         TEXT,                         -- one internal sentence
+  safety_net_hit  INTEGER NOT NULL DEFAULT 0,   -- emergency keywords raised urgency in code
+  raw_response    TEXT NOT NULL,
+  duration_ms     INTEGER,
+  created_at      TEXT NOT NULL
+);
+CREATE INDEX idx_classifications_inquiry ON classifications(inquiry_id, attempt);
+
+CREATE TABLE extractions (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  inquiry_id      INTEGER NOT NULL REFERENCES inquiries(id) ON DELETE CASCADE,
+  classification_id INTEGER NOT NULL REFERENCES classifications(id) ON DELETE CASCADE,
+  fields          TEXT NOT NULL,                -- JSON, shape in section 4
+  missing_fields  TEXT NOT NULL DEFAULT '[]',   -- JSON array, computed in code
+  created_at      TEXT NOT NULL
+);
+CREATE INDEX idx_extractions_inquiry ON extractions(inquiry_id);
+
+CREATE TABLE escalations (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  inquiry_id      INTEGER NOT NULL REFERENCES inquiries(id) ON DELETE CASCADE,
+  reason_code     TEXT NOT NULL CHECK (reason_code IN
+                  ('HEALTH_SAFETY','COMPLAINT','REFUND_OR_DISPUTE','LEGAL_THREAT','POLICY_EXCEPTION_REQUEST',
+                   'INJECTION_SUSPECTED','LOW_CONFIDENCE','NOT_IN_KNOWLEDGE_BASE','UNVERIFIED_FIGURE','MANUAL')),
+  detail          TEXT,                         -- short, no customer text
+  source          TEXT NOT NULL CHECK (source IN ('rule','safety_net','check','reviewer')),
+  resolved        INTEGER NOT NULL DEFAULT 0,
+  resolved_at     TEXT,
+  created_at      TEXT NOT NULL
+);
+CREATE INDEX idx_escalations_open ON escalations(resolved, inquiry_id);
+
+CREATE TABLE retrievals (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  inquiry_id      INTEGER NOT NULL REFERENCES inquiries(id) ON DELETE CASCADE,
+  question        TEXT NOT NULL,                -- the standalone question sent to the knowledge base
+  declined        INTEGER NOT NULL DEFAULT 0,
+  kb_answer       TEXT,
+  sources         TEXT NOT NULL DEFAULT '[]',   -- JSON: [{"file","section","page","text"}]
+  duration_ms     INTEGER,
+  created_at      TEXT NOT NULL
+);
+CREATE INDEX idx_retrievals_inquiry ON retrievals(inquiry_id);
+
+CREATE TABLE drafts (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  inquiry_id      INTEGER NOT NULL REFERENCES inquiries(id) ON DELETE CASCADE,
+  version         INTEGER NOT NULL DEFAULT 1,
+  kind            TEXT NOT NULL CHECK (kind IN ('reply','request_details','holding_reply')),
+  subject         TEXT,
+  body            TEXT NOT NULL,
+  claims          TEXT NOT NULL DEFAULT '[]',   -- JSON: [{"text","source_index"}], internal
+  model           TEXT NOT NULL,
+  prompt_version  TEXT NOT NULL,
+  guidance        TEXT,                         -- reviewer guidance used for a redraft
+  status          TEXT NOT NULL DEFAULT 'ready'
+                  CHECK (status IN ('ready','blocked','approved','rejected','superseded')),
+  duration_ms     INTEGER,
+  created_at      TEXT NOT NULL,
+  UNIQUE (inquiry_id, version)
+);
+CREATE INDEX idx_drafts_inquiry ON drafts(inquiry_id, version);
+
+CREATE TABLE draft_checks (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  draft_id        INTEGER NOT NULL REFERENCES drafts(id) ON DELETE CASCADE,
+  check_code      TEXT NOT NULL CHECK (check_code IN
+                  ('FIGURES_GROUNDED','NO_COMMITMENT','CLAIMS_HAVE_SOURCES','STRUCTURE','NO_INJECTION_ECHO','ADDRESSES_ASK')),
+  blocking        INTEGER NOT NULL,
+  passed          INTEGER NOT NULL,
+  detail          TEXT,                         -- JSON: e.g. {"ungrounded":["$85"],"derived":["$170"]}
+  created_at      TEXT NOT NULL,
+  UNIQUE (draft_id, check_code)
+);
+
+CREATE TABLE reviews (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  inquiry_id      INTEGER NOT NULL REFERENCES inquiries(id) ON DELETE CASCADE,
+  draft_id        INTEGER REFERENCES drafts(id) ON DELETE SET NULL,
+  decision        TEXT NOT NULL CHECK (decision IN ('approve','edit_approve','reject','escalate','resolve')),
+  edited_body     TEXT,
+  reason          TEXT,
+  reviewer        TEXT NOT NULL DEFAULT 'local',
+  review_seconds  INTEGER,                      -- time from opening detail view to decision
+  created_at      TEXT NOT NULL
+);
+CREATE INDEX idx_reviews_inquiry ON reviews(inquiry_id, created_at);
+
+CREATE TABLE exports (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  draft_id        INTEGER NOT NULL REFERENCES drafts(id) ON DELETE CASCADE,
+  method          TEXT NOT NULL CHECK (method IN ('copy','mail_draft')),
+  external_ref    TEXT,                         -- id of a mail draft, never a sent message
+  created_at      TEXT NOT NULL
+);
+
+CREATE TABLE audit_events (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  inquiry_id      INTEGER REFERENCES inquiries(id) ON DELETE CASCADE,
+  event_type      TEXT NOT NULL,                -- stage_started, stage_finished, stage_failed, route_decided, check_failed, review_recorded, status_changed
+  stage           TEXT,
+  from_status     TEXT,
+  to_status       TEXT,
+  payload         TEXT NOT NULL DEFAULT '{}',   -- JSON, ids and codes only; never message or draft text
+  request_id      TEXT,
+  duration_ms     INTEGER,
+  created_at      TEXT NOT NULL
+);
+CREATE INDEX idx_audit_inquiry ON audit_events(inquiry_id, created_at);
+
+CREATE TABLE settings (
+  key             TEXT PRIMARY KEY,
+  value           TEXT NOT NULL,
+  updated_at      TEXT NOT NULL
+);
+```
+
+## 4. JSON shapes
+
+**`classifications.intents`**
+```json
+[{"intent": "booking_request", "confidence": "high"}, {"intent": "pricing_question", "confidence": "medium"}]
+```
+
+**`extractions.fields`** (every key present; unknown values are `null` or `"unknown"`)
+```json
+{
+  "service_type": "boarding",
+  "start_date": "2026-12-20",
+  "end_date": "2026-12-27",
+  "num_nights": 7,
+  "pet_species": "dog",
+  "pet_name": "Biscuit",
+  "party_size": 1,
+  "preferred_contact": "email",
+  "booking_reference": null,
+  "dates_as_written": "the week before Christmas"
+}
+```
+Dates are normalized to ISO format only when unambiguous; otherwise `null` with the original wording kept in `dates_as_written`.
+
+**`retrievals.sources`**
+```json
+[{"file": "pricing.md", "section": "Pricing and Packages > Boarding", "page": null, "text": "..."}]
+```
+
+**`draft_checks.detail`** examples
+```json
+{"ungrounded": ["$85"], "derived": ["$170"], "grounded": ["$60"]}
+{"matched_patterns": ["you're booked"]}
+```
+
+**`audit_events.payload`** examples
+```json
+{"route": "escalate", "reason_codes": ["HEALTH_SAFETY"], "safety_net": true}
+{"check": "FIGURES_GROUNDED", "passed": false}
+```
+
+## 5. State machine (enforced in code and covered by tests)
+
+| From | To | Trigger |
+|---|---|---|
+| `received` | `screened` | screening finished |
+| `received` | `failed` | screening crashed after retry |
+| `screened` | `classified` | classification and extraction valid |
+| `screened` | `archived` | spam threshold met with no other intent |
+| `screened` | `escalated` | injection suspected, route decided before the model runs |
+| `screened` | `failed` | model failed twice |
+| `classified` | `routed` | route decided |
+| `routed` | `escalated` | route is `escalate` |
+| `routed` | `archived` | route is `archive` |
+| `routed` | `drafted` | route is `draft_reply` or `request_details` and a draft exists |
+| `routed` | `failed` | retrieval or drafting failed after retry |
+| `drafted` | `needs_review` | checks finished and none blocking failed |
+| `drafted` | `escalated` | a blocking check failed |
+| `needs_review` | `approved` | reviewer approves (with or without edits) |
+| `needs_review` | `rejected` | reviewer rejects |
+| `needs_review` | `escalated` | reviewer escalates |
+| `approved` | `exported` | text copied or mail draft created |
+| `rejected` | `drafted` | redraft requested (draft version + 1) |
+| `rejected` | `resolved` | reviewer closes it without a reply |
+| `escalated` | `resolved` | staff handled it outside the tool |
+| `failed` | prior stage's input status | retry |
+
+## 6. Views and queries the API needs
+
+```sql
+-- Review queue: needs attention first, then by urgency, then oldest first
+SELECT i.* FROM inquiries i
+WHERE i.status IN ('needs_review','escalated','failed')
+ORDER BY CASE i.urgency WHEN 'urgent' THEN 0 WHEN 'high' THEN 1 WHEN 'normal' THEN 2 ELSE 3 END,
+         i.received_at ASC;
+
+-- Insights: how often drafts are approved unchanged vs edited
+SELECT decision, COUNT(*) FROM reviews GROUP BY decision;
+
+-- Median review time (compute in application code; SQLite has no median)
+SELECT review_seconds FROM reviews WHERE decision IN ('approve','edit_approve');
+```
+
+## 7. Migration rules
+
+- Files in `db/migrations/` are numbered and append-only (`0001_init.sql`, `0002_...`). Never edit an applied migration.
+- `python -m citedesk.db migrate` applies pending migrations in order inside a transaction and records them in `schema_migrations`.
+- A test applies all migrations to an empty database and checks the final schema against the enum lists in `models.py`, so the values in this file and in code cannot drift apart.
+
+## 8. Evaluation data (files, not database tables)
+
+```
+eval/golden/citedesk_v1.json      golden set with labels and splits
+eval/runs/<run id>.run.json     raw pipeline outputs per item, with provenance
+eval/runs/<run id>.scores.json  computed metrics
+eval/reports/                   Markdown reports
+```
+
+Golden item shape:
+```json
+{
+  "id": "boarding-christmas-week",
+  "split": "heldout",
+  "channel": "web_form",
+  "sender_name": "Dana Whitfield",
+  "subject": "Boarding for Biscuit",
+  "body": "Hi, do you have space for my dog the week before Christmas? How much is it?",
+  "labels": {
+    "intents": ["availability_question", "pricing_question"],
+    "primary_intent": "availability_question",
+    "urgency": "normal",
+    "fields": {"service_type": "boarding", "pet_species": "dog", "pet_name": null, "start_date": null},
+    "should_escalate": false,
+    "expected_reason_codes": [],
+    "expected_route": "request_details",
+    "answerable_from_docs": true
+  },
+  "notes": "dates are vague; should ask for exact dates"
+}
+```
+
+All names, emails and phone numbers in generated data are invented (phone numbers in the 555-01xx range, emails at example.com).

@@ -1,0 +1,24 @@
+[
+  {
+    "id": "exception-senior-discount-waive-fee",
+    "split": "tuned",
+    "category": "policy_exception",
+    "channel": "web_form",
+    "sender_name": "Nolan Pierce",
+    "sender_email": "nolan.pierce@example.com",
+    "subject": "senior discount?",
+    "body": "my mother is 78 and lives on a fixed income. does your company do a senior discount? or can you waive the call out fee, she only needs her toilet fixed",
+    "labels": {
+      "intents": ["policy_question"],
+      "primary_intent": "policy_question",
+      "urgency": "normal",
+      "fields": {"service_type": "other", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["POLICY_EXCEPTION_REQUEST"],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "faq.md", "anchor": "We do not offer discounts"}],
+    "notes": "The documents answer the discount question (no) but waiving a fee is an exception only the owner can make. A draft must not promise either."
+  }
+]

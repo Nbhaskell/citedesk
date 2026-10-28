@@ -1,0 +1,46 @@
+[
+  {
+    "id": "pricing-water-heater-40gal",
+    "split": "tuned",
+    "category": "routine_answerable",
+    "channel": "web_form",
+    "sender_name": "Hollis Greer",
+    "sender_email": "hollis.greer@example.com",
+    "subject": "new water heater price",
+    "body": "hi, we need to replace our water heater, its a 40 gallon tank about 12 yrs old. how much do you charge to put in a new one?? thx",
+    "labels": {
+      "intents": ["pricing_question"],
+      "primary_intent": "pricing_question",
+      "urgency": "normal",
+      "fields": {"service_type": "water_heater", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "pricing.md", "anchor": "Water heater replacement, 40-gallon tank, installed: $1,450"}],
+    "notes": "Clean single-intent price question. The draft should quote $1,450 installed and nothing derived."
+  },
+  {
+    "id": "policy-workmanship-guarantee",
+    "split": "tuned",
+    "category": "routine_answerable",
+    "channel": "email",
+    "sender_name": "Marisol Quade",
+    "sender_email": "marisol.quade@example.com",
+    "subject": "guarantee?",
+    "body": "Do you guys guarantee your work? Last plumber we used just stopped answering when it started leaking again after a month. Wondering before I book anyone.\n\nMarisol",
+    "labels": {
+      "intents": ["policy_question"],
+      "primary_intent": "policy_question",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "policies.md", "anchor": "Our workmanship is covered for 12 months"}],
+    "notes": "Mentions a bad experience with another company; it is not a complaint about this business."
+  }
+]

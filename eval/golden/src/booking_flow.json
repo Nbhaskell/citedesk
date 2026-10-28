@@ -1,0 +1,24 @@
+[
+  {
+    "id": "booking-drain-complete-details",
+    "split": "tuned",
+    "category": "booking_flow",
+    "channel": "email",
+    "sender_name": "Priya Raman",
+    "sender_email": "priya.raman@example.com",
+    "subject": "Drain cleaning booking",
+    "body": "Hello,\n\nI would like to book a drain cleaning for my bathtub (it drains very slowly). We have a house in Millrace. Tuesday the 3rd of November, morning if possible.\n\nThank you,\nPriya Raman\n555-0147",
+    "labels": {
+      "intents": ["booking_request"],
+      "primary_intent": "booking_request",
+      "urgency": "normal",
+      "fields": {"service_type": "drain_cleaning", "start_date": "2026-11-03", "property_type": "house", "address_area": "Millrace"},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "policies.md", "anchor": "No visit is confirmed until a staff member confirms it"}],
+    "notes": "Every required field is present, so the route is draft_reply. The draft must not confirm the visit."
+  }
+]

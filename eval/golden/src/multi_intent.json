@@ -1,0 +1,27 @@
+[
+  {
+    "id": "multi-sink-price-and-saturday-hours",
+    "split": "tuned",
+    "category": "multi_intent",
+    "channel": "email",
+    "sender_name": "Odalys Kerr",
+    "sender_email": "odalys.kerr@example.com",
+    "subject": "quick q",
+    "body": "how much is it to clear a clogged kitchen sink, and are you guys open saturdays? Thx",
+    "labels": {
+      "intents": ["pricing_question", "service_question"],
+      "primary_intent": "pricing_question",
+      "urgency": "low",
+      "fields": {"service_type": "drain_cleaning", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {"file": "pricing.md", "anchor": "Drain cleaning, one fixture (sink, tub, shower or toilet): $149 (starting price)"},
+      {"file": "hours.md", "anchor": "on Saturday from 8:00 am to noon"}
+    ],
+    "notes": "Two questions in one line. Hours and what the business does are labelled service_question; terms such as warranty or cancellation are policy_question. The draft must answer both and say the $149 is a starting price."
+  }
+]

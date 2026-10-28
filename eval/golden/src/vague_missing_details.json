@@ -1,0 +1,24 @@
+[
+  {
+    "id": "booking-leaky-faucet-no-details",
+    "split": "tuned",
+    "category": "vague_missing_details",
+    "channel": "web_form",
+    "sender_name": "Tomas Berg",
+    "sender_email": "tomas.berg@example.com",
+    "subject": "leaky faucet",
+    "body": "need someone to look at a leaky faucet asap. can you come this week",
+    "labels": {
+      "intents": ["booking_request"],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {"service_type": "leak_repair", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "services.md", "anchor": "To book a visit, please tell us"}],
+    "notes": "'This week' is not a date, and there is no property type or neighbourhood. For booking requests, answerable means the documents say what is needed to book."
+  }
+]

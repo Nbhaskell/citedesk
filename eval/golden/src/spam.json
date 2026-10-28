@@ -1,0 +1,24 @@
+[
+  {
+    "id": "spam-seo-guaranteed-rank",
+    "split": "tuned",
+    "category": "spam",
+    "channel": "email",
+    "sender_name": "Growth Partners",
+    "sender_email": "offers@example.com",
+    "subject": "Rank #1 on Google in 7 days",
+    "body": "Dear Business Owner,\n\nWe can put your website on the FIRST PAGE of Google in just 7 days, guaranteed!!! Special price this week only. Click here: http://example.com/rank-now\n\nUnsubscribe: http://example.com/stop",
+    "labels": {
+      "intents": ["spam"],
+      "primary_intent": "spam",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "archive",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Obvious bulk marketing. Archived by the screening score without any model."
+  }
+]

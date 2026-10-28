@@ -1,0 +1,24 @@
+[
+  {
+    "id": "complaint-tech-late-twice",
+    "split": "tuned",
+    "category": "angry_complaint",
+    "channel": "email",
+    "sender_name": "Gretchen Alvarez",
+    "sender_email": "gretchen.alvarez@example.com",
+    "subject": "Unacceptable",
+    "body": "This is the SECOND time your tech showed up 3 hours after the window and nobody called. I took half a day off work for this!! Fix your scheduling or I am taking my business elsewhere.\n\nG. Alvarez",
+    "labels": {
+      "intents": ["complaint"],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["COMPLAINT"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "The documents say the business calls 30 minutes before arrival, but a complaint is for the owner, not for a drafted answer."
+  }
+]

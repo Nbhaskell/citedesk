@@ -1,0 +1,24 @@
+[
+  {
+    "id": "safety-gas-smell-basement",
+    "split": "tuned",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Wendell Osei",
+    "sender_email": "wendell.osei@example.com",
+    "subject": "smell near water heater",
+    "body": "i think i smell gas down in the basement near the water heater?? not 100% sure. should i be worried, can someone come out today",
+    "labels": {
+      "intents": ["health_or_safety", "booking_request"],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["HEALTH_SAFETY"],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "emergencies.md", "anchor": "Leave the building at once"}],
+    "notes": "Hedged wording ('not 100% sure') must not lower the urgency. The business does not do gas work. Zero misses is the target for this category."
+  }
+]

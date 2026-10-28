@@ -1,0 +1,406 @@
+{
+  "$defs": {
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "title": "File",
+          "type": "string"
+        },
+        "anchor": {
+          "minLength": 1,
+          "title": "Anchor",
+          "type": "string"
+        }
+      },
+      "required": [
+        "file",
+        "anchor"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "Fields": {
+      "additionalProperties": false,
+      "description": "Every core key is present; null means the customer did not say.",
+      "properties": {
+        "service_type": {
+          "anyOf": [
+            {
+              "enum": [
+                "emergency_repair",
+                "drain_cleaning",
+                "leak_repair",
+                "sewer_line_repair",
+                "water_heater",
+                "fixture_installation",
+                "inspection",
+                "other",
+                "unknown"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Service Type"
+        },
+        "start_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Start Date"
+        },
+        "property_type": {
+          "anyOf": [
+            {
+              "enum": [
+                "house",
+                "apartment",
+                "commercial",
+                "other",
+                "unknown"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Property Type"
+        },
+        "address_area": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Address Area"
+        },
+        "booking_reference": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Booking Reference"
+        }
+      },
+      "required": [
+        "service_type",
+        "start_date",
+        "property_type",
+        "address_area"
+      ],
+      "title": "Fields",
+      "type": "object"
+    },
+    "Header": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        },
+        "reference_date": {
+          "title": "Reference Date",
+          "type": "string"
+        },
+        "written_by": {
+          "title": "Written By",
+          "type": "string"
+        },
+        "docs_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Docs Sha256",
+          "type": "string"
+        },
+        "counts": {
+          "additionalProperties": true,
+          "title": "Counts",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "reference_date",
+        "written_by",
+        "docs_sha256",
+        "counts"
+      ],
+      "title": "Header",
+      "type": "object"
+    },
+    "Item": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "split": {
+          "enum": [
+            "tuned",
+            "heldout"
+          ],
+          "title": "Split",
+          "type": "string"
+        },
+        "category": {
+          "enum": [
+            "routine_answerable",
+            "multi_intent",
+            "vague_missing_details",
+            "booking_flow",
+            "urgent",
+            "safety",
+            "angry_complaint",
+            "dispute_legal",
+            "policy_exception",
+            "billing",
+            "partnership_sales",
+            "spam",
+            "out_of_scope",
+            "follow_up",
+            "injection",
+            "unanswerable",
+            "near_miss",
+            "edge"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "channel": {
+          "enum": [
+            "web_form",
+            "email",
+            "import",
+            "webhook"
+          ],
+          "title": "Channel",
+          "type": "string"
+        },
+        "sender_name": {
+          "minLength": 1,
+          "title": "Sender Name",
+          "type": "string"
+        },
+        "sender_email": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sender Email"
+        },
+        "subject": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subject"
+        },
+        "body": {
+          "minLength": 1,
+          "title": "Body",
+          "type": "string"
+        },
+        "labels": {
+          "$ref": "#/$defs/Labels"
+        },
+        "evidence": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        }
+      },
+      "required": [
+        "id",
+        "split",
+        "category",
+        "channel",
+        "sender_name",
+        "body",
+        "labels"
+      ],
+      "title": "Item",
+      "type": "object"
+    },
+    "Labels": {
+      "additionalProperties": false,
+      "properties": {
+        "intents": {
+          "items": {
+            "enum": [
+              "pricing_question",
+              "availability_question",
+              "booking_request",
+              "booking_change",
+              "cancellation",
+              "policy_question",
+              "service_question",
+              "complaint",
+              "health_or_safety",
+              "billing_question",
+              "partnership_or_sales",
+              "spam",
+              "other"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Intents",
+          "type": "array"
+        },
+        "primary_intent": {
+          "enum": [
+            "pricing_question",
+            "availability_question",
+            "booking_request",
+            "booking_change",
+            "cancellation",
+            "policy_question",
+            "service_question",
+            "complaint",
+            "health_or_safety",
+            "billing_question",
+            "partnership_or_sales",
+            "spam",
+            "other"
+          ],
+          "title": "Primary Intent",
+          "type": "string"
+        },
+        "urgency": {
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "urgent"
+          ],
+          "title": "Urgency",
+          "type": "string"
+        },
+        "fields": {
+          "$ref": "#/$defs/Fields"
+        },
+        "should_escalate": {
+          "title": "Should Escalate",
+          "type": "boolean"
+        },
+        "expected_reason_codes": {
+          "items": {
+            "enum": [
+              "HEALTH_SAFETY",
+              "COMPLAINT",
+              "REFUND_OR_DISPUTE",
+              "LEGAL_THREAT",
+              "POLICY_EXCEPTION_REQUEST",
+              "INJECTION_SUSPECTED",
+              "LOW_CONFIDENCE",
+              "NOT_IN_KNOWLEDGE_BASE",
+              "UNVERIFIED_FIGURE",
+              "MANUAL"
+            ],
+            "type": "string"
+          },
+          "title": "Expected Reason Codes",
+          "type": "array"
+        },
+        "expected_route": {
+          "enum": [
+            "draft_reply",
+            "request_details",
+            "escalate",
+            "archive"
+          ],
+          "title": "Expected Route",
+          "type": "string"
+        },
+        "answerable_from_docs": {
+          "title": "Answerable From Docs",
+          "type": "boolean"
+        },
+        "contains_sensitive_data": {
+          "default": false,
+          "title": "Contains Sensitive Data",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "intents",
+        "primary_intent",
+        "urgency",
+        "fields",
+        "should_escalate",
+        "expected_reason_codes",
+        "expected_route",
+        "answerable_from_docs"
+      ],
+      "title": "Labels",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "header": {
+      "$ref": "#/$defs/Header"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/Item"
+      },
+      "title": "Items",
+      "type": "array"
+    }
+  },
+  "required": [
+    "header",
+    "items"
+  ],
+  "title": "GoldenFile",
+  "type": "object"
+}

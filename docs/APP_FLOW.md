@@ -102,7 +102,7 @@ Run all checks and store each result. If any blocking check fails, the inquiry b
 
 ### 4.8 Escalated items
 
-Escalated items appear in their own filter with the reason shown in plain words ("Mentions an injured pet"). Staff handle them outside the tool and press "Mark resolved" with an optional note. A drafted reply may exist but is labelled "for reference".
+Escalated items appear in their own filter with the reason shown in plain words ("Mentions a gas smell, flooding or another safety risk"). Staff handle them outside the tool and press "Mark resolved" with an optional note. A drafted reply may exist but is labelled "for reference".
 
 ### 4.9 Failure and retry
 

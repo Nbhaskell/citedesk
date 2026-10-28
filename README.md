@@ -2,7 +2,7 @@
 
 > **Work in progress.** This project is under construction and is not ready to use.
 
-> **Demo data. All customers and messages are invented.** Every name, email address, phone number and inquiry in this repository is synthetic, from an invented pet daycare. There is no real customer data here.
+> **Demo data. All customers and messages are invented.** Every name, email address, phone number and inquiry in this repository is synthetic, from an invented plumbing company. There is no real customer data here.
 
 Citedesk is an AI review desk for customer inquiries at a small service business. It reads an incoming message, works out what the customer wants, drafts a reply from the business's own documents, checks the draft in code, and queues it for a person to approve.
 

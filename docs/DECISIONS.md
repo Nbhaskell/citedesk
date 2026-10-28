@@ -33,7 +33,7 @@ Ruff lint rules: `E, F, I, B, UP, SIM, S` (the `S` security rules are on; tests 
 No lock tool is installed, so `requirements.lock` is the `pip freeze` of a clean runtime-only environment and `requirements-dev.lock` is the freeze of the development environment (runtime plus dev tools). They have no hashes. Regenerate both when `pyproject.toml` dependencies change. The dev lock was made on Windows and includes `colorama`, which is harmless on Linux.
 
 ### D-008. CI is tests and lint only
-`.github/workflows/ci.yml` runs `ruff check`, `ruff format --check`, `mypy` and `pytest` on Ubuntu with Python 3.13, installing from `requirements-dev.lock`. It does not run the model, the knowledge base or any evaluation. The secret scan runs in pre-commit, as the plan says. **Not yet run on GitHub:** there is no remote yet, so "CI is green" is unverified until the repo is pushed.
+`.github/workflows/ci.yml` runs `ruff check`, `ruff format --check`, `mypy` and `pytest` on Ubuntu with Python 3.13, installing from `requirements-dev.lock`. It does not run the model, the knowledge base or any evaluation. The secret scan runs in pre-commit, as the plan says. First run on GitHub (2026-10-28, commit `5ad8063`) passed in 35 seconds.
 
 ### D-009. Secret scan: gitleaks through pre-commit
 `.pre-commit-config.yaml` runs the `gitleaks` hook (pinned to `v8.30.1`) on staged files, using the default gitleaks ruleset in `.gitleaks.toml` with no allowlist. It was checked against a deliberately fake token and blocked it. Enable it on a fresh clone with `pre-commit install`.
@@ -55,3 +55,20 @@ No Phase 0 task covers the web app, and the UI is built in Phase 6. `web/` exist
 
 ### D-015. Package metadata and install
 `pip install -e . --no-deps` after `pip install -r requirements-dev.lock` makes the package importable while keeping the locked versions authoritative.
+
+## Phase 1
+
+### D-016. The demo business is an invented plumbing company, not a pet daycare
+`docs/IMPLEMENTATION_PLAN.md` Phase 1 allows reusing the business from `rag-project/demo_docs` or generating a new one with `synthetic-business-universe`. A new one was generated. The original planning documents assumed a pet daycare, so these were changed to match (the schema still wins on names and values):
+
+- `BACKEND_SCHEMA.md`: `service_type` is now `emergency_repair`, `drain_cleaning`, `water_heater`, `fixture_installation`, `inspection`, `other`, `unknown`. `pet_species` is replaced by `property_type` (`house`, `apartment`, `commercial`, `other`, `unknown`). The required-fields table, the `extractions.fields` example and the golden item example were rewritten. `pet_name`, `party_size`, `end_date` and `num_nights` no longer exist as extraction fields. No database column or `CHECK` constraint used these enums, so no migration changes.
+- `PRD.md` (FR-7 and two phrases), `UI_UX_DESIGN_BRIEF.md` (mock-ups, the `HEALTH_SAFETY` wording, the sample draft) and `APP_FLOW.md` (one phrase) were updated.
+- `address_area` is a new extraction field, required for `booking_request`, because a plumber needs to know whether the job is inside the service area.
+
+Why plumbing: it has clearly bounded safety cases (gas smell, flooding, sewage, carbon monoxide), natural escalations for complaints, disputes and warranty exceptions, and priced jobs that exercise the figure check. The cost is that more inquiries cannot be answered from documents (price depends on diagnosis, availability is live), so fewer end in a fully drafted reply.
+
+### D-017. Only documents and inquiries are generated from the universe
+The `synthetic-business-universe` skill also describes invoices, bookings and reviews. Citedesk needs none of them, so only `universe/facts.json`, the knowledge-base documents and the labelled inquiries are generated.
+
+### D-018. Safety advice is a closed list in the fact sheet
+`universe/facts.json` has a `safety_instructions` block (shut off the main water valve; gas smell; sewage backup; carbon monoxide alarm). It is the only advice a reply may contain. Anything else about fixing a problem goes to a person. How these replies are produced (a fixed template or a checked draft) is to be decided in Phase 4 or 5 when routing and drafting are built.

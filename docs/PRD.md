@@ -13,7 +13,7 @@ It is the second building block of a small-business AI suite. It reuses the auth
 
 ## 2. Problem
 
-Small businesses answer the same questions all day (prices, hours, availability, policies) across email and web forms. Replies are slow outside business hours, urgent messages get buried among routine ones, and the details needed to book (dates, pet or product, number of people) are often missing and have to be asked for in a second round of messages.
+Small businesses answer the same questions all day (prices, hours, availability, policies) across email and web forms. Replies are slow outside business hours, urgent messages get buried among routine ones, and the details needed to book (dates, the type of job or product, the address or area) are often missing and have to be asked for in a second round of messages.
 
 An unattended chatbot that answers customers directly is risky for a business with no engineering team: a wrong price, a promised refund, or a missed emergency costs real money and trust. The product therefore puts a human in charge and makes the review fast.
 
@@ -68,7 +68,7 @@ Targets are starting hypotheses. Replace them with the measured baseline after t
 ## 8. User stories
 
 1. As staff, I open a queue sorted by urgency, so the important messages come first.
-2. As staff, I see what the system understood (intents, dates, pet, service) next to the original message, so I can spot misreadings.
+2. As staff, I see what the system understood (intents, dates, property, service) next to the original message, so I can spot misreadings.
 3. As staff, I see a draft with its sources and which checks passed, so I can verify it quickly.
 4. As staff, I edit the draft and approve it, or reject it with a reason, so the record shows what happened.
 5. As an owner, I see urgent and sensitive messages flagged with the reason, so nothing serious waits in the queue.
@@ -90,7 +90,7 @@ Priority: M = must for v1, S = should, C = could.
 
 **Understanding**
 - FR-6 (M) Classify into one or more intents from the fixed list in the Backend Schema, with a primary intent, urgency and sentiment, via structured model output validated against a schema.
-- FR-7 (M) Extract fields (service type, dates, pet species, pet name, party size, preferred contact) and compute `missing_fields` in code from required fields per intent.
+- FR-7 (M) Extract fields (service type, preferred date, property type, address area, preferred contact) and compute `missing_fields` in code from required fields per intent.
 - FR-8 (M) Record the model, prompt version and raw response for every classification.
 
 **Routing**

@@ -22,16 +22,16 @@ Conventions: ids are integers; timestamps are ISO 8601 UTC strings; JSON columns
 | `draft_kind` | `reply`, `request_details`, `holding_reply` |
 | `draft_status` | `ready`, `blocked`, `approved`, `rejected`, `superseded` |
 | `decision` | `approve`, `edit_approve`, `reject`, `escalate`, `resolve` |
-| `service_type` | `daycare`, `boarding`, `grooming`, `training`, `other`, `unknown` |
-| `pet_species` | `dog`, `cat`, `other`, `unknown` |
+| `service_type` | `emergency_repair`, `drain_cleaning`, `water_heater`, `fixture_installation`, `inspection`, `other`, `unknown` |
+| `property_type` | `house`, `apartment`, `commercial`, `other`, `unknown` |
 | `stage` | `screen`, `understand`, `route`, `retrieve`, `draft`, `check` |
 
 ## 2. Required fields per intent (kept in code, shown here for reference)
 
 | Intent | Required for `request_details` logic |
 |---|---|
-| `booking_request` | `service_type`, `start_date`, `pet_species`, `party_size`; plus `end_date` when `service_type = boarding` |
-| `booking_change` | `start_date` or `end_date`, and a way to find the booking (`booking_reference` or sender email match) |
+| `booking_request` | `service_type`, `start_date` (the preferred visit date), `property_type`, `address_area` |
+| `booking_change` | `start_date` (the new date), and a way to find the booking (`booking_reference` or sender email match) |
 | `availability_question` | `service_type`, `start_date` |
 | `cancellation` | `booking_reference` or sender email match |
 | all others | none |
@@ -222,23 +222,20 @@ CREATE TABLE settings (
 **`extractions.fields`** (every key present; unknown values are `null` or `"unknown"`)
 ```json
 {
-  "service_type": "boarding",
-  "start_date": "2026-12-20",
-  "end_date": "2026-12-27",
-  "num_nights": 7,
-  "pet_species": "dog",
-  "pet_name": "Biscuit",
-  "party_size": 1,
+  "service_type": "drain_cleaning",
+  "start_date": "2026-12-14",
+  "property_type": "house",
+  "address_area": "Alderbrook Heights",
   "preferred_contact": "email",
   "booking_reference": null,
-  "dates_as_written": "the week before Christmas"
+  "dates_as_written": "Monday the 14th, mornings are best"
 }
 ```
 Dates are normalized to ISO format only when unambiguous; otherwise `null` with the original wording kept in `dates_as_written`.
 
 **`retrievals.sources`**
 ```json
-[{"file": "pricing.md", "section": "Pricing and Packages > Boarding", "page": null, "text": "..."}]
+[{"file": "pricing.md", "section": "Pricing > Drain cleaning", "page": null, "text": "..."}]
 ```
 
 **`draft_checks.detail`** examples
@@ -313,23 +310,23 @@ eval/reports/                   Markdown reports
 Golden item shape:
 ```json
 {
-  "id": "boarding-christmas-week",
+  "id": "drain-slow-sink-this-week",
   "split": "heldout",
   "channel": "web_form",
   "sender_name": "Dana Whitfield",
-  "subject": "Boarding for Biscuit",
-  "body": "Hi, do you have space for my dog the week before Christmas? How much is it?",
+  "subject": "Kitchen sink draining slowly",
+  "body": "Hi, my kitchen sink has been draining really slowly and gurgles. Can someone come out this week? How much would that be?",
   "labels": {
     "intents": ["availability_question", "pricing_question"],
     "primary_intent": "availability_question",
     "urgency": "normal",
-    "fields": {"service_type": "boarding", "pet_species": "dog", "pet_name": null, "start_date": null},
+    "fields": {"service_type": "drain_cleaning", "property_type": null, "address_area": null, "start_date": null},
     "should_escalate": false,
     "expected_reason_codes": [],
     "expected_route": "request_details",
     "answerable_from_docs": true
   },
-  "notes": "dates are vague; should ask for exact dates"
+  "notes": "'this week' is vague; should ask for a preferred date and the neighbourhood"
 }
 ```
 

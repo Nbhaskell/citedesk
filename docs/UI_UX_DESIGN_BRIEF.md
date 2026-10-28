@@ -4,7 +4,7 @@ Version 0.1. For use with the `frontend-design` and `ai-ui-patterns` skills if t
 
 ## 1. Subject, audience and primary job
 
-**Subject:** a review desk for customer inquiries at a small pet daycare and boarding business (the fictional demo business). A person checks drafts the system wrote and decides what goes out.
+**Subject:** a review desk for customer inquiries at a small plumbing company (the fictional demo business). A person checks drafts the system wrote and decides what goes out.
 
 **Audience:** front-desk staff and the owner. Non-technical, busy, interrupted often, handling dozens of messages a day on a laptop, sometimes on a phone.
 
@@ -30,7 +30,7 @@ Choose the palette, type and layout in the design pass instead of using a defaul
 - Use one place for boldness (for example how urgency is expressed in the queue) and keep the rest disciplined.
 - Light theme is required; dark theme is optional. Body text at least 16px, line length under 80 characters in the draft editor.
 - Status and urgency use color plus a word or icon; never color alone.
-- Do not use pet clip-art clichés (paw prints everywhere). One restrained nod to the business is enough.
+- Do not use trade clip-art clichés (wrenches and water drops everywhere). One restrained nod to the business is enough.
 - Mark synthetic data in a persistent, unobtrusive footer: "Demo data. All customers and messages are invented."
 
 ## 4. Screens
@@ -43,10 +43,10 @@ Purpose: choose what to work on next.
 +--------------------------------------------------------------------------+
 | Citedesk                               [Needs review 12] [Escalated 3] [All] |
 +--------------------------------------------------------------------------+
-| URGENT  Escalated   "My dog ate chocolate..."        Dana W.    4 min ago   |
-| HIGH    Needs review  Complaint about pickup time     Marcus L.  1 h ago     |
-| NORMAL  Needs review  Boarding Dec 20-27, price?      Priya S.   2 h ago     |
-| NORMAL  Needs details Daycare for a puppy             Sam O.     3 h ago     |
+| URGENT  Escalated   "Smell of gas in basement..."    Dana W.    4 min ago   |
+| HIGH    Needs review  Complaint about late arrival    Marcus L.  1 h ago     |
+| NORMAL  Needs review  Kitchen drain, how much?        Priya S.   2 h ago     |
+| NORMAL  Needs details Faucet install, no date         Sam O.     3 h ago     |
 | ...                                                                          |
 +--------------------------------------------------------------------------+
 | Demo data. All customers and messages are invented.                         |
@@ -66,14 +66,14 @@ Purpose: verify and decide.
 | ORIGINAL MESSAGE       | UNDERSTOOD AS                  | DRAFT REPLY       |
 | From Priya S., web form| Wants: availability + price    | Subject: ...      |
 | 2 h ago                | Urgency: normal  Tone: neutral | Hi Priya, ...     |
-| "Hi, do you have space | Service: boarding              | (editable)        |
-| for my dog the week    | Pet: dog (name not given)      |                   |
-| before Christmas? ..." | Dates: "week before Christmas" | CHECKS            |
-|                        | Missing: exact start/end dates | Figures match: yes|
+| "Hi, can someone look  | Service: drain cleaning        | (editable)        |
+| at my slow kitchen     | Property: house                |                   |
+| sink this week? ..."   | Dates: "this week"             | CHECKS            |
+|                        | Missing: preferred date, area  | Figures match: yes|
 | Thread (1 earlier)     |                                | No promises: yes  |
 |                        | SOURCES (2)                    |                   |
-|                        | [1] pricing.md > Boarding  v   | [Approve] [Edit]  |
-|                        | [2] hours.md > Holidays    v   | [Reject] [Escalate]|
+|                        | [1] pricing.md > Drains    v   | [Approve] [Edit]  |
+|                        | [2] hours.md > Service area v  | [Reject] [Escalate]|
 +------------------------+--------------------------------+-------------------+
 ```
 
@@ -132,7 +132,7 @@ Write for the staff member, not the system.
 | `UNVERIFIED_FIGURE` | A price or date in the draft isn't in your documents |
 | `POLICY_EXCEPTION_REQUEST` | The draft makes a promise only you can make |
 | `INJECTION_SUSPECTED` | This message tries to give instructions to the system |
-| `HEALTH_SAFETY` | Mentions an injured or sick pet |
+| `HEALTH_SAFETY` | Mentions a gas smell, flooding or another safety risk |
 | `request_details` | Asking for missing details |
 | Submit | Approve reply |
 
@@ -140,7 +140,7 @@ Voice: plain verbs, sentence case, no apologies in error messages, say what happ
 
 Sample draft the interface should be able to display well (the price and wording are illustrative only; real drafts use values from the fact sheet and retrieved sources):
 
-> Hi Priya, thanks for getting in touch. We do offer boarding, and the rate is $60 per night for one dog. To check space for the week before Christmas, could you tell us the exact dates you'd like to drop off and pick up Biscuit? Once we have those, a member of our team will confirm availability.
+> Hi Priya, thanks for getting in touch. We do clear slow kitchen drains, and the price starts at $149. To find a time this week, could you tell us which day suits you and which neighbourhood the house is in? Once we have those, a member of our team will confirm a visit time.
 >
 > Warm regards,
 > The team

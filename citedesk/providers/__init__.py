@@ -5,6 +5,7 @@ from citedesk.providers.base import (
     LLMError,
     LLMProvider,
     LLMResult,
+    LLMStepFailed,
     LLMTimeout,
     LLMUnavailable,
 )
@@ -17,6 +18,7 @@ __all__ = [
     "LLMError",
     "LLMProvider",
     "LLMResult",
+    "LLMStepFailed",
     "LLMTimeout",
     "LLMUnavailable",
 ]

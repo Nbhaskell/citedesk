@@ -28,6 +28,7 @@ from citedesk.models import (
 from citedesk.providers import FakeLLM, LLMTimeout
 from citedesk.screening import screen
 from citedesk.state import transition
+from citedesk.understand import UnderstandFailed
 from tests.helpers import model_reply, perfect_reply
 
 S = InquiryStatus
@@ -220,7 +221,7 @@ def test_a_model_that_fails_leaves_nothing_behind(
 ) -> None:
     inquiry_id = screened(conn, settings)
     llm = FakeLLM(["nope", "nope"])
-    with pytest.raises(pipeline.UnderstandFailed):
+    with pytest.raises(UnderstandFailed):
         pipeline.understand_stage(conn, inquiry_id, settings, llm, now=NOW)
     assert status_of(conn, inquiry_id) is S.screened
     assert repo.latest_classification(conn, inquiry_id) is None

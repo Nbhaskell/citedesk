@@ -42,11 +42,10 @@ from citedesk.models import (
     Stage,
     Urgency,
 )
-from citedesk.providers import LLMProvider
+from citedesk.providers import LLMProvider, LLMStepFailed
 from citedesk.safety import emergency_hits
 from citedesk.screening import screen
 from citedesk.state import transition
-from citedesk.understand import UnderstandFailed
 
 logger = logging.getLogger("citedesk.pipeline")
 
@@ -426,7 +425,7 @@ def _run_stage(
     for _attempt in (1, 2):
         try:
             return call()
-        except UnderstandFailed as error:
+        except LLMStepFailed as error:
             return _fail(
                 conn,
                 inquiry_id,

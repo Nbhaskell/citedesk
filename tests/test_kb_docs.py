@@ -65,6 +65,20 @@ def test_pricing_headings_match_the_schema_example(docs: dict[str, str]) -> None
     assert re.search(r"^## Drain cleaning$", docs["pricing.md"], flags=re.MULTILINE)
 
 
+def test_each_not_offered_item_has_its_own_short_section(
+    facts: dict[str, Any], docs: dict[str, str]
+) -> None:
+    # One topic per section keeps each exclusion retrievable on its own. A single bare list of
+    # nine unrelated items was never retrieved for any of the nine matching questions.
+    policies = docs["policies.md"]
+    for item in facts["policies"]["not_offered"]:
+        match = re.search(rf"^## {re.escape(item)}\n\n([^\n]+)", policies, re.MULTILINE)
+        assert match, f"no section for {item!r}"
+        body = match.group(1)
+        assert re.search(r"\bnot\b", body), f"section for {item!r} is not a clear refusal: {body!r}"
+        assert not body.startswith("-"), f"section for {item!r} is a bare list item"
+
+
 def test_committed_docs_are_what_the_generator_produces(docs: dict[str, str]) -> None:
     on_disk = {p.name: p.read_text("utf-8") for p in (REPO_ROOT / "universe/docs").glob("*.md")}
     assert on_disk == docs, "run: python -m tools.generate_kb_docs"
@@ -146,7 +160,8 @@ def test_catches_an_invented_number_of_hours(facts: dict[str, Any], docs: dict[s
 
 
 def test_catches_a_dropped_not_offered_item(facts: dict[str, Any], docs: dict[str, str]) -> None:
-    bad = {**docs, "policies.md": docs["policies.md"].replace("Roof leaks", "")}
+    without_item = re.sub("roof leaks", "", docs["policies.md"], flags=re.IGNORECASE)
+    bad = {**docs, "policies.md": without_item}
     assert any("Roof leaks" in p for p in check(facts, bad))
 
 

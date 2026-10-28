@@ -34,12 +34,40 @@ No visit is confirmed until a staff member confirms it. A reply is never an auto
 
 ## Work we do not do
 
-- Gas line or gas appliance work
-- Electrical work
-- Heating and air conditioning
-- Commercial or industrial buildings
-- Septic tank pumping
-- Well pumps
-- Irrigation and sprinkler systems
-- Mould remediation
-- Roof leaks
+We do not do work in these areas: gas line or gas appliance work, electrical work, heating and air conditioning, commercial or industrial buildings, septic tank pumping, well pumps, irrigation and sprinkler systems, mould remediation and roof leaks.
+
+## Gas line or gas appliance work
+
+We do not do gas line or gas appliance work.
+
+## Electrical work
+
+We do not do electrical work.
+
+## Heating and air conditioning
+
+We do not do heating or air conditioning work.
+
+## Commercial or industrial buildings
+
+We do not work on commercial or industrial buildings.
+
+## Septic tank pumping
+
+We do not pump out septic tanks.
+
+## Well pumps
+
+We do not work on well pumps.
+
+## Irrigation and sprinkler systems
+
+We do not work on irrigation or sprinkler systems.
+
+## Mould remediation
+
+We do not do mould remediation.
+
+## Roof leaks
+
+We do not repair roof leaks.

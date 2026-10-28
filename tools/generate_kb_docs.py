@@ -49,6 +49,18 @@ SERVICE_DESCRIPTIONS = {
     "General plumbing repair": "Other plumbing repairs that are not listed above.",
 }
 
+NOT_OFFERED_SENTENCES = {
+    "Gas line or gas appliance work": "We do not do gas line or gas appliance work.",
+    "Electrical work": "We do not do electrical work.",
+    "Heating and air conditioning": "We do not do heating or air conditioning work.",
+    "Commercial or industrial buildings": "We do not work on commercial or industrial buildings.",
+    "Septic tank pumping": "We do not pump out septic tanks.",
+    "Well pumps": "We do not work on well pumps.",
+    "Irrigation and sprinkler systems": "We do not work on irrigation or sprinkler systems.",
+    "Mould remediation": "We do not do mould remediation.",
+    "Roof leaks": "We do not repair roof leaks.",
+}
+
 JOB_GROUPS = [
     ("drain_cleaning", "Drain cleaning"),
     ("leak_repair", "Leak detection"),
@@ -354,7 +366,12 @@ def policies(f: dict[str, Any]) -> str:
             ("Water damage", sentence(p["water_damage"])),
             ("Access to your home", sentence(p["access"])),
             ("Confirmation of visits", sentence(p["communication"])),
-            ("Work we do not do", bullets(p["not_offered"])),
+            (
+                "Work we do not do",
+                "We do not do work in these areas: "
+                f"{join_and([lower_first(i) for i in p['not_offered']])}.",
+            ),
+            *[(item, NOT_OFFERED_SENTENCES[item]) for item in p["not_offered"]],
         ],
     )
 

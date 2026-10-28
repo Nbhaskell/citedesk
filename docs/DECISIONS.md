@@ -115,3 +115,8 @@ Rules built into the tool and covered by tests: labels, notes, categories and ev
 
 ### D-018. Safety advice is a closed list in the fact sheet
 `universe/facts.json` has a `safety_instructions` block (shut off the main water valve; gas smell; sewage backup; carbon monoxide alarm). It is the only advice a reply may contain. Anything else about fixing a problem goes to a person. How these replies are produced (a fixed template or a checked draft) is to be decided in Phase 4 or 5 when routing and drafting are built.
+
+## Process
+
+### D-025. One branch and one pull request per phase, from Phase 2
+Phases 0 and 1 were committed directly to `main` and stay there. From Phase 2, each phase is built on its own branch (`phase-2-data-layer`, `phase-3-intake-screening`, and so on) with the usual small commits, one per task. At the phase's acceptance check the branch is pushed and a pull request is opened. Its description lists what was built, what passed, and anything unverified or assumed. CI must be green, and the owner merges. Why: CI then runs before code reaches `main`, and each phase becomes one page to review, with its acceptance check written down. Nothing is pushed and no pull request is opened until the owner asks. The branch only exists to hold the work; `main` is unchanged until the merge.

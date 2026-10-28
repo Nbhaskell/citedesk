@@ -52,7 +52,11 @@ class IntakeFailure(IntakeError):
 
 
 class ImportFormatError(Exception):
-    """A bulk file is unusable as a whole."""
+    """A bulk file is unusable as a whole. `code` is a fixed word, safe to show a caller."""
+
+    def __init__(self, message: str, code: str = "invalid_file") -> None:
+        super().__init__(message)
+        self.code = code
 
 
 def _clean(value: Any) -> Any:
@@ -258,7 +262,9 @@ def parse_jsonl(text: str) -> list[ParsedRecord]:
         if not line.strip():
             continue
         if len(parsed) >= MAX_IMPORT_RECORDS:
-            raise ImportFormatError(f"too many records (limit {MAX_IMPORT_RECORDS})")
+            raise ImportFormatError(
+                f"too many records (limit {MAX_IMPORT_RECORDS})", "too_many_records"
+            )
         try:
             record = json.loads(line)
         except json.JSONDecodeError:
@@ -275,16 +281,18 @@ def parse_csv(text: str) -> list[ParsedRecord]:
     reader = csv.DictReader(io.StringIO(text))
     columns = set(reader.fieldnames or [])
     if not columns:
-        raise ImportFormatError("the file has no header row")
+        raise ImportFormatError("the file has no header row", "no_header")
     unknown = sorted(columns - set(NewInquiry.model_fields))
     if unknown:
-        raise ImportFormatError(f"unknown column(s): {', '.join(unknown)}")
+        raise ImportFormatError(f"unknown column(s): {', '.join(unknown)}", "unknown_columns")
     if "body" not in columns:
-        raise ImportFormatError("missing required column: body")
+        raise ImportFormatError("missing required column: body", "missing_body_column")
     parsed: list[ParsedRecord] = []
     for row in reader:
         if len(parsed) >= MAX_IMPORT_RECORDS:
-            raise ImportFormatError(f"too many records (limit {MAX_IMPORT_RECORDS})")
+            raise ImportFormatError(
+                f"too many records (limit {MAX_IMPORT_RECORDS})", "too_many_records"
+            )
         if None in row:
             parsed.append(ParsedRecord(reader.line_num, None, "invalid_row"))
             continue

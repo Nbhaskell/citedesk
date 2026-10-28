@@ -213,6 +213,114 @@ def test_a_duplicate_does_not_make_a_sender_known(conn: sqlite3.Connection) -> N
     assert repo.has_clean_history(conn, "dup@example.com", exclude_id=probe) is False
 
 
+# --- searching and paging ---------------------------------------------------------------------
+
+
+def prioritised(conn: sqlite3.Connection) -> dict[str, int]:
+    """Inquiries covering every urgency, in a known priority order."""
+    spec = [
+        ("u_old", "urgent", "2026-10-28T08:00:00Z"),
+        ("u_new", "urgent", "2026-10-28T09:00:00Z"),
+        ("h", "high", "2026-10-28T07:00:00Z"),
+        ("n", "normal", "2026-10-28T06:00:00Z"),
+        ("l", "low", "2026-10-28T05:00:00Z"),
+        ("none", None, "2026-10-28T04:00:00Z"),
+    ]
+    ids: dict[str, int] = {}
+    for name, urgency, received in spec:
+        ids[name] = new_inquiry(conn, received_at=received, body=f"message {name}")
+        if urgency:
+            conn.execute("UPDATE inquiries SET urgency = ? WHERE id = ?", (urgency, ids[name]))
+    return ids
+
+
+def test_search_orders_by_urgency_then_oldest_first(conn: sqlite3.Connection) -> None:
+    ids = prioritised(conn)
+    order = [i.id for i in repo.search_inquiries(conn)]
+    # low and "no urgency yet" share the last bucket (BACKEND_SCHEMA.md section 6), oldest first.
+    assert order == [ids[k] for k in ("u_old", "u_new", "h", "n", "none", "l")]
+
+
+def test_search_filters_combine(conn: sqlite3.Connection) -> None:
+    ids = prioritised(conn)
+    set_status(conn, ids["h"], "needs_review")
+    set_status(conn, ids["u_old"], "escalated")
+    conn.execute("UPDATE inquiries SET route = 'escalate' WHERE id = ?", (ids["u_old"],))
+    assert [i.id for i in repo.search_inquiries(conn, statuses=["needs_review", "escalated"])] == [
+        ids["u_old"],
+        ids["h"],
+    ]
+    assert [i.id for i in repo.search_inquiries(conn, routes=["escalate"])] == [ids["u_old"]]
+    assert [i.id for i in repo.search_inquiries(conn, urgencies=["urgent"])] == [
+        ids["u_old"],
+        ids["u_new"],
+    ]
+    assert repo.search_inquiries(conn, statuses=["needs_review"], urgencies=["urgent"]) == []
+
+
+def test_search_text_matches_subject_body_sender_and_ignores_case(conn: sqlite3.Connection) -> None:
+    a = new_inquiry(conn, subject="Leaking Toilet", body="x")
+    b = new_inquiry(conn, body="the BOILER is broken")
+    c = new_inquiry(conn, body="y", sender_name="Priya Raman")
+    d = new_inquiry(conn, body="z", sender_email="someone@example.com")
+    assert [i.id for i in repo.search_inquiries(conn, q="toilet")] == [a]
+    assert [i.id for i in repo.search_inquiries(conn, q="boiler")] == [b]
+    assert [i.id for i in repo.search_inquiries(conn, q="PRIYA")] == [c]
+    assert [i.id for i in repo.search_inquiries(conn, q="someone@")] == [d]
+
+
+@pytest.mark.parametrize("wild", ["%", "_", "\\", "50%", "a_b"])
+def test_search_treats_wildcards_literally(conn: sqlite3.Connection, wild: str) -> None:
+    plain = new_inquiry(conn, body="an ordinary message about a drain")
+    literal = new_inquiry(conn, body=f"price is {wild} off")
+    found = [i.id for i in repo.search_inquiries(conn, q=wild)]
+    assert plain not in found
+    assert literal in found
+
+
+def test_keyset_paging_walks_every_row_once_even_as_new_ones_arrive(
+    conn: sqlite3.Connection,
+) -> None:
+    ids = prioritised(conn)
+    first = repo.search_inquiries(conn, limit=2)
+    last = first[-1]
+    key = (
+        repo.urgency_rank(last.urgency.value if last.urgency else None),
+        last.received_at,
+        last.id,
+    )
+    newest = new_inquiry(conn, received_at="2026-10-28T23:00:00Z", body="arrived while paging")
+    conn.execute("UPDATE inquiries SET urgency = 'urgent' WHERE id = ?", (newest,))
+    seen = [i.id for i in first]
+    after = key
+    while True:
+        page = repo.search_inquiries(conn, limit=2, after=after)
+        if not page:
+            break
+        seen += [i.id for i in page]
+        tail = page[-1]
+        after = (
+            repo.urgency_rank(tail.urgency.value if tail.urgency else None),
+            tail.received_at,
+            tail.id,
+        )
+    assert len(seen) == len(set(seen))
+    assert set(ids.values()) <= set(seen)
+
+
+def test_urgency_rank_puts_unknown_last() -> None:
+    ranks = [repo.urgency_rank(u) for u in ("urgent", "high", "normal", "low", None)]
+    assert ranks == [0, 1, 2, 3, 3]
+
+
+def test_list_duplicates_of_an_inquiry(conn: sqlite3.Connection) -> None:
+    original = new_inquiry(conn)
+    copies = [new_inquiry(conn, duplicate_of=original) for _ in range(2)]
+    other = new_inquiry(conn)
+    assert repo.list_duplicates_of(conn, original) == copies
+    assert repo.list_duplicates_of(conn, other) == []
+
+
 # --- screenings ------------------------------------------------------------------------------
 
 

@@ -212,6 +212,26 @@ def test_complaint_intent_requires_the_reason_code() -> None:
     assert any("COMPLAINT" in p for p in problems(item))
 
 
+def test_a_commercial_property_requires_the_policy_exception_reason() -> None:
+    commercial = {
+        "service_type": "drain_cleaning",
+        "start_date": None,
+        "property_type": "commercial",
+        "address_area": None,
+    }
+    item = make_item(labels={"fields": commercial})
+    assert any("POLICY_EXCEPTION_REQUEST" in p for p in problems(item))
+    escalated = make_item(
+        labels={
+            "fields": commercial,
+            "should_escalate": True,
+            "expected_route": "escalate",
+            "expected_reason_codes": ["POLICY_EXCEPTION_REQUEST"],
+        }
+    )
+    assert problems(escalated) == []
+
+
 def test_not_in_kb_reason_is_rejected_when_details_are_missing() -> None:
     item = make_item(
         labels={

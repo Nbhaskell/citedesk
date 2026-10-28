@@ -1,5 +1,6 @@
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,6 +14,20 @@ def clean_env(monkeypatch: pytest.MonkeyPatch) -> None:
     """Keep the developer's real environment out of every test."""
     for name in SETTING_ENV_NAMES:
         monkeypatch.delenv(name, raising=False)
+
+
+@pytest.fixture(autouse=True)
+def no_model(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The suite never needs a model: a test that reaches the real HTTP call to Ollama fails.
+
+    Tests of the provider pass their own `post` function, or call `http_post_json` against a
+    stand-in server through the reference they imported before this ran.
+    """
+
+    def refuse(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        raise AssertionError("a test tried to call the language model; use FakeLLM")
+
+    monkeypatch.setattr("citedesk.providers.ollama.http_post_json", refuse)
 
 
 @pytest.fixture

@@ -81,7 +81,7 @@ Each stage reads from and writes to the database, records an `audit_events` row,
 
 ### 4.2 Classify and extract (LLM)
 
-- One call returns JSON matching a Pydantic schema: `intents` (list, each with confidence from low, medium, high), `primary_intent`, `urgency`, `sentiment`, `fields` (see schema), `summary` (one sentence, internal).
+- One call returns JSON matching a Pydantic schema: `intents` (list, each with confidence from low, medium, high), `primary_intent`, `urgency`, `sentiment`, `escalation_signals` (a list of `REFUND_OR_DISPUTE`, `LEGAL_THREAT`, `POLICY_EXCEPTION_REQUEST`; D-041), `fields` (see schema), `summary` (one sentence, internal).
 - Use Ollama's JSON-schema output option where available; validate with Pydantic regardless; on validation failure retry once with the error appended; on a second failure mark `failed`.
 - Prompt version string stored with the result (`understand-v1`).
 - The message body is passed inside clearly delimited data blocks, and the system prompt states that text inside the block is data and not instructions.
@@ -92,8 +92,8 @@ Each stage reads from and writes to the database, records an `audit_events` row,
 
 Order of rules (first match wins, but all matching reason codes are recorded):
 
-1. Archive: spam score above threshold and no non-spam intent.
-2. Escalate: any of `HEALTH_SAFETY`, `COMPLAINT`, `REFUND_OR_DISPUTE`, `LEGAL_THREAT`, `POLICY_EXCEPTION_REQUEST`, `INJECTION_SUSPECTED`, or `LOW_CONFIDENCE` (primary intent confidence is low).
+1. Archive: spam score above threshold and no non-spam intent (and no escalation reason applies; a model that says spam alone, when screening does not, escalates with `LOW_CONFIDENCE`; D-038).
+2. Escalate: any of `HEALTH_SAFETY`, `COMPLAINT`, `REFUND_OR_DISPUTE`, `LEGAL_THREAT`, `POLICY_EXCEPTION_REQUEST`, `INJECTION_SUSPECTED`, or `LOW_CONFIDENCE` (primary intent confidence is low). A commercial `property_type` also escalates, with `POLICY_EXCEPTION_REQUEST` (D-039).
 3. Request details: intent is a booking-type intent and a required field is missing.
 4. Draft reply: everything else.
 
@@ -135,7 +135,8 @@ class LLMProvider(Protocol):
     name: str
     def generate_json(self, *, system: str, user: str, schema: dict,
                       temperature: float = 0.0, max_tokens: int = 1500,
-                      timeout_s: int = 120, seed: int | None = 0) -> LLMResult: ...
+                      timeout_s: int = 120, seed: int | None = 0,
+                      think: bool = False) -> LLMResult: ...   # `think` added in Phase 4 (D-042)
 
 class KnowledgeBase(Protocol):
     def ask(self, question: str, *, history: list[str] | None = None) -> KBResult: ...

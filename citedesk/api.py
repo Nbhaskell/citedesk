@@ -55,6 +55,7 @@ from citedesk.models import (
     Urgency,
 )
 from citedesk.pipeline import PipelineWorker
+from citedesk.providers import LLMProvider
 
 logger = logging.getLogger("citedesk.api")
 
@@ -214,8 +215,13 @@ def decode_cursor(cursor: str) -> tuple[int, str, int]:
 
 
 def create_app(
-    settings: Settings | None = None, *, start_worker: bool = True, worker_poll_seconds: float = 2.0
+    settings: Settings | None = None,
+    *,
+    start_worker: bool = True,
+    worker_poll_seconds: float = 2.0,
+    llm: LLMProvider | None = None,
 ) -> FastAPI:
+    """Build the API. The worker reads inquiries with `llm`; without one it only screens them."""
     settings = settings or Settings()
 
     @asynccontextmanager
@@ -227,7 +233,9 @@ def create_app(
         finally:
             conn.close()
         worker = (
-            PipelineWorker(settings, poll_seconds=worker_poll_seconds) if start_worker else None
+            PipelineWorker(settings, poll_seconds=worker_poll_seconds, llm=llm)
+            if start_worker
+            else None
         )
         app.state.worker = worker
         if worker is not None:

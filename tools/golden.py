@@ -7,7 +7,8 @@ Run:
     python -m tools.golden schema     write eval/golden/golden.schema.json
 
 Names and values come from citedesk/models.py, which tests keep in step with
-docs/BACKEND_SCHEMA.md and the database CHECK constraints.
+docs/BACKEND_SCHEMA.md and the database CHECK constraints. The required-fields table is
+citedesk/routing.py's, so there is one copy of it (D-040).
 """
 
 import hashlib
@@ -22,6 +23,7 @@ from typing import Annotated, Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from citedesk import models
+from citedesk.routing import missing_fields
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 GOLDEN_DIR = REPO_ROOT / "eval/golden"
@@ -58,15 +60,6 @@ CATEGORIES = (
     "near_miss",
     "edge",
 )
-
-# Required fields per intent (docs/BACKEND_SCHEMA.md section 2). Phase 4 puts the real table in
-# routing.py; a test there should check that it agrees with this one.
-REQUIRED_FIELDS = {
-    "booking_request": ("service_type", "start_date", "property_type", "address_area"),
-    "booking_change": ("start_date", "booking_reference"),
-    "availability_question": ("service_type", "start_date"),
-    "cancellation": ("booking_reference",),
-}
 
 NOT_IN_KB = "NOT_IN_KNOWLEDGE_BASE"
 EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
@@ -180,17 +173,6 @@ class GoldenFile(Strict):
 # --- rules in plain code ---------------------------------------------------------------------
 
 
-def missing_fields(intents: list[str], fields: dict[str, Any]) -> list[str]:
-    """Required fields that are absent for any of the intents, in a stable order."""
-    missing: list[str] = []
-    for intent in intents:
-        for name in REQUIRED_FIELDS.get(intent, ()):
-            value = fields.get(name)
-            if value in (None, "", "unknown") and name not in missing:
-                missing.append(name)
-    return missing
-
-
 def derive_route(
     intents: list[str], primary: str, reasons: list[str], fields: dict[str, Any]
 ) -> str:
@@ -275,6 +257,8 @@ def validate_item(raw: dict[str, Any], docs: dict[str, str]) -> list[str]:
         found.append("intent health_or_safety requires reason code HEALTH_SAFETY")
     if "complaint" in intents and "COMPLAINT" not in reasons:
         found.append("intent complaint requires reason code COMPLAINT")
+    if fields.get("property_type") == "commercial" and "POLICY_EXCEPTION_REQUEST" not in reasons:
+        found.append("property_type commercial requires reason code POLICY_EXCEPTION_REQUEST")
     if NOT_IN_KB in reasons and (
         any(r != NOT_IN_KB for r in reasons) or missing_fields(intents, fields)
     ):

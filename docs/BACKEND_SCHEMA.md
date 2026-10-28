@@ -219,6 +219,8 @@ CREATE TABLE settings (
 [{"intent": "booking_request", "confidence": "high"}, {"intent": "pricing_question", "confidence": "medium"}]
 ```
 
+**`classifications.raw_response`** is the model's accepted reply exactly as it came (a JSON object). Besides the values copied into the columns above it holds `summary`, `sentiment`, `escalation_signals` (the codes the model flagged: `REFUND_OR_DISPUTE`, `LEGAL_THREAT`, `POLICY_EXCEPTION_REQUEST`) and the model's own `urgency` before the emergency net. The route stage reads `escalation_signals` from here (D-041).
+
 **`extractions.fields`** (every key present; unknown values are `null` or `"unknown"`)
 ```json
 {
@@ -261,6 +263,7 @@ Dates are normalized to ISO format only when unambiguous; otherwise `null` with 
 | `screened` | `escalated` | injection suspected, route decided before the model runs |
 | `screened` | `failed` | model failed twice |
 | `classified` | `routed` | route decided |
+| `classified` | `failed` | route stage crashed after retry |
 | `routed` | `escalated` | route is `escalate` |
 | `routed` | `archived` | route is `archive` |
 | `routed` | `drafted` | route is `draft_reply` or `request_details` and a draft exists |

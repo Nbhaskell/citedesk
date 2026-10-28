@@ -57,13 +57,13 @@
       "primary_intent": "service_question",
       "urgency": "normal",
       "fields": {"service_type": "other", "start_date": null, "property_type": "commercial", "address_area": null},
-      "should_escalate": false,
-      "expected_reason_codes": [],
-      "expected_route": "draft_reply",
+      "should_escalate": true,
+      "expected_reason_codes": ["POLICY_EXCEPTION_REQUEST"],
+      "expected_route": "escalate",
       "answerable_from_docs": true
     },
     "evidence": [{"file": "policies.md", "anchor": "We do not work on commercial or industrial buildings."}],
-    "notes": "The documents say no commercial buildings. 'Backing up' is a grease trap, not sewage coming into a home. The word 'cafe' does not appear in the documents, which is the kind of gap retrieval can miss."
+    "notes": "The documents say no commercial buildings. 'Backing up' is a grease trap, not sewage coming into a home. The word 'cafe' does not appear in the documents, which is the kind of gap retrieval can miss. Since Phase 4 (D-039) any commercial property escalates, because the knowledge base has answered this kind of question wrongly; the reply is a one-line no that the owner writes."
   },
   {
     "id": "oos-dental-office-booking",
@@ -79,13 +79,13 @@
       "primary_intent": "booking_request",
       "urgency": "normal",
       "fields": {"service_type": "drain_cleaning", "start_date": "2026-11-06", "property_type": "commercial", "address_area": "Millrace"},
-      "should_escalate": false,
-      "expected_reason_codes": [],
-      "expected_route": "draft_reply",
+      "should_escalate": true,
+      "expected_reason_codes": ["POLICY_EXCEPTION_REQUEST"],
+      "expected_route": "escalate",
       "answerable_from_docs": true
     },
     "evidence": [{"file": "policies.md", "anchor": "We do not work on commercial or industrial buildings."}],
-    "notes": "All booking fields are present, so by the current routing rules this is draft_reply. The correct reply declines, because the business does not work on commercial buildings. There is no routing rule for property_type commercial; Phase 4 should decide whether to add one."
+    "notes": "Every booking field is present, but the business does not work on commercial buildings. Before Phase 4 this was draft_reply because no rule looked at property_type; D-039 added one, and the label follows the rule. Serving it would be an exception only the owner can grant."
   },
   {
     "id": "oos-six-unit-building",

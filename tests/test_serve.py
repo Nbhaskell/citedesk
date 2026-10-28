@@ -22,3 +22,15 @@ def test_no_setting_can_change_the_bind_host(monkeypatch: pytest.MonkeyPatch) ->
         monkeypatch.setenv(name, "0.0.0.0")  # noqa: S104
     entry.main()
     assert calls[0]["host"] == "127.0.0.1"
+
+
+def test_the_real_server_reads_inquiries_with_the_local_model(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from citedesk.providers.ollama import OllamaProvider
+
+    seen: dict[str, Any] = {}
+    monkeypatch.setattr(entry, "create_app", lambda settings, **kw: seen.update(kw) or "app")
+    monkeypatch.setattr(entry.uvicorn, "run", lambda app, **kw: None)
+    entry.main()
+    assert isinstance(seen["llm"], OllamaProvider)

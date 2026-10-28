@@ -92,3 +92,20 @@ def test_a_sheet_bigger_than_the_drafts_holds_them_all(run: dict[str, Any]) -> N
 def test_the_held_out_split_is_refused(capsys: pytest.CaptureFixture[str]) -> None:
     assert rp.main(["--split", "heldout"]) == 2
     assert "Phase 7" in capsys.readouterr().err
+
+
+def test_the_sheet_shows_the_passage_text_beside_its_claim_number(run: dict[str, Any]) -> None:
+    items = {i["id"]: i for i in GOLDEN["items"]}
+    sheet = rp.reading_sheet(run, items, 3)
+    assert "**Passages the draft was written from**" in sheet
+    assert "- [0] pricing.md" in sheet and "Drain cleaning: $149" in sheet
+
+
+def test_a_sheet_can_be_rewritten_from_a_saved_run(
+    run: dict[str, Any], tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    saved = tmp_path / "x.drafts.json"
+    saved.write_text(json.dumps(run), encoding="utf-8")
+    assert rp.main(["--sheet-from", str(saved), "--sheet", "2"]) == 0
+    written = (tmp_path / "x.sheet.md").read_text("utf-8")
+    assert written.count("\n## ") == 2

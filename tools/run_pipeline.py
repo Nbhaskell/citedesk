@@ -11,9 +11,11 @@ so they are for reading, not for publishing. The scored evaluation is Phase 7.
 """
 
 import argparse
+import json
 import sys
 import time
 from collections import Counter
+from pathlib import Path
 from typing import Any
 
 from citedesk.business import load_business
@@ -59,6 +61,18 @@ def summarise(run: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def passages(record: dict[str, Any]) -> list[dict[str, Any]]:
+    """The merged, numbered passages for a record, built as the pipeline builds them."""
+    merged: list[dict[str, Any]] = []
+    for r in record["retrievals"]:
+        if r["declined"]:
+            continue
+        for source in r["sources"]:
+            if source not in merged:
+                merged.append(source)
+    return merged
+
+
 def reading_sheet(run: dict[str, Any], items: dict[str, dict[str, Any]], count: int) -> str:
     """Markdown with `count` drafts spread evenly across the run, each beside what it answers."""
     drafted = [r for r in run["items"] if r.get("draft")]
@@ -87,9 +101,14 @@ def reading_sheet(run: dict[str, Any], items: dict[str, dict[str, Any]], count: 
             "",
             "**Asked the knowledge base:**",
             *[
-                f"- {r['question']} -> {'declined' if r['declined'] else 'answered'}: "
-                + ", ".join(f"{s['file']} ({s['section']})" for s in r["sources"])
+                f"- {r['question']} -> {'declined' if r['declined'] else 'answered'}"
                 for r in record["retrievals"]
+            ],
+            "",
+            "**Passages the draft was written from** (numbers are the claim indices):",
+            *[
+                f"- [{n}] {s['file']} ({s['section']}): {' '.join(s['text'].split())[:300]}"
+                for n, s in enumerate(passages(record))
             ],
             "",
             f"**Draft** - subject: {draft['subject']}",
@@ -111,6 +130,9 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--split", default="tuned", help="only 'tuned' can be run here")
     parser.add_argument("--limit", type=int, help="run only the first N items (not a result)")
     parser.add_argument("--sheet", type=int, default=30, help="drafts on the reading sheet")
+    parser.add_argument(
+        "--sheet-from", type=Path, help="rewrite the sheet from a saved run; no model"
+    )
     args = parser.parse_args(argv)
     if args.split != "tuned":
         print(
@@ -121,6 +143,15 @@ def main(argv: list[str]) -> int:
         return 2
 
     golden = load_golden()
+    if args.sheet_from is not None:
+        saved = json.loads(args.sheet_from.read_text("utf-8"))
+        by_id = {i["id"]: i for i in golden["items"]}
+        target = args.sheet_from.with_name(
+            args.sheet_from.name.replace(".drafts.json", ".sheet.md")
+        )
+        target.write_text(reading_sheet(saved, by_id, args.sheet), encoding="utf-8", newline="\n")
+        print(f"Wrote {target}")
+        return 0
     items = [i for i in golden["items"] if i["split"] == args.split]
     if args.limit:
         items = items[: args.limit]

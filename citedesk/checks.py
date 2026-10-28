@@ -279,6 +279,24 @@ def _excused(text: str, start: int) -> bool:
     return bool(EXCUSES.search(clause))
 
 
+def _subject_without_the_customers_words(data: CheckInput) -> str:
+    """The reply subject minus the customer's own subject, which it usually repeats ("Re: price
+    match?"). Repeating their words promises nothing; anything added still counts."""
+    theirs = data.inquiry_text.split(chr(10), 1)[0].strip()
+    subject = data.subject or ""
+    if not theirs:
+        return subject
+    return re.sub(re.escape(theirs), " ", subject, flags=re.IGNORECASE)
+
+
+SAME_ADVICE = re.compile(r"\b(?:shut(?:ting)? off|switch(?:ing)? off|turn(?:ing)? it off)\b")
+
+
+def _canonical_advice(text: str) -> str:
+    """Treat "shut off", "switch off" and "turn it off" as "turn off": the same advice."""
+    return SAME_ADVICE.sub("turn off", text)
+
+
 def check_no_commitment(
     data: CheckInput, *, patterns: Mapping[str, re.Pattern[str]] | None = None
 ) -> CheckOutcome:
@@ -287,8 +305,8 @@ def check_no_commitment(
     Wording that quotes the sources (the same words appear there) is allowed, and so is wording
     that denies or conditions the promise ("we cannot guarantee", "once it is confirmed").
     """
-    text = normalise(data.draft_text)
-    sources = normalise(data.sources_text)
+    text = normalise(f"{_subject_without_the_customers_words(data)} {data.body}")
+    sources = _canonical_advice(normalise(data.sources_text))
     matched: list[str] = []
     promise_patterns = COMMITMENT_PATTERNS if patterns is None else patterns
     for name, pattern in promise_patterns.items():
@@ -299,7 +317,7 @@ def check_no_commitment(
                 matched.append(name)
     if patterns is None:
         for name, pattern in ADVICE_PATTERNS.items():
-            for hit in pattern.finditer(text):
+            for hit in pattern.finditer(_canonical_advice(text)):
                 if hit.group(0).lower() not in sources and name not in matched:
                     matched.append(name)
     return CheckOutcome(CheckCode.NO_COMMITMENT, True, not matched, {"matched_patterns": matched})
@@ -307,6 +325,7 @@ def check_no_commitment(
 
 # --- structure ----------------------------------------------------------------------------------
 
+MAX_GREETING_WORDS = 6
 GREETING = re.compile(r"^(?:hi|hello|hey|dear|good (?:morning|afternoon|evening))\b", re.IGNORECASE)
 SIGN_OFF = re.compile(
     r"\b(?:regards|best|sincerely|thanks|thank you|cheers|yours|take care)\b", re.IGNORECASE
@@ -330,9 +349,13 @@ SNAKE = re.compile(r"\b[a-z]+(?:_[a-z]+)+\b", re.IGNORECASE)
 def check_structure(data: CheckInput) -> CheckOutcome:
     lines = [line.strip() for line in data.body.splitlines() if line.strip()]
     missing: list[str] = []
-    if not lines or not GREETING.match(lines[0]):
+    # The greeting and the sign-off each stand on their own short line; a draft written as one
+    # run-on paragraph with "Kind regards," in the middle of it is flagged (D-049).
+    if not lines or not GREETING.match(lines[0]) or len(lines[0].split()) > MAX_GREETING_WORDS:
         missing.append("greeting")
-    if not any(SIGN_OFF.search(line) for line in lines[-3:]):
+    if not any(
+        SIGN_OFF.search(line) and len(line.split()) <= MAX_GREETING_WORDS for line in lines[-3:]
+    ):
         missing.append("sign_off")
     words = len(data.body.split())
     jargon = [m.group(0).lower() for m in JARGON_PHRASES.finditer(data.draft_text)]

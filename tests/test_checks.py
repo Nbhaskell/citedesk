@@ -447,3 +447,40 @@ def test_a_deliberately_bad_draft_fails_a_blocking_check(
 def test_module_exposes_no_way_to_mark_a_draft_ready() -> None:
     # Checks report; the repository decides whether a draft may be ready (D-028).
     assert not hasattr(checks, "mark_ready")
+
+
+# --- defects found by reading real drafts (D-049) ---------------------------------------------
+
+
+def test_a_draft_written_as_one_line_is_flagged_even_though_the_words_are_there() -> None:
+    one_line = (
+        "Hello Cecily, we serve Saltmarsh and a travel fee of $40 applies. "
+        "Kind regards, Kestrel Hollow Plumbing"
+    )
+    result = check_structure(make(one_line))
+    assert not result.passed and set(result.detail["missing"]) == {"greeting", "sign_off"}
+
+
+def test_a_greeting_and_sign_off_each_on_their_own_line_still_pass() -> None:
+    assert check_structure(make("Hello Cecily,\nWe serve Saltmarsh.\nKind regards,\nKH")).passed
+
+
+def test_the_customers_own_subject_in_the_reply_subject_is_not_a_commitment() -> None:
+    # "Re: price match?" repeats the customer's words; it promises nothing.
+    data = make(
+        subject="Re: price match?",
+        inquiry_text="price match?\nWill you match their price?",
+    )
+    assert check_no_commitment(data).passed
+
+
+def test_a_promise_added_to_the_subject_is_still_found() -> None:
+    data = make(subject="Re: price match? We'll refund you", inquiry_text="price match?\nHello")
+    assert not check_no_commitment(data).passed
+
+
+@pytest.mark.parametrize("phrase", ["shut off", "switch off", "turn it off", "shutting off"])
+def test_shut_off_and_turn_off_are_the_same_advice(phrase: str) -> None:
+    body = f"Hi,\n\nTo stop the flow, {phrase} the main water valve."
+    assert check_no_commitment(make(body, sources=[POLICY])).passed
+    assert not check_no_commitment(make(body, sources=[PRICING])).passed

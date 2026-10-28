@@ -25,7 +25,7 @@ def no_model(monkeypatch: pytest.MonkeyPatch) -> None:
     """
 
     def refuse(*args: Any, **kwargs: Any) -> dict[str, Any]:
-        raise AssertionError("a test tried to call the model or knowledge base; use FakeLLM or FakeKB")
+        raise AssertionError("a test called the model or knowledge base; use FakeLLM or FakeKB")
 
     monkeypatch.setattr("citedesk.providers.ollama.http_post_json", refuse)
     monkeypatch.setattr("citedesk.knowledge.http_post_json", refuse)

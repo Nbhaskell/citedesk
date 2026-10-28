@@ -52,12 +52,12 @@ Contrast ratios were calculated, not estimated: text pairs need 4.5, boundaries 
 | Action | Patina | `#0D5C57` | primary buttons, links, selected tab | 7.1 on paper, 7.8 with white text |
 | Action tint | Patina mist | `#DCEEEC` | selected row background | patina text 6.5 |
 | Focus | Ring | `#1D5FD1` | 3px outline, 2px offset, on every focusable element | 5.3 on paper, 5.8 on sheet |
-| Urgent | Signal | `#B3261E` band and tag fill, white text 6.5; tint `#FBE4E1` with `#8F1D14` text 7.3 | | band 6.0 on paper |
-| High | Amber | band `#B7791F` (3.3 on paper); tint `#FCEBC4` with `#6B4500` text 7.2 | | |
-| Normal | Slate blue | tint `#E3EAEE` with `#2F4655` text 8.1; band `#7A8A93` | | |
-| Low | none | muted text, no band | | |
-| Pass | Green | tint `#DFF1E3` with `#1B5E2F` text 6.6 | passed checks | |
-| Fail | Signal tint | `#FBE4E1` with `#8F1D14` text 7.3 | failed checks | |
+| Urgent | Signal | `#B3261E` for the band and the tag fill (white text on it 6.5) | urgent rows | band 6.0 on paper |
+| Urgent text | Signal tint | `#FBE4E1` background, `#8F1D14` text | failed checks, error panels | 7.3 |
+| High | Amber | band `#B7791F`; tag `#FCEBC4` background, `#6B4500` text | high rows | band 3.3 on paper, text 7.2 |
+| Normal | Slate blue | tag `#E3EAEE` background, `#2F4655` text; band `#7A8A93` | normal rows | text 8.1 |
+| Low | none | muted text, no band | low rows | n/a |
+| Pass | Green | `#DFF1E3` background, `#1B5E2F` text | passed checks | 6.6 |
 | Mark | Highlight | `#FFE08A` behind ink text | grounded figures in a passage, the problem text in a blocked draft | ink 11.4 |
 
 Patina (a verdigris green) is the one accent: it nods to copper pipe without drawing it. The defaults the brief rules out are avoided: no cream with terracotta, no dark with neon, no row of identical soft-shadowed cards (panels are separated by rules, not shadows).
@@ -168,7 +168,7 @@ Data: `GET /api/settings`, `GET /api/status`. Business facts in use; draft style
 
 ## 5. Interaction
 
-**Keyboard.** `j`/`k` move through the queue and between items, `Enter` opens, `a` approve, `e` edit, `r` reject, `x` escalate, `Esc` back, `?` the shortcut list. Single-key shortcuts are off while any text field has focus, and the Settings switch turns them off entirely (WCAG 2.1.4, character key shortcuts). `a` does nothing when approving is not possible. The full path queue to approved reply is: `j`, `Enter`, `a`, wait or `Enter` on undo-free path, `Tab` to Copy reply. A skip link jumps to the main content. Focus is always visible (Ring); opening a detail moves focus to its heading; closing returns it to the row it came from.
+**Keyboard.** `j`/`k` move through the queue and between items, `Enter` opens, `a` approve, `e` edit, `r` reject, `x` escalate, `Esc` back, `?` the shortcut list. Single-key shortcuts are off while any text field has focus, and the Settings switch turns them off entirely (WCAG 2.1.4, character key shortcuts). `a` does nothing when approving is not possible. The full path from the queue to a copied reply is: `j` to the row, `Enter` to open it, `a` to approve, then (the undo bar stays for 5 seconds, and `Esc` undoes) `Tab` to Copy reply and `Enter`. A skip link jumps to the main content. Focus is always visible (Ring); opening a detail moves focus to its heading; closing returns it to the row it came from.
 
 **Live regions.** One polite region for "2 new inquiries", "Reply approved", "Copied. Nothing was sent." and stage changes on a processing item. An assertive region only for errors that stop a decision. Focus is never moved by an update.
 

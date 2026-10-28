@@ -12,6 +12,7 @@ from citedesk.knowledge import (
     KnowledgeBase,
     KnowledgeBaseError,
     RagProjectKB,
+    http_post_json,
     is_refusal,
 )
 from citedesk.models import Source
@@ -185,8 +186,6 @@ def test_it_is_a_knowledge_base() -> None:
 def test_http_errors_are_mapped_without_repeating_the_question(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from citedesk.knowledge import http_post_json
-
     private = "my private street name"
 
     def refuse(*a: Any, **k: Any) -> Any:

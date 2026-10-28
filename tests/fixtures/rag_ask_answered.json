@@ -1,0 +1,51 @@
+{
+  "request": {
+    "question": "How much does drain cleaning cost?"
+  },
+  "response": {
+    "answer": "Drain cleaning for one fixture (sink, tub, shower, or toilet) starts at $149. Main sewer line cleaning is $329. The pricing is a flat rate for these services, with no additional conditions or exceptions mentioned.",
+    "sources": [
+      "faq.md",
+      "pricing.md"
+    ],
+    "passages": [
+      {
+        "source": "faq.md",
+        "section": "How much does drain cleaning cost?",
+        "page": null,
+        "text": "Drain cleaning for one fixture starts at $149. Main sewer line cleaning is $329.",
+        "distance": 0.181,
+        "best": true,
+        "listed": true
+      },
+      {
+        "source": "pricing.md",
+        "section": "Drain cleaning",
+        "page": null,
+        "text": "- Drain cleaning, one fixture (sink, tub, shower or toilet): $149 (starting price)\n- Main sewer line cleaning: $329",
+        "distance": 0.251,
+        "best": false,
+        "listed": true
+      },
+      {
+        "source": "faq.md",
+        "section": "Do you repair sewer lines?",
+        "page": null,
+        "text": "Yes. Sewer line repair is priced by quote after a camera inspection. A camera inspection of a drain or sewer line is $175.",
+        "distance": 0.33,
+        "best": false,
+        "listed": true
+      },
+      {
+        "source": "services.md",
+        "section": "Drain cleaning",
+        "page": null,
+        "text": "Clearing blocked or slow sinks, tubs, showers and toilets. Pricing: flat price.",
+        "distance": 0.34,
+        "best": false,
+        "listed": false
+      }
+    ],
+    "seconds": 8.3
+  }
+}

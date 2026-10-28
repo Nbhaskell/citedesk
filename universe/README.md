@@ -33,5 +33,6 @@ The test suite also checks that the committed documents are exactly what the gen
 
 ## Known gaps
 
-- No PDF document yet. Whether the knowledge base needs one is decided after checking what `rag-project` can index.
+- No PDF document. `rag-project` can read PDFs, but no scenario needs one yet.
 - Live availability is deliberately absent, so availability questions cannot be answered from the documents.
+- Retrieval is imperfect. In a small check, a question about plumbing at a restaurant was still answered "yes" although commercial buildings are not served. See `docs/knowledge-base-contract.md`.

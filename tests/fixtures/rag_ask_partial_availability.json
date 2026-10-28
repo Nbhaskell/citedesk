@@ -1,0 +1,51 @@
+{
+  "request": {
+    "question": "Do you have an opening next Tuesday afternoon?"
+  },
+  "response": {
+    "answer": "The office is open on Tuesday afternoon (7:30 am to 5:00 pm). However, standard appointments are usually 2 to 4 business days out, and staff confirm the exact day. Since the context does not specify the current date or whether next Tuesday falls within this window, availability cannot be confirmed.",
+    "sources": [
+      "hours.md",
+      "faq.md"
+    ],
+    "passages": [
+      {
+        "source": "hours.md",
+        "section": "Office hours",
+        "page": null,
+        "text": "The office is open Monday to Friday from 7:30 am to 5:00 pm and on Saturday from 8:00 am to noon. The office is closed on Sunday.",
+        "distance": 0.56,
+        "best": true,
+        "listed": true
+      },
+      {
+        "source": "faq.md",
+        "section": "Do you work on weekends?",
+        "page": null,
+        "text": "Scheduled visits run on Saturday, with the first arrival at 8:00 am and the last arrival at 1:00 pm. The office is closed on Sunday. The emergency line is answered 24 hours a day, every day.",
+        "distance": 0.586,
+        "best": false,
+        "listed": true
+      },
+      {
+        "source": "hours.md",
+        "section": "How soon we can come",
+        "page": null,
+        "text": "Standard appointments are usually 2 to 4 business days out; staff confirm the exact day.",
+        "distance": 0.612,
+        "best": false,
+        "listed": true
+      },
+      {
+        "source": "policies.md",
+        "section": "Electrical work",
+        "page": null,
+        "text": "We do not do electrical work.",
+        "distance": 0.635,
+        "best": false,
+        "listed": false
+      }
+    ],
+    "seconds": 15.6
+  }
+}

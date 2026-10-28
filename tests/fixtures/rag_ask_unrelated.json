@@ -1,0 +1,48 @@
+{
+  "request": {
+    "question": "What will the weather be like tomorrow?"
+  },
+  "response": {
+    "answer": "I don't know.",
+    "sources": [],
+    "passages": [
+      {
+        "source": "policies.md",
+        "section": "Heating and air conditioning",
+        "page": null,
+        "text": "We do not do heating or air conditioning work.",
+        "distance": 0.7,
+        "best": true,
+        "listed": false
+      },
+      {
+        "source": "hours.md",
+        "section": "How soon we can come",
+        "page": null,
+        "text": "Standard appointments are usually 2 to 4 business days out; staff confirm the exact day.",
+        "distance": 0.734,
+        "best": false,
+        "listed": false
+      },
+      {
+        "source": "faq.md",
+        "section": "Can someone come today?",
+        "page": null,
+        "text": "For an emergency, call 555-0172. For a problem that is urgent but not an emergency, such as no hot water, we book the next available visit, and the same day if you ask before noon and there is room. No visit is confirmed until a staff member confirms it. A reply is never an automatic confirmation or a price guarantee.",
+        "distance": 0.748,
+        "best": false,
+        "listed": false
+      },
+      {
+        "source": "faq.md",
+        "section": "Do you work on commercial buildings?",
+        "page": null,
+        "text": "No. We serve homes and small residential buildings of up to 4 units.",
+        "distance": 0.761,
+        "best": false,
+        "listed": false
+      }
+    ],
+    "seconds": 2.3
+  }
+}

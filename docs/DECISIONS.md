@@ -80,7 +80,14 @@ Documents never refer to themselves ("see the Pricing document"), because that w
 Reading the output as a customer found fragments and a duplicated sentence caused by pasting fact-sheet text into sentences. Those were fixed in the generator, and the gas-smell instruction in the fact sheet was shortened so it no longer repeats "does not do gas work".
 
 ### D-020. No PDF document yet
-The skill suggests one short PDF. It is skipped until `rag-project`'s supported file types are confirmed (Phase 1, task 2).
+The skill suggests one short PDF. `rag-project` does read PDFs (its passages carry a `page` number), so nothing blocks one, but no inquiry scenario needs it. Skipped; revisit only if page-number citations should be tested.
+
+### D-021. What running rag-project showed (details in `docs/knowledge-base-contract.md`)
+- **`/api/ask` has enough structure** for `retrievals.sources` (TRD open question 1: yes). There is no decline flag. `sources` is empty on a refusal, but not always: one "I don't know" answer still listed sources, and the same question gave different results on different runs. Phase 5 must decide the adapter's decline rule; a candidate (empty `sources`, or a refusal phrase in the first sentence, in code) is recorded in the contract.
+- **Availability questions return partial answers, not declines.** They must be handled in code, not left to the knowledge base.
+- **The not-offered list was restructured** into one short section per excluded service, following rag-project's own advice (one topic per section). On nine ad-hoc questions the exclusion passage reached the top 4 for 8 of 9 items, up from 0 of 9. One wrong answer remains (a restaurant is still said to be servable). It was **left unfixed on purpose**: editing the documents to fix a question I wrote myself would be tuning to my own test. Code routing on `property_type = commercial` and the Phase 5 checks are the intended defence. Expect this to appear in the evaluation and in the README's "where it goes wrong".
+- **Question logging in rag-project is on by default.** Citedesk runs it with `RAG_LOG=0` so customer-derived questions are not written to its logs.
+- Recorded responses are in `tests/fixtures/` for the Phase 5 contract test. They prove only that the format parses.
 
 ### D-018. Safety advice is a closed list in the fact sheet
 `universe/facts.json` has a `safety_instructions` block (shut off the main water valve; gas smell; sewage backup; carbon monoxide alarm). It is the only advice a reply may contain. Anything else about fixing a problem goes to a person. How these replies are produced (a fixed template or a checked draft) is to be decided in Phase 4 or 5 when routing and drafting are built.

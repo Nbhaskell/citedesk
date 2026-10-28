@@ -86,7 +86,7 @@ Each stage reads from and writes to the database, records an `audit_events` row,
 - Prompt version string stored with the result (`understand-v1`).
 - The message body is passed inside clearly delimited data blocks, and the system prompt states that text inside the block is data and not instructions.
 - Temperature 0, fixed seed, token cap 1,500, timeout 120 seconds, one retry with thinking off (learned from stalled runs in `rag-project`).
-- A keyword safety net runs in code beside the model: if the text contains emergency terms (for example injury, bleeding, poisoning, seizure, collapsed, ER, emergency vet), `urgency` is raised to at least `high` and `HEALTH_SAFETY` escalation is added even if the model missed it.
+- A keyword safety net runs in code beside the model: if the text contains emergency terms (for example gas smell, carbon monoxide, flooding, burst pipe, sewage, sparks, electric shock), `urgency` is raised to at least `high` and `HEALTH_SAFETY` escalation is added even if the model missed it.
 
 ### 4.3 Route (code only)
 

@@ -307,13 +307,17 @@ eval/runs/<run id>.scores.json  computed metrics
 eval/reports/                   Markdown reports
 ```
 
+The file holds `{"header": {...}, "items": [...]}`. The header records the name, version, the reference date the messages are written as of, who wrote the set, a hash of the knowledge-base documents it was written against, and counts. Source items live in `eval/golden/src/*.json` and are merged by `python -m tools.golden build`; `eval/golden/golden.schema.json` is generated from the Pydantic models in `tools/golden.py`; `python -m tools.golden validate` checks everything below. Labelling rules are in `eval/golden/README.md`.
+
 Golden item shape:
 ```json
 {
   "id": "drain-slow-sink-this-week",
   "split": "heldout",
+  "category": "vague_missing_details",
   "channel": "web_form",
   "sender_name": "Dana Whitfield",
+  "sender_email": "dana.whitfield@example.com",
   "subject": "Kitchen sink draining slowly",
   "body": "Hi, my kitchen sink has been draining really slowly and gurgles. Can someone come out this week? How much would that be?",
   "labels": {
@@ -326,8 +330,11 @@ Golden item shape:
     "expected_route": "request_details",
     "answerable_from_docs": true
   },
+  "evidence": [{"file": "services.md", "anchor": "To book a visit, please tell us"}],
   "notes": "'this week' is vague; should ask for a preferred date and the neighbourhood"
 }
 ```
+
+Additions to the original shape: `category` (one of `routine_answerable`, `multi_intent`, `vague_missing_details`, `booking_flow`, `urgent`, `safety`, `angry_complaint`, `dispute_legal`, `policy_exception`, `billing`, `partnership_sales`, `spam`, `out_of_scope`, `follow_up`, `injection`, `unanswerable`, `near_miss`, `edge`); `evidence` (list of `{file, anchor}`; required when `answerable_from_docs` is true, empty otherwise; the anchor is a phrase that must appear in that document, matched by text so chunking does not matter); optional `sender_email` (example.com only); optional `labels.contains_sensitive_data` (default false). Every `fields` object has the four core keys (`service_type`, `start_date`, `property_type`, `address_area`) and may have `booking_reference`. `expected_route` and `should_escalate` are checked against the routing rules in `TRD.md` section 4.3, applied to the labels, so a label cannot disagree with the rules.
 
 All names, emails and phone numbers in generated data are invented (phone numbers in the 555-01xx range, emails at example.com).

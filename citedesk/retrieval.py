@@ -13,7 +13,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 from citedesk.knowledge import KBResult, KnowledgeBase, timed
-from citedesk.models import ExtractedFields, Intent, ServiceType, Source
+from citedesk.models import ExtractedFields, Intent, Retrieval, ServiceType, Source
 
 MAX_QUESTIONS = 3
 MAX_CUSTOMER_TEXT = 300
@@ -162,3 +162,17 @@ def retrieve(kb: KnowledgeBase, questions: Sequence[Question]) -> Retrieved:
         result, elapsed_ms = timed(kb, question.text)
         results.append(Answer(question.intent, question.text, result, elapsed_ms))
     return Retrieved(results)
+
+
+def merged_sources(rows: Sequence[Retrieval]) -> list[Source]:
+    """The passages of the answered questions stored in the database, merged in order without
+    repeats. This is the list the draft was written from, so a claim's `source_index` points into
+    it; the check stage rebuilds it the same way."""
+    merged: list[Source] = []
+    for row in rows:
+        if row.declined:
+            continue
+        for source in row.sources:
+            if source not in merged:
+                merged.append(source)
+    return merged

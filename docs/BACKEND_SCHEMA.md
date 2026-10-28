@@ -270,6 +270,7 @@ Dates are normalized to ISO format only when unambiguous; otherwise `null` with 
 | `routed` | `failed` | retrieval or drafting failed after retry |
 | `drafted` | `needs_review` | checks finished and none blocking failed |
 | `drafted` | `escalated` | a blocking check failed |
+| `drafted` | `failed` | check stage crashed after retry |
 | `needs_review` | `approved` | reviewer approves (with or without edits) |
 | `needs_review` | `rejected` | reviewer rejects |
 | `needs_review` | `escalated` | reviewer escalates |

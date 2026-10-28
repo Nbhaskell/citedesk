@@ -11,10 +11,6 @@ export function Placeholder({ title, children }: { title: string; children: stri
   );
 }
 
-export function QueueScreen() {
-  return <Placeholder title="Queue">Inquiries waiting for you will be listed here.</Placeholder>;
-}
-
 export function DetailScreen() {
   return (
     <Placeholder title="Inquiry">

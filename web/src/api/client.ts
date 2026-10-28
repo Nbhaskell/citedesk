@@ -3,7 +3,7 @@
 //
 // Errors carry the API's own message and request number, never the request or the response body
 // (those hold customer text).
-import type { ApiErrorBody, StatusResponse } from "./types";
+import type { ApiErrorBody, InquiryList, InquiryStatus, StatusResponse, Urgency } from "./types";
 
 export class ApiError extends Error {
   readonly httpStatus: number;
@@ -24,7 +24,17 @@ export class ApiError extends Error {
   }
 }
 
+/** What the queue can ask for. Free text goes in `q`; it is sent as a query parameter. */
+export interface InquiryQuery {
+  status?: InquiryStatus[];
+  urgency?: Urgency[];
+  q?: string;
+  cursor?: string;
+  limit?: number;
+}
+
 export interface ApiClient {
+  listInquiries(query: InquiryQuery, signal?: AbortSignal): Promise<InquiryList>;
   status(signal?: AbortSignal): Promise<StatusResponse>;
   checkStatus(): Promise<StatusResponse>;
 }
@@ -40,6 +50,17 @@ function isErrorBody(value: unknown): value is ApiErrorBody {
     typeof (error as { code?: unknown }).code === "string" &&
     typeof (error as { message?: unknown }).message === "string"
   );
+}
+
+export function queryString(query: InquiryQuery): string {
+  const params = new URLSearchParams();
+  for (const value of query.status ?? []) params.append("status", value);
+  for (const value of query.urgency ?? []) params.append("urgency", value);
+  if (query.q) params.set("q", query.q);
+  if (query.cursor) params.set("cursor", query.cursor);
+  if (query.limit) params.set("limit", String(query.limit));
+  const text = params.toString();
+  return text ? `?${text}` : "";
 }
 
 export function createHttpClient(fetchFn: FetchFn = fetch, base = ""): ApiClient {
@@ -81,6 +102,8 @@ export function createHttpClient(fetchFn: FetchFn = fetch, base = ""): ApiClient
   }
 
   return {
+    listInquiries: (query, signal) =>
+      request<InquiryList>("GET", `/api/inquiries${queryString(query)}`, signal),
     status: (signal) => request<StatusResponse>("GET", "/api/status", signal),
     checkStatus: () => request<StatusResponse>("POST", "/api/status/check"),
   };

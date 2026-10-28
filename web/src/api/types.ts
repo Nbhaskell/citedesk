@@ -15,4 +15,6 @@ export type Insights = Schemas["Insights"];
 export type StatusResponse = Schemas["StatusResponse"];
 export type ExportText = Schemas["ExportText"];
 export type InquiryStatus = Schemas["InquiryStatus"];
+export type Urgency = Schemas["Urgency"];
+export type Route = Schemas["Route"];
 export type ApiErrorBody = { error: { code: string; message: string; request_id: string } };

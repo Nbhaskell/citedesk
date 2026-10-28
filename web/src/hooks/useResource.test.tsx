@@ -99,6 +99,34 @@ describe("useResource", () => {
     expect(load).toHaveBeenCalledTimes(3);
   });
 
+  it("never shows the answer to another key: a new key is loading again", async () => {
+    const load = vi.fn(async () => "x");
+    let release: (value: string) => void = () => {};
+    const { result, rerender } = renderHook(({ key }) => useResource(load, { key }), {
+      initialProps: { key: "a" },
+    });
+    await flush();
+    expect(result.current).toMatchObject({ data: "x", loading: false });
+    load.mockImplementationOnce(() => new Promise<string>((resolve) => (release = resolve)));
+    rerender({ key: "b" });
+    expect(result.current).toMatchObject({ data: null, loading: true, error: null });
+    await act(async () => release("y"));
+    expect(result.current).toMatchObject({ data: "y", loading: false });
+  });
+
+  it("does not carry old data into a failure for a new key", async () => {
+    const load = vi.fn(async () => "x");
+    const { result, rerender } = renderHook(({ key }) => useResource(load, { key }), {
+      initialProps: { key: "a" },
+    });
+    await flush();
+    load.mockRejectedValueOnce(new ApiError(0, "network", "Can't reach Citedesk.", null));
+    rerender({ key: "b" });
+    await flush();
+    expect(result.current).toMatchObject({ data: null, loading: false });
+    expect(result.current.error).toMatchObject({ code: "network" });
+  });
+
   it("aborts the request and stops polling when it unmounts", async () => {
     let signal: AbortSignal | undefined;
     const load = vi.fn(async (s: AbortSignal) => {

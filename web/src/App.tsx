@@ -1,11 +1,11 @@
 import { Route, Routes } from "react-router-dom";
 import { LiveRegionProvider } from "./components/LiveRegion";
 import { Shell } from "./components/Shell";
+import { QueueScreen } from "./screens/queue/QueueScreen";
 import {
   DetailScreen,
   InsightsScreen,
   NotFoundScreen,
-  QueueScreen,
   SettingsScreen,
 } from "./screens/Placeholder";
 

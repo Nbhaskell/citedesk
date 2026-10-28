@@ -139,3 +139,44 @@ export const actions = {
   retry: { button: "Retry", done: (stage: string): string => `Retrying from ${stage}` },
   undo: "Undo",
 } as const;
+
+/** The state shown on a queue row: what is waiting, in the words a person uses. */
+export function stateWords(
+  inquiryStatus: Schemas["InquiryStatus"],
+  inquiryRoute: Schemas["Route"] | null,
+): string {
+  if (inquiryStatus === "needs_review") {
+    return inquiryRoute === "request_details" ? route.request_details : route.draft_reply;
+  }
+  return status[inquiryStatus];
+}
+
+export const queue = {
+  title: "Queue",
+  searchLabel: "Search inquiries",
+  searchHint: "Searches names, subjects and messages",
+  filtersLabel: "Show",
+  tabs: {
+    review: "Needs review",
+    escalated: "Escalated",
+    failed: "Failed",
+    archived: "Archived",
+    all: "All",
+  },
+  urgentOnly: "Urgent only",
+  urgentOnlyClear: "Show everything",
+  loading: "Loading the queue",
+  empty: "Nothing waiting. New inquiries will appear here.",
+  emptyArchived: "Nothing has been archived.",
+  noResults: "No inquiries match this filter.",
+  showAll: "Show all",
+  showMore: "Show more",
+  loadingMore: "Loading more…",
+  moreFailed: "Couldn't load more. Try again.",
+  unknownSender: "Unknown sender",
+  noSubject: "(no subject)",
+  repeat: "Repeat of an earlier message",
+  listLabel: "Inquiries",
+  newInquiries: (count: number): string =>
+    count === 1 ? "1 new inquiry" : `${count} new inquiries`,
+} as const;

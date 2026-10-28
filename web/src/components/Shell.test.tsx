@@ -68,7 +68,9 @@ describe("the shell", () => {
         },
       }),
     );
-    const region = screen.getAllByRole("status")[0] as HTMLElement;
+    const region = screen
+      .getAllByRole("status")
+      .find((r) => r.getAttribute("aria-live") === "polite") as HTMLElement;
     await waitFor(() => expect(region).toHaveTextContent("Connection lost. Retrying."));
     expect(
       within(screen.getByRole("banner")).getByText("Connection lost. Retrying."),

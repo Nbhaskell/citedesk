@@ -28,31 +28,10 @@ from citedesk.understand import (
     normalise_fields,
     parse_output,
 )
+from tests.helpers import model_reply as reply
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 RECEIVED = "2026-10-28T23:00:00Z"  # a Wednesday
-
-
-def reply(**over: Any) -> dict[str, Any]:
-    base: dict[str, Any] = {
-        "summary": "Asks how much a kitchen drain costs.",
-        "intents": [{"intent": "pricing_question", "confidence": "high"}],
-        "primary_intent": "pricing_question",
-        "urgency": "normal",
-        "sentiment": "neutral",
-        "escalation_signals": [],
-        "fields": {
-            "service_type": "drain_cleaning",
-            "start_date": None,
-            "property_type": None,
-            "address_area": None,
-            "preferred_contact": None,
-            "booking_reference": None,
-            "dates_as_written": None,
-        },
-    }
-    base.update(over)
-    return base
 
 
 def run(llm: FakeLLM, **over: Any) -> understand.Understanding:

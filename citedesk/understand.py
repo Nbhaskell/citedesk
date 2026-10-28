@@ -55,6 +55,13 @@ NET_FLOOR = Urgency.high  # TRD 4.2: "at least high"
 
 Signal = Literal["REFUND_OR_DISPUTE", "LEGAL_THREAT", "POLICY_EXCEPTION_REQUEST"]
 
+# Codes this step puts in audit events. They are our own words, so events.py treats them as known
+# even if a customer happens to write the same word.
+FAILURE_REASONS = frozenset(
+    {"timeout", "unavailable", "bad_response", "truncated", "invalid_json", "invalid_output"}
+)
+NOTE_CODES = frozenset({"start_date_invalid", "start_date_in_past"})
+
 
 # --- what the model must return ---------------------------------------------------------------
 

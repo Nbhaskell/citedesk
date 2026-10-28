@@ -20,7 +20,7 @@ from collections.abc import Mapping, Sequence
 from enum import StrEnum
 from typing import Any
 
-from citedesk import models
+from citedesk import models, understand
 from citedesk.db import utc_now
 from citedesk.models import AuditEvent, AuditEventType, InquiryStatus, Stage
 from citedesk.safety import EMERGENCY_PATTERNS
@@ -44,7 +44,8 @@ KNOWN_CODES: frozenset[str] = frozenset(
 
 
 # Names the screening code produces. Several are also ordinary words ("sewage", "flooding"), so a
-# customer who writes one must not make the audit event for it fail.
+# customer who writes one must not make the audit event for it fail. The same goes for the field
+# names the understand step reports as missing and the reasons a stage can fail.
 KNOWN_CODES = (
     KNOWN_CODES
     | frozenset(EMERGENCY_PATTERNS)
@@ -52,6 +53,10 @@ KNOWN_CODES = (
     | frozenset(WEAK)
     | frozenset(SPAM_SIGNALS)
     | frozenset(DERIVED_FLAGS)
+    | frozenset(models.ExtractedFields.model_fields)
+    | understand.FAILURE_REASONS
+    | understand.NOTE_CODES
+    | {"crashed"}
 )
 
 

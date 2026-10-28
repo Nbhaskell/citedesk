@@ -1,11 +1,14 @@
 """Emergency terms: a keyword net in code, so no model is needed to notice an emergency.
 
-Phase 3 uses it for two things only: spam is never archived when an emergency term is present, and
-an inquiry escalated for suspected injection still gets the `HEALTH_SAFETY` reason and urgent
-priority, because no model reads it. Phase 4 builds the full safety net on top (raising urgency
-for model-classified inquiries) and measures it on the golden set.
+Used three ways: spam is never archived when an emergency term is present; an inquiry escalated
+for suspected injection still gets the `HEALTH_SAFETY` reason and urgent priority, because no model
+reads it; and for every other inquiry the understand stage raises urgency and the route stage adds
+`HEALTH_SAFETY` when the net fires, even if the model missed it (docs/TRD.md section 4.2).
 
-Hits are pattern names, never the matched text.
+The net errs towards firing: a missed emergency costs far more than an extra look from the owner.
+Two additions keep it honest (D-037): sewage is also recognised when it is described rather than
+named, and a mention is discounted when its own clause says it was long ago. Hits are pattern
+names, never the matched text.
 """
 
 import re
@@ -29,6 +32,15 @@ EMERGENCY_PATTERNS: dict[str, re.Pattern[str]] = {
     ),
     "sewage": re.compile(
         r"\bsewage\b|\bsewer\b.{0,20}\b(?:back(?:ing|ed)?\s*up|backup)\b|\bbacking up into\b"
+        # Described rather than named: foul water on a floor, toilet paper where it should not be,
+        # water coming up out of a drain, a toilet that overflows.
+        r"|\b(?:dirty|smelly|smelling|foul|filthy|stinky|stinking|brown|black|grey|gray|murky)\b"
+        r"[^.!?]{0,25}\bwater\b[^.!?]{0,60}\b(?:on|across|over)\b[^.!?]{0,25}\bfloor\b"
+        r"|\btoilet paper\b[^.!?]{0,40}\b(?:floor|tub|shower|sink|drain)\b"
+        r"|\b(?:floor|tub|shower|sink)\b[^.!?]{0,40}\btoilet paper\b"
+        r"|\b(?:coming|comes|came|bubbling|bubbles|bubbled|rising|rises|rose|welling)\s+up\s+"
+        r"(?:out\s+of|through|from)\s+(?:the\s+|our\s+|my\s+)?(?:floor\s+drain|toilet|tub|shower)\b"
+        r"|\btoilet\b[^.!?]{0,15}\boverflow(?:s|ed|ing)\b"
     ),
     "electrical": re.compile(
         r"\bsparks?\b|\bsparking\b|\belectric(?:al)? shock\b"
@@ -36,11 +48,47 @@ EMERGENCY_PATTERNS: dict[str, re.Pattern[str]] = {
     ),
 }
 
+# A mention of an emergency is discounted when its own clause says it was long ago ("a pipe burst in
+# our kitchen last month") and does not also say it is happening again. The window is one clause,
+# so "last year ... please help, water everywhere" still fires on the second half.
+CLAUSE_BREAK = re.compile(r"[.!?;,]+|\b(?:and|but|so|because|now|please|then)\b")
+HISTORICAL = re.compile(
+    r"\blast (?:month|year|winter|summer|spring|fall|autumn)\b"
+    r"|\b(?:months?|years?) ago\b"
+    r"|\bback in\b"
+    r"|\bin (?:19|20)\d\d\b"
+    r"|\bthe last time\b"
+    r"|\bpreviously\b"
+)
+PRESENT = re.compile(
+    r"\b(?:again|still|today|tonight|currently|this (?:morning|afternoon|evening))\b"
+)
+
+
+def _is_history(text: str, match: re.Match[str], breaks: list[tuple[int, int]]) -> bool:
+    start = max((end for begin, end in breaks if end <= match.start()), default=0)
+    stop = min((begin for begin, _ in breaks if begin >= match.end()), default=len(text))
+    clause = text[start:stop]
+    return bool(HISTORICAL.search(clause)) and not PRESENT.search(clause)
+
+
+def _fires(pattern: re.Pattern[str], text: str, breaks: list[tuple[int, int]]) -> bool:
+    """True if any match of the pattern, overlapping ones included, is not past history."""
+    position = 0
+    while (match := pattern.search(text, position)) is not None:
+        if not _is_history(text, match, breaks):
+            return True
+        position = match.start() + 1
+    return False
+
 
 def emergency_hits(text: str) -> list[str]:
     """Names of the emergency patterns found in the text, in a stable order."""
     normalised = normalise(text)
-    return [name for name, pattern in EMERGENCY_PATTERNS.items() if pattern.search(normalised)]
+    breaks = [(m.start(), m.end()) for m in CLAUSE_BREAK.finditer(normalised)]
+    return [
+        name for name, pattern in EMERGENCY_PATTERNS.items() if _fires(pattern, normalised, breaks)
+    ]
 
 
 def has_emergency_terms(text: str) -> bool:

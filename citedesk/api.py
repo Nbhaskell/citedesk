@@ -1,10 +1,17 @@
-"""The HTTP API (docs/TRD.md section 6), as far as Phase 3 goes.
+"""The HTTP API (docs/TRD.md section 6), as far as Phase 6 goes (no endpoint sends anything).
 
     GET  /api/status                 health, queue depth, whether the worker runs
     POST /api/inquiries              store one inquiry (answers at once; the pipeline runs later)
     POST /api/inquiries/import       a JSONL or CSV file as the request body
     GET  /api/inquiries              list, filtered and paged in review-queue order
     GET  /api/inquiries/{id}         everything known about one inquiry
+    POST /api/drafts/{id}/approve    approve a draft, optionally with the reviewer's edit
+    POST /api/drafts/{id}/reject     reject a draft (a reason is required)
+    POST /api/inquiries/{id}/escalate   send an item waiting for review to the owner (note required)
+    POST /api/inquiries/{id}/resolve    close an escalated or rejected item
+    GET  /api/drafts/{id}/export     the approved text; changes nothing
+    POST /api/drafts/{id}/export     record that the approved text was copied
+    GET  /api/insights               counts and review times
 
 Every response carries an `X-Request-ID`. Every error has the one shape
 `{"error": {"code", "message", "request_id"}}`, and a message never repeats what the caller sent.
@@ -24,14 +31,15 @@ from typing import Annotated, Any, Literal
 from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from citedesk import __version__, events, intake, repo
+from citedesk import __version__, events, insights, intake, repo, review
 from citedesk.business import Business
 from citedesk.config import Settings
 from citedesk.db import connect, migrate
+from citedesk.insights import Insights
 from citedesk.intake import (
     DuplicateExternalId,
     ImportFormatError,
@@ -133,6 +141,35 @@ class InquiryDetail(BaseModel):
     checks: list[DraftCheck]
     history: list[AuditEvent]
     duplicates: list[int]
+
+
+class ApproveBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    edited_body: str | None = None
+    review_seconds: int | None = None
+
+
+class RejectBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    reason: str
+    review_seconds: int | None = None
+
+
+class EscalateBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    note: str
+
+
+class ResolveBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    note: str | None = None
+
+
+class ExportText(BaseModel):
+    inquiry_id: int
+    draft_id: int
+    subject: str | None
+    body: str
 
 
 class RejectionOut(BaseModel):
@@ -310,6 +347,18 @@ def create_app(
             phrases.get(error.status_code, "The request could not be handled."),
         )
 
+    @app.exception_handler(review.NotFound)
+    async def handle_review_not_found(request: Request, error: review.NotFound) -> JSONResponse:
+        return error_response(request, 404, "not_found", str(error))
+
+    @app.exception_handler(review.WrongState)
+    async def handle_wrong_state(request: Request, error: review.WrongState) -> JSONResponse:
+        return error_response(request, 409, "wrong_state", str(error))
+
+    @app.exception_handler(review.InvalidReview)
+    async def handle_invalid_review(request: Request, error: review.InvalidReview) -> JSONResponse:
+        return error_response(request, 422, "invalid_review", str(error))
+
     @app.exception_handler(DuplicateExternalId)
     async def handle_duplicate(request: Request, error: DuplicateExternalId) -> JSONResponse:
         message = (
@@ -465,24 +514,86 @@ def create_app(
             next_cursor=encode_cursor(page[-1]) if len(rows) > limit else None,
         )
 
+    def detail_of(conn: sqlite3.Connection, inquiry_id: int) -> InquiryDetail:
+        inquiry = repo.get_inquiry(conn, inquiry_id)
+        if inquiry is None:
+            raise ApiError(404, "not_found", "No inquiry has that id.")
+        draft = repo.latest_draft(conn, inquiry_id)
+        return InquiryDetail(
+            inquiry=inquiry,
+            screening=repo.get_screening(conn, inquiry_id),
+            classification=repo.latest_classification(conn, inquiry_id),
+            extraction=repo.latest_extraction(conn, inquiry_id),
+            escalations=repo.list_escalations(conn, inquiry_id),
+            retrievals=repo.list_retrievals(conn, inquiry_id),
+            draft=draft,
+            checks=repo.list_draft_checks(conn, draft.id) if draft else [],
+            history=events.list_events(conn, inquiry_id),
+            duplicates=repo.list_duplicates_of(conn, inquiry_id),
+        )
+
     @app.get("/api/inquiries/{inquiry_id}", response_model=InquiryDetail)
     def inquiry_detail(inquiry_id: int) -> InquiryDetail:
         with db() as conn:
-            inquiry = repo.get_inquiry(conn, inquiry_id)
-            if inquiry is None:
-                raise ApiError(404, "not_found", "No inquiry has that id.")
-            draft = repo.latest_draft(conn, inquiry_id)
-            return InquiryDetail(
-                inquiry=inquiry,
-                screening=repo.get_screening(conn, inquiry_id),
-                classification=repo.latest_classification(conn, inquiry_id),
-                extraction=repo.latest_extraction(conn, inquiry_id),
-                escalations=repo.list_escalations(conn, inquiry_id),
-                retrievals=repo.list_retrievals(conn, inquiry_id),
-                draft=draft,
-                checks=repo.list_draft_checks(conn, draft.id) if draft else [],
-                history=events.list_events(conn, inquiry_id),
-                duplicates=repo.list_duplicates_of(conn, inquiry_id),
+            return detail_of(conn, inquiry_id)
+
+    # --- review ---
+
+    @app.post("/api/drafts/{draft_id}/approve", response_model=InquiryDetail)
+    def approve_draft(draft_id: int, request: Request, body: ApproveBody) -> InquiryDetail:
+        with db() as conn:
+            decision = review.approve(
+                conn,
+                draft_id,
+                edited_body=body.edited_body,
+                review_seconds=body.review_seconds,
+                request_id=request_id_of(request),
             )
+            return detail_of(conn, decision.inquiry_id)
+
+    @app.post("/api/drafts/{draft_id}/reject", response_model=InquiryDetail)
+    def reject_draft(draft_id: int, request: Request, body: RejectBody) -> InquiryDetail:
+        with db() as conn:
+            decision = review.reject(
+                conn,
+                draft_id,
+                reason=body.reason,
+                review_seconds=body.review_seconds,
+                request_id=request_id_of(request),
+            )
+            return detail_of(conn, decision.inquiry_id)
+
+    @app.post("/api/inquiries/{inquiry_id}/escalate", response_model=InquiryDetail)
+    def escalate_inquiry(inquiry_id: int, request: Request, body: EscalateBody) -> InquiryDetail:
+        with db() as conn:
+            review.escalate(conn, inquiry_id, note=body.note, request_id=request_id_of(request))
+            return detail_of(conn, inquiry_id)
+
+    @app.post("/api/inquiries/{inquiry_id}/resolve", response_model=InquiryDetail)
+    def resolve_inquiry(inquiry_id: int, request: Request, body: ResolveBody) -> InquiryDetail:
+        with db() as conn:
+            review.resolve(conn, inquiry_id, note=body.note, request_id=request_id_of(request))
+            return detail_of(conn, inquiry_id)
+
+    @app.get("/api/drafts/{draft_id}/export", response_model=ExportText)
+    def read_export(draft_id: int) -> ExportText:
+        with db() as conn:
+            text = review.approved_text(conn, draft_id)
+        return ExportText(
+            inquiry_id=text.inquiry_id, draft_id=text.draft_id, subject=text.subject, body=text.body
+        )
+
+    @app.post("/api/drafts/{draft_id}/export", response_model=ExportText)
+    def record_export(draft_id: int, request: Request) -> ExportText:
+        with db() as conn:
+            text = review.export(conn, draft_id, request_id=request_id_of(request))
+        return ExportText(
+            inquiry_id=text.inquiry_id, draft_id=text.draft_id, subject=text.subject, body=text.body
+        )
+
+    @app.get("/api/insights", response_model=Insights)
+    def read_insights() -> Insights:
+        with db() as conn:
+            return insights.compute(conn, synthetic_data=settings.synthetic_data)
 
     return app

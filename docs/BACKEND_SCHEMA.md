@@ -22,7 +22,7 @@ Conventions: ids are integers; timestamps are ISO 8601 UTC strings; JSON columns
 | `draft_kind` | `reply`, `request_details`, `holding_reply` |
 | `draft_status` | `ready`, `blocked`, `approved`, `rejected`, `superseded` |
 | `decision` | `approve`, `edit_approve`, `reject`, `escalate`, `resolve` |
-| `service_type` | `emergency_repair`, `drain_cleaning`, `water_heater`, `fixture_installation`, `inspection`, `other`, `unknown` |
+| `service_type` | `emergency_repair`, `drain_cleaning`, `leak_repair`, `sewer_line_repair`, `water_heater`, `fixture_installation`, `inspection`, `other`, `unknown` |
 | `property_type` | `house`, `apartment`, `commercial`, `other`, `unknown` |
 | `stage` | `screen`, `understand`, `route`, `retrieve`, `draft`, `check` |
 

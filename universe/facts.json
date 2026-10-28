@@ -20,6 +20,19 @@
     {"name": "Obadiah Finch", "role": "Lead technician", "handles": "on-site work"},
     {"name": "Lucia Marrow", "role": "Technician", "handles": "on-site work"}
   ],
+  "services_offered": [
+    {"name": "Emergency plumbing repair", "service_type": "emergency_repair", "pricing": "emergency call-out fee plus hourly labour and parts"},
+    {"name": "Drain cleaning", "service_type": "drain_cleaning", "pricing": "flat price"},
+    {"name": "Main sewer line cleaning", "service_type": "drain_cleaning", "pricing": "flat price"},
+    {"name": "Sewer line repair", "service_type": "sewer_line_repair", "pricing": "quote only, after a camera inspection"},
+    {"name": "Leak detection", "service_type": "leak_repair", "pricing": "flat price"},
+    {"name": "Plumbing leak repair", "service_type": "leak_repair", "pricing": "quote only, hourly labour plus parts"},
+    {"name": "Slab leak repair", "service_type": "leak_repair", "pricing": "quote only, after leak detection"},
+    {"name": "Water heater service and replacement", "service_type": "water_heater", "pricing": "flat price for flush and tank replacement; tankless is quote only"},
+    {"name": "Fixture installation", "service_type": "fixture_installation", "pricing": "flat price"},
+    {"name": "Plumbing inspection", "service_type": "inspection", "pricing": "flat price"},
+    {"name": "General plumbing repair", "service_type": "other", "pricing": "hourly labour plus parts, with a written estimate over $300"}
+  ],
   "service_area": {
     "core": ["Alderbrook Heights", "Millrace", "Old Quarry", "Tamarind Park", "Wren Common"],
     "outer": {"areas": ["Dunmore Flats", "Saltmarsh"], "travel_fee": 40},
@@ -54,6 +67,7 @@
       {"job": "Drain cleaning, one fixture (sink, tub, shower or toilet)", "service_type": "drain_cleaning", "price": 149, "price_note": "starting price"},
       {"job": "Main sewer line cleaning", "service_type": "drain_cleaning", "price": 329},
       {"job": "Camera inspection of a drain or sewer line", "service_type": "inspection", "price": 175},
+      {"job": "Leak detection (electronic, finds the source of a hidden leak)", "service_type": "leak_repair", "price": 245, "note": "Credited toward the repair if the customer approves it during the same visit"},
       {"job": "Water heater flush", "service_type": "water_heater", "price": 129},
       {"job": "Water heater replacement, 40-gallon tank, installed", "service_type": "water_heater", "price": 1450, "note": "Includes permit and removal of the old unit"},
       {"job": "Water heater replacement, 50-gallon tank, installed", "service_type": "water_heater", "price": 1650, "note": "Includes permit and removal of the old unit"},
@@ -63,7 +77,7 @@
       {"job": "Fixture shut-off valve replacement, each", "service_type": "fixture_installation", "price": 135},
       {"job": "Whole-home plumbing inspection with written summary", "service_type": "inspection", "price": 225, "note": "About 2 hours. Summary sent within 2 business days."}
     ],
-    "quote_only": ["Tankless water heater installation", "Repiping", "Leak and pipe repair (hourly labour plus parts)", "Bathroom or kitchen remodel plumbing"],
+    "quote_only": ["Tankless water heater installation", "Repiping", "Sewer line repair (after a camera inspection)", "Slab leak repair (after leak detection)", "Leak and pipe repair (hourly labour plus parts)", "Bathroom or kitchen remodel plumbing"],
     "written_estimate_required_over": 300,
     "discounts": "None offered. No senior, military, repeat-customer or price-match discounts.",
     "payment": {"methods": ["card", "check", "cash"], "when": "On completion of the visit", "invoice": "Emailed the same day", "late_fee_percent_per_month": 1.5, "late_fee_after_days": 30}

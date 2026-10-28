@@ -67,6 +67,8 @@ No Phase 0 task covers the web app, and the UI is built in Phase 6. `web/` exist
 
 Why plumbing: it has clearly bounded safety cases (gas smell, flooding, sewage, carbon monoxide), natural escalations for complaints, disputes and warranty exceptions, and priced jobs that exercise the figure check. The cost is that more inquiries cannot be answered from documents (price depends on diagnosis, availability is live), so fewer end in a fully drafted reply.
 
+**Amendment (same day).** After comparing the fact sheet with the services menu of a real plumbing company's website (used only as a reference for which standard services exist; no names, wording or prices were copied), `service_type` gained `leak_repair` and `sewer_line_repair`, and the fact sheet gained a `services_offered` list, leak detection ($245, invented), and quote-only entries for sewer line repair and slab leak repair. General plumbing repair maps to `other`. Without these, ordinary requests such as "find a leak under my slab" would have escalated as `NOT_IN_KNOWLEDGE_BASE` and the labels would have been ambiguous. `tests/test_universe_facts.py` now checks that every `service_type` in the fact sheet exists in the schema enum, that no offered service clashes with the not-offered list, and that phone numbers and emails follow the synthetic-data rules.
+
 ### D-017. Only documents and inquiries are generated from the universe
 The `synthetic-business-universe` skill also describes invoices, bookings and reviews. Citedesk needs none of them, so only `universe/facts.json`, the knowledge-base documents and the labelled inquiries are generated.
 

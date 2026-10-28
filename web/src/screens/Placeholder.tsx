@@ -11,14 +11,6 @@ export function Placeholder({ title, children }: { title: string; children: stri
   );
 }
 
-export function DetailScreen() {
-  return (
-    <Placeholder title="Inquiry">
-      The message, the draft and its checks will be shown here.
-    </Placeholder>
-  );
-}
-
 export function InsightsScreen() {
   return <Placeholder title="Insights">Counts and review times will be shown here.</Placeholder>;
 }

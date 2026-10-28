@@ -366,7 +366,7 @@ describe("Queue: keyboard", () => {
     renderApp(client);
     await screen.findByRole("link", { name: /Person 1/ });
     await user.keyboard("jj{Enter}");
-    expect(await screen.findByRole("heading", { name: "Inquiry" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /^Inquiry 3/ })).toBeInTheDocument();
   });
 
   it("leaves j and k to the search box while typing", async () => {

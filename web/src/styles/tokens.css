@@ -1,0 +1,51 @@
+/* Design tokens from docs/UI_DESIGN_PLAN.md section 3. src/styles/tokens.test.ts checks the contrast
+   of every text and boundary pair below, so a changed value that fails the plan fails the tests. */
+:root {
+  /* surfaces and text */
+  --paper: #f3f5f3;
+  --sheet: #ffffff;
+  --ink: #1f2a30;
+  --slate: #56646c;
+  --rule: #d5dad7; /* decoration only, never the sole boundary of a control */
+  --edge: #7a8a93; /* boundaries of inputs and buttons */
+
+  /* action and focus */
+  --patina: #0d5c57;
+  --patina-mist: #dceeec;
+  --ring: #1d5fd1;
+
+  /* urgency: always shown with a word, never colour alone */
+  --signal: #b3261e;
+  --signal-tint: #fbe4e1;
+  --signal-ink: #8f1d14;
+  --amber: #b7791f;
+  --amber-tint: #fcebc4;
+  --amber-ink: #6b4500;
+  --slate-tint: #e3eaee;
+  --slate-ink: #2f4655;
+
+  /* check results */
+  --pass-tint: #dff1e3;
+  --pass-ink: #1b5e2f;
+  --mark: #ffe08a;
+
+  /* type */
+  --font-ui: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-prose: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --size-body: 1.0625rem; /* 17px */
+  --size-small: 1rem; /* 16px, the smallest text anywhere */
+  --size-prose: 1.125rem; /* 18px, customer text and drafts */
+  --size-title: 1.5rem;
+  --measure: 68ch;
+
+  /* space and shape */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --target: 2.75rem; /* 44px minimum touch target */
+  --radius: 4px;
+  --gutter: 1rem;
+}

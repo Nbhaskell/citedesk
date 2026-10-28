@@ -32,7 +32,7 @@ jobs:
       - name: OpenAPI file is current
         run: python -m tools.export_openapi --check
 
-  web-types:
+  web:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -48,3 +48,11 @@ jobs:
         run: npm ci
       - name: Generated API types are current and compile
         run: npm run check:api
+      - name: Lint
+        run: npm run lint
+      - name: Format check
+        run: npm run format:check
+      - name: Tests
+        run: npm test
+      - name: Build
+        run: npm run build

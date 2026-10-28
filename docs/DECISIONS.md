@@ -227,3 +227,29 @@ The business serves homes and small residential buildings up to four units, and 
 - **No model, no understanding.** `process`, `run_pending` and `PipelineWorker` take an optional model; without one they only screen, as in Phase 3. The library and the tests never attach one. `python -m citedesk` attaches Ollama, in one place (`__main__.py`). An autouse test fixture makes any test that reaches the real Ollama call fail, so the suite cannot need a model by accident.
 - **Reasons the pipeline cannot give for injection items.** The model never reads a message screening flagged (TRD 4.1), so a refund demand inside an injection attempt (`injection-claimed-owner-refund`) is escalated for `INJECTION_SUSPECTED` only. The golden label lists both, which is what should be true of the message; the scoring script reports the difference instead of hiding it.
 - **Audit events.** `stage_started`, `stage_finished`, `route_decided` (route, reason codes, missing fields, whether the net fired) and `stage_failed` hold codes only. The field names that can appear as "missing" and the failure reasons were added to the events module's list of known codes, so a customer who happens to write "timeout" or "start_date" cannot make an audit write fail.
+
+### D-044. First baseline: stages 1 to 3 on the tuned split, as it came out
+One run, `understand-v1`, `qwen3:8b` through Ollama, thinking off, temperature 0, seed 0, commit `a4eb351` (clean tree), golden file hash `a40859200b7a`, run id `understand-v1-tuned-20261028-211930` (the run and scores files are in `eval/runs/`, which is git-ignored). **No prompt, rule or label was changed after seeing these numbers.** Produced by `python -m tools.score_understanding`; the rules for each metric are in that file and its report footnotes.
+
+**Coverage.** 135 items: 123 read by the model, 6 escalated at screening (injection), 6 archived at screening (spam). 0 failed, 0 needed a second attempt. Model time per item: median 2.2 s, p90 2.5 s, max 5.4 s. The acceptance check (every item reaches `routed`, `escalated` or `archived` without a crash) holds for this run; the scripted-model test checks the same on every commit.
+
+| Metric | Result |
+|---|---|
+| Primary intent accuracy (123 read) | 79.7% (98/123); macro-F1 75.6%; exact intent set 47.2%; primary is one of the labelled intents 84.6% |
+| Field accuracy (123 read, 5 fields, exact after tidying) | 87.3% overall; every field right on 56.9% of items |
+| service_type / start_date / property_type / address_area / booking_reference | 73.2% / 83.7% / 86.2% / 93.5% / 100% |
+| Fields the model invented when the label was null | service_type 10, start_date 19, property_type 12, address_area 8 |
+| Urgency (123 read) | 54.5% (the emergency net changed nothing here; model alone is also 54.5%) |
+| Escalation, all 135 items | precision 83.8% (31 tp, 6 fp), recall 81.6% (31 tp, 7 fn) |
+| Route accuracy | 80.7% |
+
+**Escalation by reason** (tp / fp / fn): `HEALTH_SAFETY` 8 / 6 / 0; `COMPLAINT` 13 / 3 / 0; `REFUND_OR_DISPUTE` 2 / 0 / 2; `LEGAL_THREAT` 2 / 0 / 0; `POLICY_EXCEPTION_REQUEST` 2 / 0 / 6; `INJECTION_SUSPECTED` 6 / 0 / 0; `LOW_CONFIDENCE` 0 / 0 / 1.
+
+**What the numbers say, without acting on them.**
+- **Safety recall was 8 of 8**, all caught by both the model and the net. Precision is low because the model labels non-emergencies (a gurgling drain smell, a ceiling drip, no hot water with a newborn, lost water pressure, a ceiling leak of unknown size) as `health_or_safety`; five of the six false positives are in the `urgent` category. Plus the known net over-fire (D-037).
+- **The model's own escalation flags are weak** (D-041): `POLICY_EXCEPTION_REQUEST` recall 25% (all six misses are items labelled `exception-*`), `REFUND_OR_DISPUTE` 50%. These are the failures the false-negative list shows, and they are exactly the case D-041 warned has no second line in Phase 4. A keyword net for refund and exception wording, or a better definition in the prompt, is the obvious next step; neither was tried.
+- **`LOW_CONFIDENCE` recall 0 of 1** (the gibberish item; the label itself is model-dependent). **Billing** is the weakest intent: six `billing_question` items were read as complaint, policy, pricing or cancellation.
+- **Urgency is poor** (54.5%): the model rarely says `urgent` or `high` where the labels do, and the emergency net only floors at `high`.
+- Route mistakes follow from these: 6 escalations missed (the exception items), 5 `request_details` items escalated (the over-eager safety reading), 10 `draft_reply` items turned into `request_details` (invented-then-missing fields).
+
+**What this cannot tell you.** These are the tuned items, so any later improvement measured on them is partly fitting. The held-out set is not written; it will be run once in Phase 7 and these numbers are the comparison point. Counts per reason are small (6 exception items, 4 refund items, 1 low-confidence item), so those rates are rough guides. One author wrote the labels, the prompt and the documents. Single run: no estimate of run-to-run variation (temperature 0 and a fixed seed make it small but not zero).

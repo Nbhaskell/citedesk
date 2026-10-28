@@ -7,7 +7,7 @@ from typing import Any
 
 from citedesk.providers.base import LLMResult
 
-Reply = str | dict[str, Any] | list[Any] | Exception
+Reply = str | dict[str, Any] | list[Any] | Exception | LLMResult
 
 
 @dataclass(frozen=True)
@@ -28,7 +28,8 @@ class FakeLLM:
     """Replies from a script: a list used in order, or a function of the call.
 
     A reply that is an exception is raised instead of returned. A dict or list is sent as JSON
-    text; a string is sent as it is, so a test can send invalid JSON. Running out of scripted
+    text; a string is sent as it is, so a test can send invalid JSON; an `LLMResult` is returned
+    untouched, for a test that needs a truncated reply or token counts. Running out of scripted
     replies is a test bug, so it raises AssertionError.
     """
 
@@ -67,5 +68,7 @@ class FakeLLM:
             raise AssertionError("FakeLLM was called more times than it has replies")
         if isinstance(reply, Exception):
             raise reply
+        if isinstance(reply, LLMResult):
+            return reply
         text = reply if isinstance(reply, str) else json.dumps(reply)
         return LLMResult(text=text, model=self.model, duration_ms=1)

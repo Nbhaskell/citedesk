@@ -100,3 +100,10 @@ def test_the_fake_is_an_llm_provider() -> None:
 def test_the_error_types_share_a_base() -> None:
     for error in (LLMUnavailable, LLMTimeout, LLMBadResponse):
         assert issubclass(error, LLMError)
+
+
+def test_a_prepared_result_is_returned_untouched() -> None:
+    from citedesk.providers import LLMResult
+
+    cut = LLMResult(text='{"a": ', model="m", duration_ms=5, truncated=True)
+    assert FakeLLM([cut]).generate_json(system="s", user="u", schema=SCHEMA) is cut

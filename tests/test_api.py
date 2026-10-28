@@ -543,3 +543,26 @@ def test_starting_the_app_twice_does_not_break_the_database(api_settings: Settin
             assert client.get("/api/status").json()["components"]["database"]["status"] == "ok"
     conn = sqlite3.connect(api_settings.db_path)
     assert conn.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0] == 1
+
+
+def test_with_a_model_the_worker_takes_a_posted_inquiry_all_the_way_to_routing(
+    api_settings: Settings,
+) -> None:
+    from citedesk.providers import FakeLLM
+    from tests.helpers import model_reply
+
+    llm = FakeLLM(lambda call: model_reply())
+    with TestClient(
+        create_app(api_settings, start_worker=True, worker_poll_seconds=0.05, llm=llm)
+    ) as client:
+        created = post(client).json()
+        deadline = time.monotonic() + 5
+        status = "received"
+        while time.monotonic() < deadline and status in ("received", "screened", "classified"):
+            status = client.get(f"/api/inquiries/{created['id']}").json()["inquiry"]["status"]
+            time.sleep(0.02)
+        detail = client.get(f"/api/inquiries/{created['id']}").json()
+    assert status == "routed"
+    assert detail["classification"]["prompt_version"] == "understand-v1"
+    assert detail["extraction"]["missing_fields"] == []
+    assert detail["inquiry"]["route"] == "draft_reply"

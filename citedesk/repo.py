@@ -146,6 +146,94 @@ def find_by_external_id(
     )
 
 
+URGENCY_RANK_SQL = (
+    "CASE urgency WHEN 'urgent' THEN 0 WHEN 'high' THEN 1 WHEN 'normal' THEN 2 ELSE 3 END"
+)
+
+
+def urgency_rank(urgency: str | None) -> int:
+    """Sort position of an urgency, matching URGENCY_RANK_SQL: urgent first, unknown last."""
+    return {"urgent": 0, "high": 1, "normal": 2}.get(urgency or "", 3)
+
+
+def _like_pattern(text: str) -> str:
+    escaped = text.lower().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    return f"%{escaped}%"
+
+
+def search_inquiries(
+    conn: sqlite3.Connection,
+    *,
+    statuses: Sequence[InquiryStatus | str] | None = None,
+    routes: Sequence[Route | str] | None = None,
+    urgencies: Sequence[Urgency | str] | None = None,
+    q: str | None = None,
+    limit: int = 50,
+    after: tuple[int, str, int] | None = None,
+) -> list[Inquiry]:
+    """Inquiries in review-queue order (urgent first, then oldest), filtered and paged.
+
+    `after` is the (urgency rank, received_at, id) of the last row already seen. Paging by that
+    key rather than by offset means rows arriving meanwhile cannot make a page skip or repeat one.
+    Text search matches subject, body and sender, ignores case, and treats % and _ literally.
+    """
+    where: list[str] = []
+    params: list[Any] = []
+    for column, values, enum_class in (
+        ("status", statuses, InquiryStatus),
+        ("route", routes, Route),
+        ("urgency", urgencies, Urgency),
+    ):
+        if values is not None:
+            marks = ", ".join("?" for _ in values) or "NULL"
+            where.append(f"{column} IN ({marks})")
+            params += [enum_class(v).value for v in values]
+    if q:
+        like = _like_pattern(q)
+        columns = ("subject", "body", "sender_name", "sender_email")
+        where.append(
+            "(" + " OR ".join(f"lower(COALESCE({c}, '')) LIKE ? ESCAPE '\\'" for c in columns) + ")"
+        )
+        params += [like] * len(columns)
+    if after is not None:
+        rank, received_at, last_id = after
+        where.append(
+            f"({URGENCY_RANK_SQL} > ? OR ({URGENCY_RANK_SQL} = ? AND received_at > ?) "
+            f"OR ({URGENCY_RANK_SQL} = ? AND received_at = ? AND id > ?))"
+        )
+        params += [rank, rank, received_at, rank, received_at, last_id]
+    sql = "SELECT * FROM inquiries"
+    if where:
+        sql += " WHERE " + " AND ".join(where)
+    sql += f" ORDER BY {URGENCY_RANK_SQL}, received_at, id LIMIT ?"  # noqa: S608 (constants only)
+    params.append(limit)
+    return _many(conn, Inquiry, sql, tuple(params))
+
+
+def list_duplicates_of(conn: sqlite3.Connection, inquiry_id: int) -> list[int]:
+    rows = conn.execute(
+        "SELECT id FROM inquiries WHERE duplicate_of = ? ORDER BY id", (inquiry_id,)
+    ).fetchall()
+    return [int(r["id"]) for r in rows]
+
+
+def has_clean_history(
+    conn: sqlite3.Connection, sender_email: str | None, *, exclude_id: int
+) -> bool:
+    """True if this sender has an earlier inquiry that screening judged clean (a known customer).
+
+    v1 has no customer table; a sender is known by email and by having sent something real."""
+    if not sender_email:
+        return False
+    row = conn.execute(
+        "SELECT 1 FROM inquiries i JOIN screenings s ON s.inquiry_id = i.id "
+        "WHERE i.sender_email = ? AND i.id != ? AND i.duplicate_of IS NULL AND s.result = 'clean' "
+        "LIMIT 1",
+        (sender_email.lower(), exclude_id),
+    ).fetchone()
+    return row is not None
+
+
 UPDATABLE = {
     "route": Route,
     "urgency": Urgency,

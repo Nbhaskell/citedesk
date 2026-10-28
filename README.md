@@ -10,7 +10,7 @@ Citedesk is an AI review desk for customer inquiries at a small service business
 
 ## Status
 
-Phases 0 to 2 are built: repository and tooling, the invented business with its labelled test messages, and the data layer (database schema, migrations, status rules, audit events). The API has one endpoint, `GET /api/status`, and no inquiry is processed yet. See `docs/IMPLEMENTATION_PLAN.md` for the build order.
+Phases 0 to 3 are built: repository and tooling, the invented business with its labelled test messages, the data layer, and intake with screening. The API accepts inquiries (one at a time or as a JSONL or CSV file), masks card and Social Security numbers before storing them, archives spam, and escalates suspected prompt injection. Nothing reads a message with a model yet, and no reply is drafted. See `docs/IMPLEMENTATION_PLAN.md` for the build order.
 
 ## Run it (Windows, PowerShell)
 

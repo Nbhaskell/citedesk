@@ -23,6 +23,8 @@ from typing import Any
 from citedesk import models
 from citedesk.db import utc_now
 from citedesk.models import AuditEvent, AuditEventType, InquiryStatus, Stage
+from citedesk.safety import EMERGENCY_PATTERNS
+from citedesk.screening import DERIVED_FLAGS, SPAM_SIGNALS, STRONG, WEAK
 
 KEY = re.compile(r"^[a-z][a-z0-9_]{0,40}$")
 TOKEN = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:+-]{0,63}")
@@ -38,6 +40,18 @@ KNOWN_CODES: frozenset[str] = frozenset(
     and issubclass(enum_class, StrEnum)
     and enum_class is not StrEnum
     for member in enum_class
+)
+
+
+# Names the screening code produces. Several are also ordinary words ("sewage", "flooding"), so a
+# customer who writes one must not make the audit event for it fail.
+KNOWN_CODES = (
+    KNOWN_CODES
+    | frozenset(EMERGENCY_PATTERNS)
+    | frozenset(STRONG)
+    | frozenset(WEAK)
+    | frozenset(SPAM_SIGNALS)
+    | frozenset(DERIVED_FLAGS)
 )
 
 

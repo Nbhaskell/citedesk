@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     rag_url: str = Field("http://127.0.0.1:8000", validation_alias="RAG_URL")
     escalate_on_low_confidence: bool = Field(True, validation_alias="ESCALATE_ON_LOW_CONFIDENCE")
     spam_threshold: float = Field(0.8, ge=0, le=1, validation_alias="SPAM_THRESHOLD")
+    duplicate_window_hours: int = Field(24, ge=0, validation_alias="DUPLICATE_WINDOW_HOURS")
+    max_body_chars: int = Field(10000, gt=0, validation_alias="MAX_BODY_CHARS")
     draft_max_words: int = Field(200, gt=0, validation_alias="DRAFT_MAX_WORDS")
     enable_thinking: bool = Field(False, validation_alias="ENABLE_THINKING")
     synthetic_data: bool = Field(True, validation_alias="SYNTHETIC_DATA")

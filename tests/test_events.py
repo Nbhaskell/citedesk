@@ -170,6 +170,16 @@ def test_known_codes_are_allowed_even_if_the_customer_used_the_word() -> None:
     validate_payload({"intent": "spam", "route": "archive"}, protect=["spam archive"])
 
 
+def test_every_screening_pattern_and_signal_name_is_a_known_code() -> None:
+    from citedesk.safety import EMERGENCY_PATTERNS
+    from citedesk.screening import DERIVED_FLAGS, SPAM_SIGNALS, STRONG, WEAK
+
+    names = [*EMERGENCY_PATTERNS, *STRONG, *WEAK, *SPAM_SIGNALS, *DERIVED_FLAGS]
+    assert "sewage" in names and "links" in names
+    for name in names:
+        validate_payload({"value": name}, protect=[f"the customer wrote {name} here"])
+
+
 def test_every_stage_and_status_name_is_a_known_code() -> None:
     for name in [*(s.value for s in Stage), *(s.value for s in InquiryStatus)]:
         validate_payload({"value": name}, protect=[name])

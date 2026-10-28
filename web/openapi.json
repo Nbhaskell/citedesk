@@ -30,6 +30,34 @@
         "title": "ApproveBody",
         "type": "object"
       },
+      "Attention": {
+        "properties": {
+          "escalated": {
+            "title": "Escalated",
+            "type": "integer"
+          },
+          "failed": {
+            "title": "Failed",
+            "type": "integer"
+          },
+          "needs_review": {
+            "title": "Needs Review",
+            "type": "integer"
+          },
+          "urgent_open": {
+            "title": "Urgent Open",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "needs_review",
+          "escalated",
+          "failed",
+          "urgent_open"
+        ],
+        "title": "Attention",
+        "type": "object"
+      },
       "AuditEvent": {
         "additionalProperties": false,
         "properties": {
@@ -141,6 +169,34 @@
         ],
         "title": "AuditEventType",
         "type": "string"
+      },
+      "BusinessOut": {
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "emergency_phone": {
+            "title": "Emergency Phone",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "phone": {
+            "title": "Phone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "phone",
+          "emergency_phone",
+          "email"
+        ],
+        "title": "BusinessOut",
+        "type": "object"
       },
       "Channel": {
         "enum": [
@@ -300,6 +356,17 @@
       },
       "ComponentStatus": {
         "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
           "status": {
             "enum": [
               "ok",
@@ -1237,6 +1304,17 @@
             ],
             "title": "Subject"
           },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
           "urgency": {
             "anyOf": [
               {
@@ -1255,6 +1333,7 @@
           "received_at",
           "sender_name",
           "subject",
+          "summary",
           "status",
           "route",
           "urgency",
@@ -1299,6 +1378,10 @@
             "title": "Decisions",
             "type": "array"
           },
+          "draft_time_sample": {
+            "title": "Draft Time Sample",
+            "type": "integer"
+          },
           "edited_share": {
             "anyOf": [
               {
@@ -1328,6 +1411,43 @@
             ],
             "title": "Median Review Seconds"
           },
+          "median_seconds_to_draft": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Seconds To Draft"
+          },
+          "period_end": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period End"
+          },
+          "period_start": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Start"
+          },
+          "review_time_sample": {
+            "title": "Review Time Sample",
+            "type": "integer"
+          },
           "synthetic_data": {
             "title": "Synthetic Data",
             "type": "boolean"
@@ -1346,6 +1466,11 @@
           "approved_unchanged_share",
           "edited_share",
           "median_review_seconds",
+          "review_time_sample",
+          "median_seconds_to_draft",
+          "draft_time_sample",
+          "period_start",
+          "period_end",
           "synthetic_data"
         ],
         "title": "Insights",
@@ -1639,6 +1764,32 @@
         "title": "Route",
         "type": "string"
       },
+      "RuleOut": {
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/ReasonCode"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "set_by": {
+            "enum": [
+              "code",
+              "environment"
+            ],
+            "title": "Set By",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "enabled",
+          "set_by"
+        ],
+        "title": "RuleOut",
+        "type": "object"
+      },
       "Screening": {
         "additionalProperties": false,
         "properties": {
@@ -1719,6 +1870,48 @@
         "title": "ServiceType",
         "type": "string"
       },
+      "SettingsView": {
+        "properties": {
+          "business": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BusinessOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "draft_max_words": {
+            "title": "Draft Max Words",
+            "type": "integer"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "rules": {
+            "items": {
+              "$ref": "#/components/schemas/RuleOut"
+            },
+            "title": "Rules",
+            "type": "array"
+          },
+          "synthetic_data": {
+            "title": "Synthetic Data",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "business",
+          "draft_max_words",
+          "model",
+          "synthetic_data",
+          "rules"
+        ],
+        "title": "SettingsView",
+        "type": "object"
+      },
       "Source": {
         "additionalProperties": false,
         "properties": {
@@ -1774,6 +1967,20 @@
             "title": "App",
             "type": "string"
           },
+          "attention": {
+            "$ref": "#/components/schemas/Attention"
+          },
+          "checked_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked At"
+          },
           "components": {
             "$ref": "#/components/schemas/Components"
           },
@@ -1814,7 +2021,9 @@
           "model",
           "components",
           "queue_depth",
-          "worker_running"
+          "worker_running",
+          "attention",
+          "checked_at"
         ],
         "title": "StatusResponse",
         "type": "object"
@@ -2514,6 +2723,25 @@
         "summary": "Read Insights"
       }
     },
+    "/api/settings": {
+      "get": {
+        "description": "What is in force, read-only. The escalation rules are fixed in code (D-050).",
+        "operationId": "read_settings_api_settings_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Read Settings"
+      }
+    },
     "/api/status": {
       "get": {
         "operationId": "status_api_status_get",
@@ -2530,6 +2758,25 @@
           }
         },
         "summary": "Status"
+      }
+    },
+    "/api/status/check": {
+      "post": {
+        "description": "Ask the model server and the knowledge base now (short, loopback only, no text sent).",
+        "operationId": "check_status_api_status_check_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Check Status"
       }
     }
   }

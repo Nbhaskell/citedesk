@@ -164,6 +164,8 @@ Base `http://127.0.0.1:8100`. All JSON. Request and response models are Pydantic
 | `POST /api/inquiries/{id}/resolve` | Close an escalated item handled outside the tool |
 | `GET /api/drafts/{id}/export` | Returns approved text for copying |
 | `GET /api/insights` | Aggregates |
+| `POST /api/status/check` | Ask the model server and the knowledge base now; the result is remembered and shown by `GET /api/status` (D-053) |
+| `GET /api/settings` | Read-only: business details, draft word limit, model, data mode, escalation rules and who sets each (D-053) |
 | `GET /api/status` | Model, knowledge base and database health, synthetic-data flag |
 
 Errors use one shape: `{ "error": { "code": "...", "message": "...", "request_id": "..." } }`.

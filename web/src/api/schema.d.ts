@@ -193,6 +193,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Settings
+         * @description What is in force, read-only. The escalation rules are fixed in code (D-050).
+         */
+        get: operations["read_settings_api_settings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/status": {
         parameters: {
             query?: never;
@@ -210,6 +230,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/status/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check Status
+         * @description Ask the model server and the knowledge base now (short, loopback only, no text sent).
+         */
+        post: operations["check_status_api_status_check_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -220,6 +260,17 @@ export interface components {
             edited_body?: string | null;
             /** Review Seconds */
             review_seconds?: number | null;
+        };
+        /** Attention */
+        Attention: {
+            /** Escalated */
+            escalated: number;
+            /** Failed */
+            failed: number;
+            /** Needs Review */
+            needs_review: number;
+            /** Urgent Open */
+            urgent_open: number;
         };
         /** AuditEvent */
         AuditEvent: {
@@ -248,6 +299,17 @@ export interface components {
          * @enum {string}
          */
         AuditEventType: "stage_started" | "stage_finished" | "stage_failed" | "route_decided" | "check_failed" | "review_recorded" | "status_changed";
+        /** BusinessOut */
+        BusinessOut: {
+            /** Email */
+            email: string;
+            /** Emergency Phone */
+            emergency_phone: string;
+            /** Name */
+            name: string;
+            /** Phone */
+            phone: string;
+        };
         /**
          * Channel
          * @enum {string}
@@ -301,6 +363,8 @@ export interface components {
         };
         /** ComponentStatus */
         ComponentStatus: {
+            /** Reason */
+            reason?: string | null;
             /**
              * Status
              * @enum {string}
@@ -553,6 +617,8 @@ export interface components {
             status: components["schemas"]["InquiryStatus"];
             /** Subject */
             subject: string | null;
+            /** Summary */
+            summary: string | null;
             urgency: components["schemas"]["Urgency"] | null;
         };
         /** Insights */
@@ -565,12 +631,22 @@ export interface components {
             by_status: components["schemas"]["Count"][];
             /** Decisions */
             decisions: components["schemas"]["Count"][];
+            /** Draft Time Sample */
+            draft_time_sample: number;
             /** Edited Share */
             edited_share: number | null;
             /** Escalations By Reason */
             escalations_by_reason: components["schemas"]["Count"][];
             /** Median Review Seconds */
             median_review_seconds: number | null;
+            /** Median Seconds To Draft */
+            median_seconds_to_draft: number | null;
+            /** Period End */
+            period_end: string | null;
+            /** Period Start */
+            period_start: string | null;
+            /** Review Time Sample */
+            review_time_sample: number;
             /** Synthetic Data */
             synthetic_data: boolean;
             /** Total Inquiries */
@@ -661,6 +737,17 @@ export interface components {
          * @enum {string}
          */
         Route: "draft_reply" | "request_details" | "escalate" | "archive";
+        /** RuleOut */
+        RuleOut: {
+            code: components["schemas"]["ReasonCode"];
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Set By
+             * @enum {string}
+             */
+            set_by: "code" | "environment";
+        };
         /** Screening */
         Screening: {
             /** Created At */
@@ -692,6 +779,18 @@ export interface components {
          * @enum {string}
          */
         ServiceType: "emergency_repair" | "drain_cleaning" | "leak_repair" | "sewer_line_repair" | "water_heater" | "fixture_installation" | "inspection" | "other" | "unknown";
+        /** SettingsView */
+        SettingsView: {
+            business: components["schemas"]["BusinessOut"] | null;
+            /** Draft Max Words */
+            draft_max_words: number;
+            /** Model */
+            model: string;
+            /** Rules */
+            rules: components["schemas"]["RuleOut"][];
+            /** Synthetic Data */
+            synthetic_data: boolean;
+        };
         /** Source */
         Source: {
             /** File */
@@ -715,6 +814,9 @@ export interface components {
              * @constant
              */
             app: "citedesk";
+            attention: components["schemas"]["Attention"];
+            /** Checked At */
+            checked_at: string | null;
             components: components["schemas"]["Components"];
             /** Model */
             model: string;
@@ -1177,7 +1279,47 @@ export interface operations {
             };
         };
     };
+    read_settings_api_settings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsView"];
+                };
+            };
+        };
+    };
     status_api_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusResponse"];
+                };
+            };
+        };
+    };
+    check_status_api_status_check_post: {
         parameters: {
             query?: never;
             header?: never;

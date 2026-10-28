@@ -210,6 +210,24 @@ def search_inquiries(
     return _many(conn, Inquiry, sql, tuple(params))
 
 
+MAX_SUMMARY_CHARS = 200
+
+
+def latest_summaries(conn: sqlite3.Connection, inquiry_ids: Sequence[int]) -> dict[int, str]:
+    """The model's one-line summary of each inquiry that has been read, cut to fit a list row."""
+    if not inquiry_ids:
+        return {}
+    marks = ", ".join("?" for _ in inquiry_ids)
+    rows = conn.execute(
+        f"SELECT inquiry_id, summary FROM classifications c WHERE inquiry_id IN ({marks}) "  # noqa: S608
+        "AND summary IS NOT NULL AND id = "
+        "(SELECT MAX(id) FROM classifications WHERE inquiry_id = c.inquiry_id)",
+        tuple(inquiry_ids),
+    ).fetchall()
+    cleaned = {int(r["inquiry_id"]): " ".join(str(r["summary"]).split()) for r in rows}
+    return {k: v[:MAX_SUMMARY_CHARS] for k, v in cleaned.items() if v}
+
+
 def list_duplicates_of(conn: sqlite3.Connection, inquiry_id: int) -> list[int]:
     rows = conn.execute(
         "SELECT id FROM inquiries WHERE duplicate_of = ? ORDER BY id", (inquiry_id,)

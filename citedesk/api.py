@@ -27,6 +27,7 @@ import logging
 import sqlite3
 import uuid
 from collections.abc import AsyncIterator, Iterator
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager, contextmanager
 from typing import Annotated, Any, Literal
 
@@ -37,10 +38,10 @@ from pydantic import BaseModel, ConfigDict
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from citedesk import __version__, events, insights, intake, pipeline, repo, review
-from citedesk.business import Business
+from citedesk import __version__, events, health, insights, intake, pipeline, repo, review
+from citedesk.business import Business, load_business
 from citedesk.config import Settings
-from citedesk.db import connect, migrate
+from citedesk.db import connect, migrate, utc_now
 from citedesk.insights import Insights
 from citedesk.intake import (
     DuplicateExternalId,
@@ -61,6 +62,7 @@ from citedesk.models import (
     Inquiry,
     InquiryStatus,
     Intent,
+    ReasonCode,
     Retrieval,
     Route,
     Screening,
@@ -86,12 +88,20 @@ IMPORT_REASONS = {
 
 class ComponentStatus(BaseModel):
     status: Literal["ok", "error", "not_checked"]
+    reason: str | None = None
 
 
 class Components(BaseModel):
     database: ComponentStatus
     model: ComponentStatus
     knowledge_base: ComponentStatus
+
+
+class Attention(BaseModel):
+    needs_review: int
+    escalated: int
+    failed: int
+    urgent_open: int
 
 
 class StatusResponse(BaseModel):
@@ -103,6 +113,8 @@ class StatusResponse(BaseModel):
     components: Components
     queue_depth: int
     worker_running: bool
+    attention: Attention
+    checked_at: str | None
 
 
 class SubmitResponse(BaseModel):
@@ -119,6 +131,7 @@ class InquirySummary(BaseModel):
     received_at: str
     sender_name: str | None
     subject: str | None
+    summary: str | None
     status: InquiryStatus
     route: Route | None
     urgency: Urgency | None
@@ -155,6 +168,27 @@ class RejectBody(BaseModel):
     model_config = ConfigDict(extra="forbid")
     reason: str
     review_seconds: int | None = None
+
+
+class BusinessOut(BaseModel):
+    name: str
+    phone: str
+    emergency_phone: str
+    email: str
+
+
+class RuleOut(BaseModel):
+    code: ReasonCode
+    enabled: bool
+    set_by: Literal["code", "environment"]
+
+
+class SettingsView(BaseModel):
+    business: BusinessOut | None
+    draft_max_words: int
+    model: str
+    synthetic_data: bool
+    rules: list[RuleOut]
 
 
 class RedraftBody(BaseModel):
@@ -268,6 +302,7 @@ def create_app(
     llm: LLMProvider | None = None,
     kb: KnowledgeBase | None = None,
     business: Business | None = None,
+    get_json: health.GetFn | None = None,
 ) -> FastAPI:
     """Build the API. The worker reads inquiries with `llm`; without one it only screens them.
     With `kb` and `business` as well it goes on to retrieve, draft and check a reply."""
@@ -300,6 +335,7 @@ def create_app(
 
     app = FastAPI(title="Citedesk", version=__version__, lifespan=lifespan)
     app.state.worker = None
+    app.state.checks = None  # (model, knowledge base, time) after the first POST /api/status/check
 
     @contextmanager
     def db() -> Iterator[sqlite3.Connection]:
@@ -405,32 +441,96 @@ def create_app(
 
     # --- routes ---
 
-    @app.get("/api/status", response_model=StatusResponse)
-    def status() -> StatusResponse:
+    def build_status() -> StatusResponse:
         database = "ok"
         depth = 0
+        counts = {"needs_review": 0, "escalated": 0, "failed": 0, "urgent_open": 0}
         try:
             with db() as conn:
                 row = conn.execute(
-                    "SELECT COUNT(*) AS n FROM inquiries WHERE status = 'received'"
+                    "SELECT "
+                    "COALESCE(SUM(status = 'received'), 0) AS queued, "
+                    "COALESCE(SUM(status = 'needs_review'), 0) AS needs_review, "
+                    "COALESCE(SUM(status = 'escalated'), 0) AS escalated, "
+                    "COALESCE(SUM(status = 'failed'), 0) AS failed, "
+                    "COALESCE(SUM(urgency = 'urgent' AND status IN "
+                    "('needs_review', 'escalated', 'failed')), 0) AS urgent_open "
+                    "FROM inquiries"
                 ).fetchone()
-                depth = int(row["n"])
+                depth = int(row["queued"])
+                counts = {name: int(row[name]) for name in counts}
         except sqlite3.Error:
             database = "error"
         worker: PipelineWorker | None = app.state.worker
+        cached: tuple[health.Check, health.Check, str] | None = app.state.checks
+        if cached is None:
+            model_part = ComponentStatus(status="not_checked")
+            kb_part = ComponentStatus(status="not_checked")
+        else:
+            model_part = ComponentStatus(status=cached[0].status, reason=cached[0].reason)
+            kb_part = ComponentStatus(status=cached[1].status, reason=cached[1].reason)
+        failing = "error" in (database, model_part.status, kb_part.status)
         return StatusResponse(
-            status="ok" if database == "ok" else "degraded",
+            status="degraded" if failing else "ok",
             app="citedesk",
             version=__version__,
             synthetic_data=settings.synthetic_data,
             model=settings.llm_model,
             components=Components(
                 database=ComponentStatus(status="ok" if database == "ok" else "error"),
-                model=ComponentStatus(status="not_checked"),
-                knowledge_base=ComponentStatus(status="not_checked"),
+                model=model_part,
+                knowledge_base=kb_part,
             ),
             queue_depth=depth,
             worker_running=worker is not None and worker.running,
+            attention=Attention(**counts),
+            checked_at=None if cached is None else cached[2],
+        )
+
+    @app.get("/api/status", response_model=StatusResponse)
+    def status() -> StatusResponse:
+        return build_status()
+
+    @app.post("/api/status/check", response_model=StatusResponse)
+    def check_status() -> StatusResponse:
+        """Ask the model server and the knowledge base now (short, loopback only, no text sent)."""
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            model_job = pool.submit(health.check_model, settings, get_json)
+            kb_job = pool.submit(health.check_knowledge_base, settings, get_json)
+            app.state.checks = (model_job.result(), kb_job.result(), utc_now())
+        return build_status()
+
+    @app.get("/api/settings", response_model=SettingsView)
+    def read_settings() -> SettingsView:
+        """What is in force, read-only. The escalation rules are fixed in code (D-050)."""
+        details = business
+        if details is None:
+            try:
+                details = load_business(settings.business_facts_path)
+            except (OSError, ValueError):
+                details = None
+        return SettingsView(
+            business=None
+            if details is None
+            else BusinessOut(
+                name=details.name,
+                phone=details.phone,
+                emergency_phone=details.emergency_phone,
+                email=details.email,
+            ),
+            draft_max_words=settings.draft_max_words,
+            model=settings.llm_model,
+            synthetic_data=settings.synthetic_data,
+            rules=[
+                RuleOut(
+                    code=code,
+                    enabled=settings.escalate_on_low_confidence
+                    if code is ReasonCode.LOW_CONFIDENCE
+                    else True,
+                    set_by="environment" if code is ReasonCode.LOW_CONFIDENCE else "code",
+                )
+                for code in ReasonCode
+            ],
         )
 
     @app.post("/api/inquiries", status_code=201, response_model=SubmitResponse)
@@ -510,6 +610,8 @@ def create_app(
                 after=after,
             )
         page = rows[:limit]
+        with db() as conn:
+            summaries = repo.latest_summaries(conn, [i.id for i in page])
         return InquiryList(
             items=[
                 InquirySummary(
@@ -519,6 +621,7 @@ def create_app(
                     received_at=i.received_at,
                     sender_name=i.sender_name,
                     subject=i.subject,
+                    summary=summaries.get(i.id),
                     status=i.status,
                     route=i.route,
                     urgency=i.urgency,

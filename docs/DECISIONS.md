@@ -167,3 +167,8 @@ One error shape `{error: {code, message, request_id}}` on every failure, with an
 
 ### D-035. The worker, and what is not logged
 The screen stage does all its work (status changes, escalations, route, audit events) in one transaction, so a crash leaves the inquiry at `received`, where it can fail cleanly with `failure_stage = screen` (the state table allows nothing else; see D-029). The stage is retried once, then the inquiry is marked `failed` with a message naming only the exception type. The worker thread polls every two seconds and wakes on each new inquiry; one worker per process, one inquiry at a time, and a second process would be safe because the status is checked inside the transaction. Suspected-injection items get route `escalate` but no urgency unless an emergency term is present (then `HEALTH_SAFETY` and `urgent`), because no model reads them. No structured log helper exists yet: the code logs only ids and exception type names, and Phase 8 verifies that no message text reaches a log.
+
+## Phase 4
+
+### D-036. A failed route stage: `classified` to `failed` (settles the first gap in D-029)
+The state table had no way to fail from `classified`, so a crash in the route stage would have left an inquiry stuck there with the worker retrying it forever. Added `classified` → `failed` ("route stage crashed after retry") to `BACKEND_SCHEMA.md` section 5, `state.py` (`ALLOWED`, and `RETRY_TARGET[route] = classified`) and the state tests, together, as D-029 asked. A retry returns to `classified`. The second gap in D-029 (`drafted` has no failure move, for a crash in the check stage) is **left open on purpose**: nothing in Phase 4 needs it, and a test now pins that `drafted` still refuses to fail, so Phase 5 has to decide it knowingly.

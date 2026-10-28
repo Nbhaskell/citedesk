@@ -24,6 +24,7 @@ ALLOWED: frozenset[tuple[S, S]] = frozenset(
         (S.screened, S.escalated),
         (S.screened, S.failed),
         (S.classified, S.routed),
+        (S.classified, S.failed),
         (S.routed, S.escalated),
         (S.routed, S.archived),
         (S.routed, S.drafted),
@@ -44,6 +45,7 @@ ALLOWED: frozenset[tuple[S, S]] = frozenset(
 RETRY_TARGET: dict[Stage, S] = {
     Stage.screen: S.received,
     Stage.understand: S.screened,
+    Stage.route: S.classified,
     Stage.retrieve: S.routed,
     Stage.draft: S.routed,
 }

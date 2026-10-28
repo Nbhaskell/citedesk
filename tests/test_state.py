@@ -19,6 +19,7 @@ EXPECTED = {
     (S.screened, S.escalated),
     (S.screened, S.failed),
     (S.classified, S.routed),
+    (S.classified, S.failed),
     (S.routed, S.escalated),
     (S.routed, S.archived),
     (S.routed, S.drafted),
@@ -38,6 +39,7 @@ EXPECTED = {
 RETRY = {
     Stage.screen: S.received,
     Stage.understand: S.screened,
+    Stage.route: S.classified,
     Stage.retrieve: S.routed,
     Stage.draft: S.routed,
 }
@@ -65,7 +67,7 @@ def test_the_expected_table_matches_the_schema_document() -> None:
 
 def test_the_implementation_matches_the_document() -> None:
     assert state.ALLOWED == EXPECTED
-    assert len(state.ALLOWED) == 20
+    assert len(state.ALLOWED) == 21
 
 
 def test_a_forbidden_shortcut_would_be_caught(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -96,8 +98,8 @@ def test_every_status_pair(source: S, target: S) -> None:
 def test_allowed_and_disallowed_counts_add_up() -> None:
     allowed = [p for p in ALL_PAIRS if p in EXPECTED]
     assert len(ALL_PAIRS) == 169
-    assert len(allowed) == 20
-    assert len(ALL_PAIRS) - len(allowed) == 149
+    assert len(allowed) == 21
+    assert len(ALL_PAIRS) - len(allowed) == 148
 
 
 # --- retry from failed -----------------------------------------------------------------------
@@ -129,6 +131,7 @@ def test_retry_targets_are_themselves_statuses_that_can_fail() -> None:
     [
         (S.received, {Stage.screen}),
         (S.screened, {Stage.understand}),
+        (S.classified, {Stage.route}),
         (S.routed, {Stage.retrieve, Stage.draft}),
     ],
 )

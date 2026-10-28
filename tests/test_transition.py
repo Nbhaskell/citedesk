@@ -173,7 +173,9 @@ def test_an_inquiry_can_fail_at_its_own_stage(conn: sqlite3.Connection) -> None:
     [
         ([], Stage.draft),
         ([S.screened], Stage.screen),
+        ([S.screened, S.classified], Stage.understand),
         ([S.screened, S.classified, S.routed], Stage.understand),
+        ([S.screened, S.classified, S.routed], Stage.route),
     ],
 )
 def test_the_failed_stage_must_fit_the_current_status(
@@ -187,11 +189,25 @@ def test_the_failed_stage_must_fit_the_current_status(
     assert status_of(conn, inquiry_id) is before
 
 
-def test_statuses_that_cannot_fail_refuse_to(conn: sqlite3.Connection) -> None:
+def test_a_crash_in_the_route_stage_can_be_recorded_from_classified(
+    conn: sqlite3.Connection,
+) -> None:
     inquiry_id = new_inquiry(conn)
     walk(conn, inquiry_id, S.screened, S.classified)
+    transition(
+        conn, inquiry_id, S.failed, failure_stage=Stage.route, failure_message="Routing crashed"
+    )
+    inquiry = repo.get_inquiry(conn, inquiry_id)
+    assert inquiry is not None
+    assert inquiry.status is S.failed and inquiry.failure_stage is Stage.route
+
+
+def test_statuses_that_cannot_fail_refuse_to(conn: sqlite3.Connection) -> None:
+    # `drafted` still has no failure move: the check stage is Phase 5's to settle (D-029).
+    inquiry_id = new_inquiry(conn)
+    walk(conn, inquiry_id, S.screened, S.classified, S.routed, S.drafted)
     with pytest.raises(InvalidTransition):
-        transition(conn, inquiry_id, S.failed, failure_stage=Stage.route, failure_message="x")
+        transition(conn, inquiry_id, S.failed, failure_stage=Stage.check, failure_message="x")
 
 
 def test_failing_needs_a_stage_and_a_short_message(conn: sqlite3.Connection) -> None:
@@ -255,6 +271,7 @@ def test_failure_details_are_refused_on_a_non_failing_move(conn: sqlite3.Connect
     [
         ([], Stage.screen, S.received),
         ([S.screened], Stage.understand, S.screened),
+        ([S.screened, S.classified], Stage.route, S.classified),
         ([S.screened, S.classified, S.routed], Stage.retrieve, S.routed),
         ([S.screened, S.classified, S.routed], Stage.draft, S.routed),
     ],

@@ -261,6 +261,7 @@ Dates are normalized to ISO format only when unambiguous; otherwise `null` with 
 | `screened` | `escalated` | injection suspected, route decided before the model runs |
 | `screened` | `failed` | model failed twice |
 | `classified` | `routed` | route decided |
+| `classified` | `failed` | route stage crashed after retry |
 | `routed` | `escalated` | route is `escalate` |
 | `routed` | `archived` | route is `archive` |
 | `routed` | `drafted` | route is `draft_reply` or `request_details` and a draft exists |

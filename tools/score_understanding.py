@@ -32,9 +32,11 @@ from pathlib import Path
 from typing import Any
 
 from citedesk import events, pipeline, repo, understand
+from citedesk.business import Business
 from citedesk.config import Settings
 from citedesk.db import connect, migrate
 from citedesk.intake import NewInquiry, submit
+from citedesk.knowledge import KnowledgeBase
 from citedesk.models import AuditEventType, ReasonCode, Stage
 from citedesk.providers import LLMProvider
 from tools.golden import GOLDEN_FILE, REPO_ROOT
@@ -98,8 +100,14 @@ def git_state() -> dict[str, Any]:
     return {"commit": git("rev-parse", "HEAD"), "dirty": bool(git("status", "--porcelain"))}
 
 
-def collect(conn: Any, inquiry_id: int, item_id: str) -> dict[str, Any]:
-    """What the pipeline left behind for one inquiry: codes and model output, no message text."""
+def collect(
+    conn: Any, inquiry_id: int, item_id: str, *, with_drafts: bool = False
+) -> dict[str, Any]:
+    """What the pipeline left behind for one inquiry: codes and model output, no message text.
+
+    With `with_drafts` it also keeps what was retrieved and the draft with its checks. Those are
+    text the system wrote about a customer message, so only the Phase 5 reading run asks for them.
+    """
     inquiry = repo.get_inquiry(conn, inquiry_id)
     if inquiry is None:
         raise LookupError(f"no inquiry {inquiry_id}")
@@ -141,6 +149,37 @@ def collect(conn: Any, inquiry_id: int, item_id: str) -> dict[str, Any]:
             "attempts": attempts,
             "raw_response": classification.raw_response,
         }
+    if with_drafts:
+        draft = repo.latest_draft(conn, inquiry_id)
+        record["retrievals"] = [
+            {
+                "question": r.question,
+                "declined": r.declined,
+                "answer": r.kb_answer,
+                "sources": [s.model_dump() for s in r.sources],
+            }
+            for r in repo.list_retrievals(conn, inquiry_id)
+        ]
+        record["draft"] = None
+        record["checks"] = []
+        if draft is not None:
+            record["draft"] = {
+                "kind": draft.kind.value,
+                "status": draft.status.value,
+                "model": draft.model,
+                "subject": draft.subject,
+                "body": draft.body,
+                "claims": [c.model_dump() for c in draft.claims],
+            }
+            record["checks"] = [
+                {
+                    "code": c.check_code.value,
+                    "blocking": c.blocking,
+                    "passed": c.passed,
+                    "detail": c.detail,
+                }
+                for c in repo.list_draft_checks(conn, draft.id)
+            ]
     return record
 
 
@@ -151,6 +190,9 @@ def run_items(
     *,
     reference_date: str,
     progress: Callable[[int, int, dict[str, Any]], None] | None = None,
+    kb: KnowledgeBase | None = None,
+    business: Business | None = None,
+    with_drafts: bool = False,
 ) -> list[dict[str, Any]]:
     """Send each item through the pipeline into a throwaway database and collect the outcomes."""
     conn = connect(":memory:")
@@ -170,8 +212,8 @@ def run_items(
             }
         )
         inquiry_id = submit(conn, inquiry, settings, now=stamp).id
-        pipeline.process(conn, inquiry_id, settings, llm=llm)
-        record = collect(conn, inquiry_id, item["id"])
+        pipeline.process(conn, inquiry_id, settings, llm=llm, kb=kb, business=business)
+        record = collect(conn, inquiry_id, item["id"], with_drafts=with_drafts)
         results.append(record)
         if progress is not None:
             progress(number, len(items), record)
@@ -562,9 +604,21 @@ def make_run(
     split: str,
     reference_date: str,
     progress: Callable[[int, int, dict[str, Any]], None] | None = None,
+    kb: KnowledgeBase | None = None,
+    business: Business | None = None,
+    with_drafts: bool = False,
 ) -> dict[str, Any]:
     started = datetime.now(UTC)
-    results = run_items(items, settings, llm, reference_date=reference_date, progress=progress)
+    results = run_items(
+        items,
+        settings,
+        llm,
+        reference_date=reference_date,
+        progress=progress,
+        kb=kb,
+        business=business,
+        with_drafts=with_drafts,
+    )
     finished = datetime.now(UTC)
     return {
         "header": {

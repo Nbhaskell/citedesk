@@ -34,3 +34,16 @@ def test_the_real_server_reads_inquiries_with_the_local_model(
     monkeypatch.setattr(entry.uvicorn, "run", lambda app, **kw: None)
     entry.main()
     assert isinstance(seen["llm"], OllamaProvider)
+
+
+def test_the_real_server_also_gets_the_knowledge_base_and_the_business(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from citedesk.business import Business
+    from citedesk.knowledge import RagProjectKB
+
+    seen: dict[str, Any] = {}
+    monkeypatch.setattr(entry, "create_app", lambda settings, **kw: seen.update(kw) or "app")
+    monkeypatch.setattr(entry.uvicorn, "run", lambda app, **kw: None)
+    entry.main()
+    assert isinstance(seen["kb"], RagProjectKB) and isinstance(seen["business"], Business)

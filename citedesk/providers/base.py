@@ -27,6 +27,16 @@ class LLMBadResponse(LLMError):
     """The server answered, but not with a usable reply."""
 
 
+class LLMStepFailed(Exception):
+    """A step that needs the model gave up after its retry. `reason` is a short code; the message
+    holds no text from the inquiry or from the model's reply."""
+
+    def __init__(self, reason: str, attempts: int) -> None:
+        super().__init__(f"the model gave no usable reply after {attempts} attempts ({reason})")
+        self.reason = reason
+        self.attempts = attempts
+
+
 @dataclass(frozen=True)
 class LLMResult:
     """One model reply. `text` is the raw reply; the caller parses and validates it."""

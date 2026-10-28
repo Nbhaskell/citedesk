@@ -31,6 +31,7 @@ ALLOWED: frozenset[tuple[S, S]] = frozenset(
         (S.routed, S.failed),
         (S.drafted, S.needs_review),
         (S.drafted, S.escalated),
+        (S.drafted, S.failed),
         (S.needs_review, S.approved),
         (S.needs_review, S.rejected),
         (S.needs_review, S.escalated),
@@ -48,6 +49,7 @@ RETRY_TARGET: dict[Stage, S] = {
     Stage.route: S.classified,
     Stage.retrieve: S.routed,
     Stage.draft: S.routed,
+    Stage.check: S.drafted,
 }
 
 # The stages that can fail from each status: exactly those whose retry returns to that status.

@@ -93,3 +93,7 @@ def test_env_example_holds_no_secrets() -> None:
     lowered = " ".join(_env_example_entries()).lower()
     for word in ("key", "token", "password", "secret"):
         assert word not in lowered
+
+
+def test_the_fact_sheet_path_defaults_to_the_invented_business() -> None:
+    assert Settings(_env_file=None).business_facts_path == Path("universe/facts.json")

@@ -32,6 +32,7 @@ from citedesk.providers import (
     LLMBadResponse,
     LLMError,
     LLMProvider,
+    LLMStepFailed,
     LLMTimeout,
     LLMUnavailable,
 )
@@ -103,25 +104,25 @@ class UnderstandOutput(Strict):
         return next(i.confidence for i in self.intents if i.intent is self.primary_intent)
 
 
-def _inline(node: Any, defs: dict[str, Any]) -> Any:
+def inline_refs(node: Any, defs: dict[str, Any]) -> Any:
     """Replace `$ref`s with the definitions they point to and drop titles, so the schema is one
     self-contained tree that a grammar can be built from."""
     if isinstance(node, dict):
         if "$ref" in node:
-            return _inline(defs[node["$ref"].rsplit("/", 1)[-1]], defs)
+            return inline_refs(defs[node["$ref"].rsplit("/", 1)[-1]], defs)
         return {
-            key: _inline(value, defs)
+            key: inline_refs(value, defs)
             for key, value in node.items()
             if key not in ("$defs", "title") or not isinstance(value, str | dict)
         }
     if isinstance(node, list):
-        return [_inline(item, defs) for item in node]
+        return [inline_refs(item, defs) for item in node]
     return node
 
 
 def json_schema() -> dict[str, Any]:
     raw = UnderstandOutput.model_json_schema()
-    schema: dict[str, Any] = _inline(raw, raw.get("$defs", {}))
+    schema: dict[str, Any] = inline_refs(raw, raw.get("$defs", {}))
     return schema
 
 
@@ -270,14 +271,8 @@ def normalise_fields(
 # --- the step itself --------------------------------------------------------------------------
 
 
-class UnderstandFailed(Exception):
-    """The model gave no usable reply. `reason` is a short code; the message holds no text from
-    the inquiry or the reply."""
-
-    def __init__(self, reason: str, attempts: int) -> None:
-        super().__init__(f"the model gave no usable reply after {attempts} attempts ({reason})")
-        self.reason = reason
-        self.attempts = attempts
+class UnderstandFailed(LLMStepFailed):
+    """The model gave no usable reply to the understand step."""
 
 
 @dataclass(frozen=True)
@@ -303,7 +298,7 @@ _LLM_REASONS: dict[type[LLMError], str] = {
 }
 
 
-def _describe(error: ValidationError) -> str:
+def describe_error(error: ValidationError) -> str:
     """Which fields were wrong and why, without repeating what the model wrote."""
     parts = []
     for item in error.errors(include_input=False, include_url=False):
@@ -312,7 +307,7 @@ def _describe(error: ValidationError) -> str:
     return "; ".join(parts)[:MAX_NOTE]
 
 
-def _retry_note(problem: str) -> str:
+def retry_note(problem: str) -> str:
     return (
         f"\n\nYour previous reply was rejected: {problem}. "
         "Reply again with only the corrected JSON object."
@@ -361,7 +356,7 @@ def understand(
             try:
                 output = parse_output(result.text)
             except ValidationError as error:
-                reason, problem = "invalid_output", _describe(error)
+                reason, problem = "invalid_output", describe_error(error)
             except ValueError:
                 reason, problem = "invalid_json", "it was not valid JSON"
             else:
@@ -375,7 +370,7 @@ def understand(
                     body,
                     received_at,
                 )
-        user = first_user + _retry_note(problem)
+        user = first_user + retry_note(problem)
 
     raise UnderstandFailed(reason, ATTEMPTS)
 

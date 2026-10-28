@@ -202,10 +202,19 @@ def test_a_crash_in_the_route_stage_can_be_recorded_from_classified(
     assert inquiry.status is S.failed and inquiry.failure_stage is Stage.route
 
 
-def test_statuses_that_cannot_fail_refuse_to(conn: sqlite3.Connection) -> None:
-    # `drafted` still has no failure move: the check stage is Phase 5's to settle (D-029).
+def test_a_crash_in_the_check_stage_can_be_recorded_from_drafted(conn: sqlite3.Connection) -> None:
     inquiry_id = new_inquiry(conn)
     walk(conn, inquiry_id, S.screened, S.classified, S.routed, S.drafted)
+    transition(
+        conn, inquiry_id, S.failed, failure_stage=Stage.check, failure_message="Checking crashed"
+    )
+    assert status_of(conn, inquiry_id) is S.failed
+
+
+def test_statuses_that_cannot_fail_refuse_to(conn: sqlite3.Connection) -> None:
+    # Once a draft is waiting for a person there is no stage left that can fail.
+    inquiry_id = new_inquiry(conn)
+    walk(conn, inquiry_id, S.screened, S.classified, S.routed, S.drafted, S.needs_review)
     with pytest.raises(InvalidTransition):
         transition(conn, inquiry_id, S.failed, failure_stage=Stage.check, failure_message="x")
 
@@ -274,6 +283,7 @@ def test_failure_details_are_refused_on_a_non_failing_move(conn: sqlite3.Connect
         ([S.screened, S.classified], Stage.route, S.classified),
         ([S.screened, S.classified, S.routed], Stage.retrieve, S.routed),
         ([S.screened, S.classified, S.routed], Stage.draft, S.routed),
+        ([S.screened, S.classified, S.routed, S.drafted], Stage.check, S.drafted),
     ],
 )
 def test_retry_returns_to_where_the_failed_stage_started_and_clears_the_failure(

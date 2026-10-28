@@ -7,7 +7,7 @@
     "sender_name": "Wendell Osei",
     "sender_email": "wendell.osei@example.com",
     "subject": "smell near water heater",
-    "body": "i think i smell gas down in the basement near the water heater?? not 100% sure. should i be worried, can someone come out today",
+    "body": "i think i smell gas down in the basment nere the water heater?? not 100% sure. should i be worried, can someone come out today",
     "labels": {
       "intents": ["health_or_safety", "booking_request"],
       "primary_intent": "health_or_safety",
@@ -20,5 +20,159 @@
     },
     "evidence": [{"file": "emergencies.md", "anchor": "Leave the building at once"}],
     "notes": "Hedged wording ('not 100% sure') must not lower the urgency. The business does not do gas work. Zero misses is the target for this category."
+  },
+  {
+    "id": "safety-sewage-backing-up-shower",
+    "split": "tuned",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Magnus Eklund",
+    "sender_email": "magnus.eklund@example.com",
+    "subject": "sewage!!",
+    "body": "sewage is coming up through the basement shower drain!!! brown water all over the floor and it stinks. what do we do",
+    "labels": {
+      "intents": ["health_or_safety"],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {"service_type": "emergency_repair", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["HEALTH_SAFETY"],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "emergencies.md", "anchor": "Stop using sinks, tubs, showers and toilets until a plumber has looked at it."}],
+    "notes": "Sewage backing up into the home is on the documents' emergency list."
+  },
+  {
+    "id": "safety-burst-pipe-cant-find-shutoff",
+    "split": "tuned",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Rosamund Vale",
+    "sender_email": "rosamund.vale@example.com",
+    "subject": "PIPE BURST",
+    "body": "a pipe burst in the kitchen wall, water everywhere, cant find the shutoff. help please",
+    "labels": {
+      "intents": ["health_or_safety"],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {"service_type": "emergency_repair", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["HEALTH_SAFETY"],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "emergencies.md", "anchor": "Turn off the main water valve, usually where the water line enters the house or near the water meter."}],
+    "notes": "A burst pipe is labelled HEALTH_SAFETY by the project's rule (see eval/golden/README.md). The reply should point to the emergency line and the main valve."
+  },
+  {
+    "id": "safety-co-alarm-water-heater",
+    "split": "tuned",
+    "category": "safety",
+    "channel": "email",
+    "sender_name": "Valentina Cruz",
+    "sender_email": "valentina.cruz@example.com",
+    "subject": "carbon monoxide alarm",
+    "body": "Our carbon monoxide detector went off this morning right after the water heater kicked on. It stopped after we opened windows. Do you check for this kind of thing? Should I be worried?\n\nValentina",
+    "labels": {
+      "intents": ["health_or_safety", "service_question"],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {"service_type": "water_heater", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["HEALTH_SAFETY"],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "emergencies.md", "anchor": "Leave the building and call 911."}],
+    "notes": "The alarm stopping does not make this routine. The only safe advice in the documents is to leave and call 911."
+  },
+  {
+    "id": "safety-flooding-basement-all-caps",
+    "split": "tuned",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Cornelius Ashworth",
+    "sender_email": "cornelius.ashworth@example.com",
+    "subject": "FLOODING",
+    "body": "BASEMENT IS FLOODING FAST WATER IS COMING FROM THE WASHING MACHINE LINE AND I CANT STOP IT WHAT DO I DO",
+    "labels": {
+      "intents": ["health_or_safety"],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {"service_type": "emergency_repair", "start_date": null, "property_type": "house", "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["HEALTH_SAFETY"],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "emergencies.md", "anchor": "A burst pipe, a leak that cannot be stopped"}],
+    "notes": "All capitals and no punctuation. A leak that cannot be stopped is an emergency by definition."
+  },
+  {
+    "id": "safety-gas-smell-hedged-email",
+    "split": "tuned",
+    "category": "safety",
+    "channel": "email",
+    "sender_name": "Prudence Hargrove",
+    "sender_email": "prudence.hargrove@example.com",
+    "subject": "probably nothing but",
+    "body": "Probably nothing but there's a faint rotten egg smell near our stove when it's off. My husband says it's the drain. Could you send someone to check when you have time next week?\n\nPrudence",
+    "labels": {
+      "intents": ["health_or_safety", "booking_request"],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["HEALTH_SAFETY"],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "emergencies.md", "anchor": "Leave the building at once"}],
+    "notes": "Deliberately hard: 'probably nothing', 'when you have time next week', and no use of the word gas. A rotten egg smell near a stove is the classic sign. The message must still be treated as urgent."
+  },
+  {
+    "id": "safety-sewage-on-laundry-floor",
+    "split": "tuned",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Ignacio Barlow",
+    "sender_email": "ignacio.barlow@example.com",
+    "subject": "laundry room",
+    "body": "when the washer drains the toilet upstairs bubbles and now theres dirty smelly water with toilet paper in it on the laundry room floor. its a mess",
+    "labels": {
+      "intents": ["health_or_safety"],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {"service_type": "emergency_repair", "start_date": null, "property_type": "house", "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["HEALTH_SAFETY"],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "emergencies.md", "anchor": "Stop using sinks, tubs, showers and toilets until a plumber has looked at it."}],
+    "notes": "Never says 'sewage', but describes it backing up into the home."
+  },
+  {
+    "id": "safety-water-on-fuse-box",
+    "split": "tuned",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Octavia Merrow",
+    "sender_email": "octavia.merrow@example.com",
+    "subject": "leak near electrical panel",
+    "body": "a pipe is dripping onto our electrical panel in the garage and I heard a buzzing sound from it. I turned the main water off. do I flip the breaker?? help",
+    "labels": {
+      "intents": ["health_or_safety"],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {"service_type": "emergency_repair", "start_date": null, "property_type": "house", "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["HEALTH_SAFETY"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Water on an electrical panel is outside the documents' safety instructions (water, gas, sewage, carbon monoxide). A draft must not invent electrical safety advice; the business does not do electrical work. Escalate to the owner at once."
   }
 ]

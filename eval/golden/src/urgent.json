@@ -1,0 +1,178 @@
+[
+  {
+    "id": "urgent-no-hot-water-newborn",
+    "split": "tuned",
+    "category": "urgent",
+    "channel": "web_form",
+    "sender_name": "Marguerite Ng",
+    "sender_email": "marguerite.ng@example.com",
+    "subject": "NO HOT WATER",
+    "body": "no hot water since last night and we have a 3 week old baby. please can someone come today. 555-0121",
+    "labels": {
+      "intents": ["booking_request"],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {"service_type": "water_heater", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "emergencies.md", "anchor": "No hot water, a toilet that will not stop running"}],
+    "notes": "No hot water is urgent but not an emergency by the documents' definition. The baby raises sympathy, not the category. 'Today' is relative, so no date."
+  },
+  {
+    "id": "urgent-toilet-wont-stop-running",
+    "split": "tuned",
+    "category": "urgent",
+    "channel": "web_form",
+    "sender_name": "Caspian Ridley",
+    "sender_email": "caspian.ridley@example.com",
+    "subject": "toilet running",
+    "body": "toilet wont stop running and its wasteing a ton of watter. can you come today",
+    "labels": {
+      "intents": ["booking_request"],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {"service_type": "other", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "emergencies.md", "anchor": "a toilet that will not stop running"}],
+    "notes": "Named in the documents as urgent but not an emergency."
+  },
+  {
+    "id": "urgent-thanksgiving-guests-clogged-drain",
+    "split": "tuned",
+    "category": "urgent",
+    "channel": "email",
+    "sender_name": "Dorothea Whitlock",
+    "sender_email": "dorothea.whitlock@example.com",
+    "subject": "need help before Thanksgiving",
+    "body": "Hi,\n\nWe have 14 people coming for Thanksgiving and our kitchen sink is completely blocked, nothing drains at all. We need this fixed before Wednesday. Is there any way you can fit us in?\n\nThank you so much,\nDorothea",
+    "labels": {
+      "intents": ["booking_request"],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {"service_type": "drain_cleaning", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "services.md", "anchor": "To book a visit, please tell us"}],
+    "notes": "'Before Wednesday' is relative so no date. The draft must not promise to fit them in."
+  },
+  {
+    "id": "urgent-water-pressure-gone",
+    "split": "tuned",
+    "category": "urgent",
+    "channel": "web_form",
+    "sender_name": "Evander Moss",
+    "sender_email": "evander.moss@example.com",
+    "subject": "no water pressure",
+    "body": "water pressure just dropped to almost nothing in the whole house, neighbors are fine. need someone asap",
+    "labels": {
+      "intents": ["booking_request"],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {"service_type": "other", "start_date": null, "property_type": "house", "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "services.md", "anchor": "To book a visit, please tell us"}],
+    "notes": "Whole-house pressure loss with neighbours unaffected. High, not an emergency by definition."
+  },
+  {
+    "id": "urgent-water-heater-slow-leak-bucket",
+    "split": "tuned",
+    "category": "urgent",
+    "channel": "web_form",
+    "sender_name": "Philomena Cray",
+    "sender_email": "philomena.cray@example.com",
+    "subject": "water heater leaking",
+    "body": "our water heater is leaking slowly from the bottom. i put a bucket under it and empty it every few hours so its contained for now. how fast can someone come?",
+    "labels": {
+      "intents": ["booking_request", "availability_question"],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {"service_type": "water_heater", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "emergencies.md", "anchor": "a slow leak that is contained"}],
+    "notes": "A contained slow leak is urgent, not an emergency, per the documents. If it could not be contained it would become one."
+  },
+  {
+    "id": "urgent-landlord-deadline-toilet",
+    "split": "tuned",
+    "category": "urgent",
+    "channel": "email",
+    "sender_name": "Tabitha Greaves",
+    "sender_email": "tabitha.greaves@example.com",
+    "subject": "toilet repair by Friday",
+    "body": "Hello, our toilet is cracked and leaking at the base. My landlord says it has to be repaired by Friday Nov 6 or we get fined. It's the apartment on the 3rd floor. Please advise ASAP.\n\nTabitha Greaves",
+    "labels": {
+      "intents": ["booking_request"],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {"service_type": "other", "start_date": "2026-11-06", "property_type": "apartment", "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "services.md", "anchor": "To book a visit, please tell us"}],
+    "notes": "Date and property type present, neighbourhood missing, so details are requested."
+  },
+  {
+    "id": "urgent-basement-drain-gurgling-smell",
+    "split": "tuned",
+    "category": "urgent",
+    "channel": "web_form",
+    "sender_name": "Leopold Finch",
+    "sender_email": "leopold.finch@example.com",
+    "subject": "basement drain smell",
+    "body": "the floor drain in my basement is gurgling and there's a really bad smell coming up, kinda like sewer. nothing coming up out of it yet. can someone look today?",
+    "labels": {
+      "intents": ["booking_request"],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {"service_type": "drain_cleaning", "start_date": null, "property_type": "house", "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "services.md", "anchor": "To book a visit, please tell us"}],
+    "notes": "Deliberately borderline: a sewer smell and gurgling, but explicitly 'nothing coming up'. Labelled urgent-not-emergency. If sewage began backing up it would escalate."
+  },
+  {
+    "id": "urgent-ceiling-drip-after-shower",
+    "split": "tuned",
+    "category": "urgent",
+    "channel": "web_form",
+    "sender_name": "Augustin Pell",
+    "sender_email": "augustin.pell@example.com",
+    "subject": "drip from ceiling",
+    "body": "water drips from the downstairs ceiling whenever the upstairs shower runs. we stopped using that shower. we're in Millrace, can you come today?",
+    "labels": {
+      "intents": ["booking_request"],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {"service_type": "leak_repair", "start_date": null, "property_type": null, "address_area": "Millrace"},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "services.md", "anchor": "To book a visit, please tell us"}],
+    "notes": "The leak is controlled by not using the shower, so it is not an emergency. Date and property type are missing."
+  }
+]

@@ -20,5 +20,159 @@
     },
     "evidence": [],
     "notes": "The documents say the business calls 30 minutes before arrival, but a complaint is for the owner, not for a drafted answer."
+  },
+  {
+    "id": "complaint-rude-technician-mud",
+    "split": "tuned",
+    "category": "angry_complaint",
+    "channel": "web_form",
+    "sender_name": "Hermione Castellan",
+    "sender_email": "hermione.castellan@example.com",
+    "subject": "your technician",
+    "body": "your guy was rude to my husband, tracked mud thru the whole house and left with out even saying what he fixed. i want someone to call me about this",
+    "labels": {
+      "intents": ["complaint"],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {"service_type": null, "start_date": null, "property_type": "house", "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["COMPLAINT"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "A request for a phone call; the reply may only say the owner will follow up."
+  },
+  {
+    "id": "complaint-leak-returned-after-repair",
+    "split": "tuned",
+    "category": "angry_complaint",
+    "channel": "email",
+    "sender_name": "Jasper Whitcombe",
+    "sender_email": "jasper.whitcombe@example.com",
+    "subject": "Re: faucet repair - leaking AGAIN",
+    "body": "You fixed my bathroom faucet three weeks ago and I paid you in full. It's leaking again, exactly the same place. This is ridiculous. What are you going to do about it?\n\nJ. Whitcombe",
+    "labels": {
+      "intents": ["complaint"],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {"service_type": "leak_repair", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["COMPLAINT"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "The 12-month workmanship warranty is relevant but a promised remedy is for the owner. A draft must not promise a free repair."
+  },
+  {
+    "id": "complaint-calls-not-returned",
+    "split": "tuned",
+    "category": "angry_complaint",
+    "channel": "web_form",
+    "sender_name": "Bartholomew Ince",
+    "sender_email": "bartholomew.ince@example.com",
+    "subject": "NO ONE CALLS BACK",
+    "body": "i have called your office FOUR times this week and left messages. nobody has called me back. is this a real business?? my sink has been broken for 8 days",
+    "labels": {
+      "intents": ["complaint", "booking_request"],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {"service_type": "other", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["COMPLAINT"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "A complaint with a buried service need. Escalates because of the complaint, whatever the missing booking details."
+  },
+  {
+    "id": "complaint-scratched-hardwood-floor",
+    "split": "tuned",
+    "category": "angry_complaint",
+    "channel": "email",
+    "sender_name": "Eleanor Vickers",
+    "sender_email": "eleanor.vickers@example.com",
+    "subject": "damage to my floor",
+    "body": "After your technician left on Tuesday I found a long deep scratch across my hardwood floor in the hallway, right where he dragged his equipment. I have photos. I expect this to be dealt with properly.\n\nEleanor Vickers",
+    "labels": {
+      "intents": ["complaint"],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {"service_type": null, "start_date": null, "property_type": "house", "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["COMPLAINT"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Property damage claim without a demand for money or a legal threat. Labelled COMPLAINT only; if she demanded payment it would add REFUND_OR_DISPUTE."
+  },
+  {
+    "id": "complaint-all-caps-rant",
+    "split": "tuned",
+    "category": "angry_complaint",
+    "channel": "web_form",
+    "sender_name": "Mortimer Gault",
+    "sender_email": "mortimer.gault@example.com",
+    "subject": "WORST SERVICE EVER",
+    "body": "WAITED ALL DAY FOR YOUR PLUMBER AND HE NEVER SHOWED. NOBODY CALLED. THIS IS THE WORST SERVICE I HAVE EVER EXPERIENCED. I WILL TELL EVERYONE I KNOW",
+    "labels": {
+      "intents": ["complaint"],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["COMPLAINT"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Threatening to tell others is not a legal threat."
+  },
+  {
+    "id": "complaint-polite-but-disappointed",
+    "split": "tuned",
+    "category": "angry_complaint",
+    "channel": "email",
+    "sender_name": "Clarissa Wynn",
+    "sender_email": "clarissa.wynn@example.com",
+    "subject": "feedback on last week's visit",
+    "body": "Hello,\n\nI wanted to let you know that I was a little disappointed with my visit last week. The work took about twice as long as I'd been led to expect and nobody explained why. The repair itself seems fine. I thought you'd want to know.\n\nKind regards,\nClarissa Wynn",
+    "labels": {
+      "intents": ["complaint"],
+      "primary_intent": "complaint",
+      "urgency": "normal",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["COMPLAINT"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Mild and polite, but still a complaint. A model that reads tone only may treat it as feedback and draft a thank-you."
+  },
+  {
+    "id": "complaint-wrong-part-no-return",
+    "split": "tuned",
+    "category": "angry_complaint",
+    "channel": "web_form",
+    "sender_name": "Lysander Kirk",
+    "sender_email": "lysander.kirk@example.com",
+    "subject": "tech said he'd be back",
+    "body": "Your technician came out, said he had the wrong part and would come back with the right one. That was 2 weeks ago and I haven't heard a word. My shower is still unusable. Pretty fed up honestly.",
+    "labels": {
+      "intents": ["complaint"],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {"service_type": "other", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["COMPLAINT"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "An unfinished job and a promise the business must check; nothing in the documents answers it."
   }
 ]

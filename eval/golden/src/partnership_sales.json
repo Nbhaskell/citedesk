@@ -1,0 +1,90 @@
+[
+  {
+    "id": "partner-property-manager-contract",
+    "split": "tuned",
+    "category": "partnership_sales",
+    "channel": "email",
+    "sender_name": "Valerian Pryce",
+    "sender_email": "valerian.pryce@example.com",
+    "subject": "Preferred plumber for our rentals",
+    "body": "Hello,\n\nI manage about 40 rental homes in the Alderbrook area and I'm looking for a reliable plumber to be our first call for repairs. Do you take on property managers as accounts, and is there anyone I can talk to about rates?\n\nValerian Pryce\nBrightkey Rentals",
+    "labels": {
+      "intents": ["partnership_or_sales"],
+      "primary_intent": "partnership_or_sales",
+      "urgency": "normal",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "about.md", "anchor": "landlord and property-manager accounts"}],
+    "notes": "The documents say the owner handles landlord and property-manager accounts. The draft should point to the owner and promise no rates."
+  },
+  {
+    "id": "partner-supplier-pex-catalog",
+    "split": "tuned",
+    "category": "partnership_sales",
+    "channel": "email",
+    "sender_name": "Casimir Orlov",
+    "sender_email": "casimir.orlov@example.com",
+    "subject": "Wholesale PEX and fittings",
+    "body": "Hi, I'm a rep for a pipe and fittings distributor and we supply plumbing contractors in your area with PEX, copper and brass fittings at wholesale prices. Happy to send our catalogue and a price list if you'd like to take a look.\n\nCasimir Orlov",
+    "labels": {
+      "intents": ["partnership_or_sales"],
+      "primary_intent": "partnership_or_sales",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "about.md", "anchor": "supplier and partnership offers"}],
+    "notes": "A relevant, personalised supplier offer, not bulk spam. Goes to the owner."
+  },
+  {
+    "id": "partner-realtor-referrals",
+    "split": "tuned",
+    "category": "partnership_sales",
+    "channel": "web_form",
+    "sender_name": "Marigold Vance",
+    "sender_email": "marigold.vance@example.com",
+    "subject": "referral partnership",
+    "body": "Hi I'm a realtor and I get asked all the time for plumbers by my buyers (inspections, water heaters etc). Would you be interested in a referral arrangement? Is there a referral fee?",
+    "labels": {
+      "intents": ["partnership_or_sales"],
+      "primary_intent": "partnership_or_sales",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "about.md", "anchor": "supplier and partnership offers"}],
+    "notes": "The draft must not mention a referral fee or agree to anything."
+  },
+  {
+    "id": "partner-scheduling-software-demo",
+    "split": "tuned",
+    "category": "partnership_sales",
+    "channel": "email",
+    "sender_name": "Dashiell Frost",
+    "sender_email": "dashiell.frost@example.com",
+    "subject": "Quick question for Kestrel Hollow Plumbing",
+    "body": "Hi there,\n\nI noticed Kestrel Hollow Plumbing is based in Alderbrook. We make scheduling and dispatch software for small plumbing companies and I'd love to show you a 15 minute demo. Do you have time next week?\n\nBest,\nDashiell Frost",
+    "labels": {
+      "intents": ["partnership_or_sales"],
+      "primary_intent": "partnership_or_sales",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "about.md", "anchor": "supplier and partnership offers"}],
+    "notes": "Borderline between cold sales and spam. It is personalised and names the company, so it is labelled partnership_or_sales and not archived."
+  }
+]

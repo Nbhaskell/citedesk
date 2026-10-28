@@ -99,5 +99,14 @@ The skill suggests one short PDF. `rag-project` does read PDFs (its passages car
 - **Relative dates are null.** "Next Tuesday" and "this week" are ambiguous, so `start_date` is null and details are requested.
 - The TRD's safety-net keyword examples were still pet-themed after the business change and have been replaced with plumbing terms.
 
+### D-023. The tuned golden set: 135 items (details in `eval/golden/README.md`)
+All 13 intents, all 18 categories and every escalation reason a labeller can know in advance are covered; `UNVERIFIED_FIGURE` and `MANUAL` appear at zero because they come from draft checks and reviewers, not from the message. `booking_flow` has 11 items instead of the planned 12 and `unanswerable` 7; the total is within the planned "about two thirds of 200".
+
+Two findings from writing it that need an owner decision, neither changed unilaterally:
+- **Gas water heaters.** The fact sheet prices water heater replacement but excludes "gas line or gas appliance work". A gas-fired heater is on that line. Recorded as an unanswerable item rather than resolved.
+- **Commercial property has no routing rule.** The TRD routes only on reason codes, missing fields and spam; a complete booking request for a commercial building gets `draft_reply`, and only the knowledge base (which D-021 showed can say "yes") stands between the customer and a wrong answer. Phase 4 should decide whether to add a rule.
+
+Small counts per label (for example 8 safety items, 2 legal threats) mean per-reason scores will be noisy; the evaluation report must say so.
+
 ### D-018. Safety advice is a closed list in the fact sheet
 `universe/facts.json` has a `safety_instructions` block (shut off the main water valve; gas smell; sewage backup; carbon monoxide alarm). It is the only advice a reply may contain. Anything else about fixing a problem goes to a person. How these replies are produced (a fixed template or a checked draft) is to be decided in Phase 4 or 5 when routing and drafting are built.

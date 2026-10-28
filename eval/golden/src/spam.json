@@ -20,5 +20,115 @@
     },
     "evidence": [],
     "notes": "Obvious bulk marketing. Archived by the screening score without any model."
+  },
+  {
+    "id": "spam-crypto-bot",
+    "split": "tuned",
+    "category": "spam",
+    "channel": "web_form",
+    "sender_name": "Jordan Smith",
+    "sender_email": "profit.now@example.com",
+    "subject": "MAKE $5000 A DAY",
+    "body": "I made $5000 yesterday with this crypto trading bot and so can YOU!!! No experience needed. Limited spots. Join free: http://example.com/bot http://example.com/bot2 WhatsApp +1 555-0188",
+    "labels": {
+      "intents": ["spam"],
+      "primary_intent": "spam",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "archive",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Web-form spam with several links and hype."
+  },
+  {
+    "id": "spam-fake-invoice-phish",
+    "split": "tuned",
+    "category": "spam",
+    "channel": "email",
+    "sender_name": "Accounts Dept",
+    "sender_email": "billing-update@example.com",
+    "subject": "Invoice #88213 attached - action required",
+    "body": "Dear customer,\n\nYour invoice #88213 is overdue. To avoid account suspension please download and review the attached statement immediately: http://example.com/invoice-view\n\nIf you do not respond within 24 hours your account will be closed.",
+    "labels": {
+      "intents": ["spam"],
+      "primary_intent": "spam",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "archive",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Phishing dressed as a billing notice. It mimics a billing_question, which is why a model must not be the only judge."
+  },
+  {
+    "id": "spam-gift-card-prize",
+    "split": "tuned",
+    "category": "spam",
+    "channel": "web_form",
+    "sender_name": "Prize Desk",
+    "sender_email": "winner@example.com",
+    "subject": "Congratulations!!!",
+    "body": "Congratulations!!! You have been SELECTED to receive a $500 gift card. Claim your reward now before it expires: http://example.com/claim",
+    "labels": {
+      "intents": ["spam"],
+      "primary_intent": "spam",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "archive",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Classic prize spam."
+  },
+  {
+    "id": "spam-cheap-meds",
+    "split": "tuned",
+    "category": "spam",
+    "channel": "email",
+    "sender_name": "Online Pharmacy",
+    "sender_email": "deals@example.com",
+    "subject": "cheap meds no prescription",
+    "body": "buy meds online no prescription needed lowest prices fast shipping http://example.com/meds",
+    "labels": {
+      "intents": ["spam"],
+      "primary_intent": "spam",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "archive",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Irrelevant to the business and link-bearing."
+  },
+  {
+    "id": "spam-links-only",
+    "split": "tuned",
+    "category": "spam",
+    "channel": "web_form",
+    "sender_name": "asdf",
+    "sender_email": "x1@example.com",
+    "subject": "check this",
+    "body": "http://example.com/a http://example.com/b http://example.com/c http://example.com/d",
+    "labels": {
+      "intents": ["spam"],
+      "primary_intent": "spam",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "archive",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Only links, no content. Tests link density with no spam words."
   }
 ]

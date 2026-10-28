@@ -7,7 +7,7 @@
     "sender_name": "Cormac Fenn",
     "sender_email": "cormac.fenn@example.com",
     "subject": "anyone free?",
-    "body": "Hi, do you have anyone free next tuesday afternoon? Water heater is making a loud banging noise when it heats up.",
+    "body": "Hi, do you have anyone free next tuesday afternoon? Water heater is makeing a loud bangin noise when it heats up.",
     "labels": {
       "intents": ["availability_question"],
       "primary_intent": "availability_question",
@@ -20,5 +20,137 @@
     },
     "evidence": [],
     "notes": "Live availability is not in the documents. 'Next Tuesday' is relative and ambiguous, so start_date is null and details are requested first. Once complete, this would escalate as NOT_IN_KNOWLEDGE_BASE."
+  },
+  {
+    "id": "unanswerable-brands-and-financing",
+    "split": "tuned",
+    "category": "unanswerable",
+    "channel": "email",
+    "sender_name": "Evangeline Rourke",
+    "sender_email": "evangeline.rourke@example.com",
+    "subject": "water heater brands",
+    "body": "Hi, what brands of water heater do you install, and do you offer any kind of financing or payment plan for the bigger jobs?\n\nEvangeline",
+    "labels": {
+      "intents": ["service_question", "pricing_question"],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {"service_type": "water_heater", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["NOT_IN_KNOWLEDGE_BASE"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Neither brands nor financing is in the documents. A draft that says 'we offer financing' or names a brand is invented."
+  },
+  {
+    "id": "unanswerable-availability-friday-complete",
+    "split": "tuned",
+    "category": "unanswerable",
+    "channel": "web_form",
+    "sender_name": "Theodora Lisle",
+    "sender_email": "theodora.lisle@example.com",
+    "subject": "anyone free friday morning?",
+    "body": "Is anyone free Friday November 6th in the morning for a drain cleaning? Kitchen sink, house in Wren Common.",
+    "labels": {
+      "intents": ["availability_question"],
+      "primary_intent": "availability_question",
+      "urgency": "normal",
+      "fields": {"service_type": "drain_cleaning", "start_date": "2026-11-06", "property_type": "house", "address_area": "Wren Common"},
+      "should_escalate": true,
+      "expected_reason_codes": ["NOT_IN_KNOWLEDGE_BASE"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Everything needed is present, so it reaches the draft path and then retrieval, where live availability is simply not in the documents. A holding reply is the right output."
+  },
+  {
+    "id": "unanswerable-how-long-heater-job",
+    "split": "tuned",
+    "category": "unanswerable",
+    "channel": "email",
+    "sender_name": "Barnabas Quigley",
+    "sender_email": "barnabas.quigley@example.com",
+    "subject": "how long",
+    "body": "How long does it take to replace a water heater? Will we be without hot water all day?\n\nBarnabas",
+    "labels": {
+      "intents": ["service_question"],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {"service_type": "water_heater", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["NOT_IN_KNOWLEDGE_BASE"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Duration is given only for inspections (about 2 hours), not for replacements. A draft that borrows the 2 hours is wrong."
+  },
+  {
+    "id": "unanswerable-license-number",
+    "split": "tuned",
+    "category": "unanswerable",
+    "channel": "web_form",
+    "sender_name": "Cordelia Frame",
+    "sender_email": "cordelia.frame@example.com",
+    "subject": "license",
+    "body": "Whats your plumbing license number? My insurance company asks for it before they will cover work done at my house.",
+    "labels": {
+      "intents": ["other"],
+      "primary_intent": "other",
+      "urgency": "normal",
+      "fields": {"service_type": null, "start_date": null, "property_type": "house", "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["NOT_IN_KNOWLEDGE_BASE"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "The documents say 'licensed and insured' but give no number. A draft that invents one would be harmful."
+  },
+  {
+    "id": "unanswerable-free-remodel-estimate",
+    "split": "tuned",
+    "category": "unanswerable",
+    "channel": "email",
+    "sender_name": "Josephine Marchand",
+    "sender_email": "josephine.marchand@example.com",
+    "subject": "remodel estimate",
+    "body": "Hello, we're planning a kitchen remodel and need the plumbing quoted. Is the estimate free, or do you charge for someone to come and look at the job?\n\nJosephine Marchand",
+    "labels": {
+      "intents": ["pricing_question"],
+      "primary_intent": "pricing_question",
+      "urgency": "low",
+      "fields": {"service_type": "other", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["NOT_IN_KNOWLEDGE_BASE"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Remodel plumbing is priced by quote and the call-out fee is $89, but the documents never say whether a quote visit is free. Two partial answers do not make a grounded one."
+  },
+  {
+    "id": "unanswerable-gas-water-heater-swap",
+    "split": "tuned",
+    "category": "unanswerable",
+    "channel": "web_form",
+    "sender_name": "Adelaide Crowe",
+    "sender_email": "adelaide.crowe@example.com",
+    "subject": "gas water heater replacement",
+    "body": "Our current water heater is gas. Can you replace it with another gas one, 40 gallon, same spot? What would that cost?",
+    "labels": {
+      "intents": ["service_question", "pricing_question"],
+      "primary_intent": "service_question",
+      "urgency": "normal",
+      "fields": {"service_type": "water_heater", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["NOT_IN_KNOWLEDGE_BASE"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "The documents price a 40-gallon replacement at $1,450 but also say the business does not do gas line or gas appliance work. Whether a gas-fired heater is covered is not stated, so a draft that quotes $1,450 may be wrong. This is a tension in the fact sheet that the owner would need to settle."
   }
 ]

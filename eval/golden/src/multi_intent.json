@@ -7,7 +7,7 @@
     "sender_name": "Odalys Kerr",
     "sender_email": "odalys.kerr@example.com",
     "subject": "quick q",
-    "body": "how much is it to clear a clogged kitchen sink, and are you guys open saturdays? Thx",
+    "body": "how much is it to clear a clogd kitchen sink, and are you guys open saturdays? Thx",
     "labels": {
       "intents": ["pricing_question", "service_question"],
       "primary_intent": "pricing_question",
@@ -23,5 +23,224 @@
       {"file": "hours.md", "anchor": "on Saturday from 8:00 am to noon"}
     ],
     "notes": "Two questions in one line. Hours and what the business does are labelled service_question; terms such as warranty or cancellation are policy_question. The draft must answer both and say the $149 is a starting price."
+  },
+  {
+    "id": "multi-heater-price-and-warranty",
+    "split": "tuned",
+    "category": "multi_intent",
+    "channel": "web_form",
+    "sender_name": "Harlan Dietz",
+    "sender_email": "harlan.dietz@example.com",
+    "subject": "50 gallon heater",
+    "body": "Looking at replacing our water heater with a 50 gallon. What would it cost installed and what kind of warranty do I get on the install?",
+    "labels": {
+      "intents": ["pricing_question", "policy_question"],
+      "primary_intent": "pricing_question",
+      "urgency": "normal",
+      "fields": {"service_type": "water_heater", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {"file": "pricing.md", "anchor": "Water heater replacement, 50-gallon tank, installed: $1,650"},
+      {"file": "policies.md", "anchor": "Our workmanship is covered for 12 months"}
+    ],
+    "notes": "The warranty on the heater itself is the manufacturer's, not the business's. The draft should keep the two apart."
+  },
+  {
+    "id": "multi-sewer-repair-and-camera-price",
+    "split": "tuned",
+    "category": "multi_intent",
+    "channel": "email",
+    "sender_name": "Zora Whelan",
+    "sender_email": "zora.whelan@example.com",
+    "subject": "sewer",
+    "body": "do you repair sewer lines, and whats the price for the camera inspection part",
+    "labels": {
+      "intents": ["service_question", "pricing_question"],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {"service_type": "sewer_line_repair", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {"file": "services.md", "anchor": "Repairing a damaged main sewer line once a camera inspection has shown the problem."},
+      {"file": "pricing.md", "anchor": "Camera inspection of a drain or sewer line: $175"}
+    ],
+    "notes": "Repair is quote-only; the inspection price is $175. The draft must not invent a repair price."
+  },
+  {
+    "id": "multi-call-out-fee-and-saturday",
+    "split": "tuned",
+    "category": "multi_intent",
+    "channel": "web_form",
+    "sender_name": "Percival Nunn",
+    "sender_email": "percival.nunn@example.com",
+    "subject": "call out fee",
+    "body": "whats the call out fee? and can you do a saturday",
+    "labels": {
+      "intents": ["pricing_question", "service_question"],
+      "primary_intent": "pricing_question",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {"file": "pricing.md", "anchor": "The standard call-out fee is $89."},
+      {"file": "hours.md", "anchor": "On Saturday the first arrival is at 8:00 am and the last arrival is at 1:00 pm."}
+    ],
+    "notes": "'Can you do a saturday' is about scheduled visits in general, not a request to book one."
+  },
+  {
+    "id": "multi-leak-detection-and-insurance",
+    "split": "tuned",
+    "category": "multi_intent",
+    "channel": "email",
+    "sender_name": "Imogen Farrow",
+    "sender_email": "imogen.farrow@example.com",
+    "subject": "hidden leak + insurance",
+    "body": "Hello, there's a damp patch on our dining room ceiling and I suspect a leak in the wall above. Do you do leak detection, and if it turns out to be covered by our home insurance, can you give us the paperwork for the claim?\n\nImogen Farrow\n555-0163",
+    "labels": {
+      "intents": ["service_question", "policy_question"],
+      "primary_intent": "service_question",
+      "urgency": "normal",
+      "fields": {"service_type": "leak_repair", "start_date": null, "property_type": "house", "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {"file": "services.md", "anchor": "Electronic detection to find the source of a hidden leak"},
+      {"file": "policies.md", "anchor": "can provide an itemised invoice and photos for an insurance claim"}
+    ],
+    "notes": "A damp patch is not a leak that cannot be stopped, so not an emergency. The business does not give opinions on coverage."
+  },
+  {
+    "id": "multi-book-flush-and-price",
+    "split": "tuned",
+    "category": "multi_intent",
+    "channel": "web_form",
+    "sender_name": "Desmond Okoye",
+    "sender_email": "desmond.okoye@example.com",
+    "subject": "Water heater flush",
+    "body": "Please book a water heater flush for Friday Nov 6th, house is in Wren Common. what does it cost btw?",
+    "labels": {
+      "intents": ["booking_request", "pricing_question"],
+      "primary_intent": "booking_request",
+      "urgency": "normal",
+      "fields": {"service_type": "water_heater", "start_date": "2026-11-06", "property_type": "house", "address_area": "Wren Common"},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {"file": "pricing.md", "anchor": "Water heater flush: $129"},
+      {"file": "policies.md", "anchor": "No visit is confirmed until a staff member confirms it"}
+    ],
+    "notes": "All booking fields present. The draft gives the price but must not confirm Friday."
+  },
+  {
+    "id": "multi-area-and-flush-price",
+    "split": "tuned",
+    "category": "multi_intent",
+    "channel": "email",
+    "sender_name": "Annika Solberg",
+    "sender_email": "annika.solberg@example.com",
+    "subject": "Do you cover Tamarind Park?",
+    "body": "Hi, we're in Tamarind Park, do you cover that area? And roughly how much for a water heater flush?\n\nAnnika",
+    "labels": {
+      "intents": ["service_question", "pricing_question"],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {"service_type": "water_heater", "start_date": null, "property_type": null, "address_area": "Tamarind Park"},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {"file": "service-area.md", "anchor": "We serve Alderbrook Heights, Millrace, Old Quarry, Tamarind Park and Wren Common."},
+      {"file": "pricing.md", "anchor": "Water heater flush: $129"}
+    ],
+    "notes": "'Roughly' invites an estimate; the draft should quote the flat price and not round or adjust it."
+  },
+  {
+    "id": "multi-faucet-and-disposal-total",
+    "split": "tuned",
+    "category": "multi_intent",
+    "channel": "web_form",
+    "sender_name": "Rafferty Cole",
+    "sender_email": "rafferty.cole@example.com",
+    "subject": "kitchen reno plumbing",
+    "body": "We're redoing our kitchen. Need a faucet and a garbage disposal both installed, we're buying both ourselves. What would the two cost together?",
+    "labels": {
+      "intents": ["pricing_question"],
+      "primary_intent": "pricing_question",
+      "urgency": "low",
+      "fields": {"service_type": "fixture_installation", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {"file": "pricing.md", "anchor": "Faucet replacement, customer supplies the faucet: $165"},
+      {"file": "pricing.md", "anchor": "Garbage disposal installation, customer supplies the unit: $185"}
+    ],
+    "notes": "One intent, two items. The total ($350) is not in the documents: a derived sum that the figure check should flag as derived, not block."
+  },
+  {
+    "id": "multi-complaint-plus-warranty",
+    "split": "tuned",
+    "category": "multi_intent",
+    "channel": "email",
+    "sender_name": "Thalia Brandt",
+    "sender_email": "thalia.brandt@example.com",
+    "subject": "Re: yesterday's visit",
+    "body": "Your technician was quite short with me yesterday and wouldn't explain what he'd done. Separately, can you tell me what the warranty on the repair is?\n\nThalia Brandt",
+    "labels": {
+      "intents": ["complaint", "policy_question"],
+      "primary_intent": "complaint",
+      "urgency": "normal",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["COMPLAINT"],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "policies.md", "anchor": "Our workmanship is covered for 12 months"}],
+    "notes": "The complaint escalates; the warranty question is answerable and may appear in a reference draft."
+  },
+  {
+    "id": "multi-cancel-and-rebook",
+    "split": "tuned",
+    "category": "multi_intent",
+    "channel": "web_form",
+    "sender_name": "Oswin Tate",
+    "sender_email": "oswin.tate@example.com",
+    "subject": "change of plans",
+    "body": "cancel my visit and book a new one for tuesday the 17th pls",
+    "labels": {
+      "intents": ["cancellation", "booking_request"],
+      "primary_intent": "cancellation",
+      "urgency": "normal",
+      "fields": {"service_type": null, "start_date": "2026-11-17", "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "services.md", "anchor": "To book a visit, please tell us"}],
+    "notes": "No booking reference, no service, property or area. 'Tuesday the 17th' agrees with 17 November 2026."
   }
 ]

@@ -54,6 +54,11 @@ Written by an AI model (Claude), by hand, in one pass per category, from the sam
 
 ## Known gaps
 
-- The writing is cleaner than real customer writing and the same hand wrote all of it.
+- **Small counts.** 135 items in total, and fewer per label: `HEALTH_SAFETY` 8, `LEGAL_THREAT` 2, `LOW_CONFIDENCE` 1, `REFUND_OR_DISPUTE` 5, `cancellation` as primary intent 3, `availability_question` 3. A per-reason precision or recall from so few items is a rough guide at best. For example, 0 misses out of 8 safety items is compatible with a true miss rate of up to roughly one in three.
+- **The mix is not a real inbox.** 45 of 135 items (33%) are expected to escalate and 6 are spam, so that every rule is exercised. Overall accuracy on this set says nothing about the share of escalations or spam a real business would see.
+- **Some labels are judgment calls.** Notes on borderline items say so (a ceiling leak of unknown severity, a sewer smell with nothing coming up, a cafe versus a home). `LOW_CONFIDENCE` depends on the model reporting low confidence and is the label most likely to disagree with a run.
+- **A tension in the fact sheet.** It prices water heater replacement but also says the business does not do gas line or gas appliance work, so a gas-fired heater is unclear. `unanswerable-gas-water-heater-swap` records it as unanswerable. The owner would need to settle it; if the fact sheet changes, the documents are regenerated and this item is revisited.
+- **No rule for commercial property.** `oos-dental-office-booking` has every booking field, so by the current rules the route is `draft_reply`, and the correct reply is a refusal. Phase 4 may add a routing rule.
+- The writing is cleaner than real customer writing and the same hand wrote all of it. About 17 of 135 messages contain a real misspelling and about 44 start in lower case; the median message is 25 words. Real inquiries have more typos, more rambling, more attachments and more messages that mix two unrelated topics.
 - Single labeller; no second pair of eyes on any label.
 - Labels follow the rules above, which are a judgment, not a fact. Where a rule is arguable (for example, hours as `service_question`), it is stated here so it can be challenged.

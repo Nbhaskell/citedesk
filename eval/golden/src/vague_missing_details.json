@@ -7,7 +7,7 @@
     "sender_name": "Tomas Berg",
     "sender_email": "tomas.berg@example.com",
     "subject": "leaky faucet",
-    "body": "need someone to look at a leaky faucet asap. can you come this week",
+    "body": "need someone to look at a leeky faucet asap. can you come this week",
     "labels": {
       "intents": ["booking_request"],
       "primary_intent": "booking_request",
@@ -20,5 +20,203 @@
     },
     "evidence": [{"file": "services.md", "anchor": "To book a visit, please tell us"}],
     "notes": "'This week' is not a date, and there is no property type or neighbourhood. For booking requests, answerable means the documents say what is needed to book."
+  },
+  {
+    "id": "vague-toilet-weird-noise",
+    "split": "tuned",
+    "category": "vague_missing_details",
+    "channel": "web_form",
+    "sender_name": "Cecil Harwood",
+    "sender_email": "cecil.harwood@example.com",
+    "subject": "toilet",
+    "body": "my toliet is making a wierd noise can someone look at it",
+    "labels": {
+      "intents": ["booking_request"],
+      "primary_intent": "booking_request",
+      "urgency": "normal",
+      "fields": {"service_type": "other", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "services.md", "anchor": "To book a visit, please tell us"}],
+    "notes": "Toilet repair is general plumbing repair, so service_type is other."
+  },
+  {
+    "id": "vague-need-a-plumber",
+    "split": "tuned",
+    "category": "vague_missing_details",
+    "channel": "web_form",
+    "sender_name": "Ambrose Keene",
+    "sender_email": "ambrose.keene@example.com",
+    "subject": null,
+    "body": "need a plumber",
+    "labels": {
+      "intents": ["booking_request"],
+      "primary_intent": "booking_request",
+      "urgency": "normal",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "services.md", "anchor": "To book a visit, please tell us"}],
+    "notes": "Three words. The intent is clear enough; everything else is missing. A model that is unsure may report low confidence and escalate instead."
+  },
+  {
+    "id": "vague-water-heater-not-working",
+    "split": "tuned",
+    "category": "vague_missing_details",
+    "channel": "web_form",
+    "sender_name": "Lenora Fitch",
+    "sender_email": "lenora.fitch@example.com",
+    "subject": "water heater not working",
+    "body": "Water heater isnt working. Call me 555-0152",
+    "labels": {
+      "intents": ["booking_request"],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {"service_type": "water_heater", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "services.md", "anchor": "To book a visit, please tell us"}],
+    "notes": "A heater that is not working is probably no hot water, labelled high. The reply asks for details by email; the business does not promise a phone call."
+  },
+  {
+    "id": "vague-bathroom-remodel-quote",
+    "split": "tuned",
+    "category": "vague_missing_details",
+    "channel": "email",
+    "sender_name": "Winifred Pratt",
+    "sender_email": "winifred.pratt@example.com",
+    "subject": "bathroom",
+    "body": "Hello. We are redoing our whole bathroom and need a quote for the plumbing side of it. Can you help with that?\n\nWinifred",
+    "labels": {
+      "intents": ["pricing_question"],
+      "primary_intent": "pricing_question",
+      "urgency": "low",
+      "fields": {"service_type": "other", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "pricing.md", "anchor": "Bathroom or kitchen remodel plumbing"}],
+    "notes": "A pricing question has no required fields, so the route is draft_reply even though little is known. The documents say remodel plumbing is priced by quote."
+  },
+  {
+    "id": "vague-ceiling-leak-severity-unclear",
+    "split": "tuned",
+    "category": "vague_missing_details",
+    "channel": "web_form",
+    "sender_name": "Brannigan Shaw",
+    "sender_email": "brannigan.shaw@example.com",
+    "subject": "leak",
+    "body": "we have a leak in the ceiling can you come",
+    "labels": {
+      "intents": ["booking_request"],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {"service_type": "leak_repair", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "emergencies.md", "anchor": "A burst pipe, a leak that cannot be stopped"}],
+    "notes": "Deliberately hard: the severity is unknown. It could be a drip or an uncontrolled leak. Labelled as not an emergency because nothing says it cannot be stopped; a good reply asks, and points to the emergency line if the leak cannot be stopped."
+  },
+  {
+    "id": "vague-fix-my-sink-price",
+    "split": "tuned",
+    "category": "vague_missing_details",
+    "channel": "email",
+    "sender_name": "Eulalia Bram",
+    "sender_email": "eulalia.bram@example.com",
+    "subject": "price for fixing my sink",
+    "body": "Can you give me a price for fixing my sink",
+    "labels": {
+      "intents": ["pricing_question"],
+      "primary_intent": "pricing_question",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "pricing.md", "anchor": "The standard call-out fee is $89."}],
+    "notes": "It is unclear whether the sink is clogged, leaking or needs a new faucet. The draft can only give the call-out fee and the hourly rate, and should ask what is wrong."
+  },
+  {
+    "id": "vague-do-you-do-plumbing",
+    "split": "tuned",
+    "category": "vague_missing_details",
+    "channel": "web_form",
+    "sender_name": "Isidore Platt",
+    "sender_email": "isidore.platt@example.com",
+    "subject": "hi",
+    "body": "Hi, do you do plumbing",
+    "labels": {
+      "intents": ["service_question"],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "about.md", "anchor": "Kestrel Hollow Plumbing is a residential plumbing service in Alderbrook"}],
+    "notes": "The company's own name makes this a trivially answerable question."
+  },
+  {
+    "id": "vague-anyone-available-for-leak",
+    "split": "tuned",
+    "category": "vague_missing_details",
+    "channel": "web_form",
+    "sender_name": "Clementine Ward",
+    "sender_email": "clementine.ward@example.com",
+    "subject": "available?",
+    "body": "Is anyone available for a leak",
+    "labels": {
+      "intents": ["availability_question"],
+      "primary_intent": "availability_question",
+      "urgency": "high",
+      "fields": {"service_type": "leak_repair", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "No date given, and live availability is not in the documents."
+  },
+  {
+    "id": "vague-moms-house-near-the-park",
+    "split": "tuned",
+    "category": "vague_missing_details",
+    "channel": "email",
+    "sender_name": "Sylvester Moon",
+    "sender_email": "sylvester.moon@example.com",
+    "subject": "for my mom",
+    "body": "hi i want to book something for my moms house, shes in one of those newer streets over by the park. she can only do mornings. let me know what you need",
+    "labels": {
+      "intents": ["booking_request"],
+      "primary_intent": "booking_request",
+      "urgency": "normal",
+      "fields": {"service_type": null, "start_date": null, "property_type": "house", "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "services.md", "anchor": "To book a visit, please tell us"}],
+    "notes": "'By the park' is not a neighbourhood name, so address_area is null even though Tamarind Park exists; the system should not guess."
   }
 ]

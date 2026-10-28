@@ -1,0 +1,112 @@
+[
+  {
+    "id": "followup-any-update-on-quote",
+    "split": "tuned",
+    "category": "follow_up",
+    "channel": "email",
+    "sender_name": "Prosper Wakefield",
+    "sender_email": "prosper.wakefield@example.com",
+    "subject": "Re: water heater quote",
+    "body": "Hi, following up on my email from Monday about the water heater quote. Any update?\n\nProsper",
+    "labels": {
+      "intents": ["other"],
+      "primary_intent": "other",
+      "urgency": "normal",
+      "fields": {"service_type": "water_heater", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["NOT_IN_KNOWLEDGE_BASE"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "The status of a specific earlier conversation is not in the documents. A staff member must answer. The earlier email is not in this set, so the item is self-contained."
+  },
+  {
+    "id": "followup-did-you-get-photos",
+    "split": "tuned",
+    "category": "follow_up",
+    "channel": "web_form",
+    "sender_name": "Hester Bramwell",
+    "sender_email": "hester.bramwell@example.com",
+    "subject": "photos",
+    "body": "I emaild photos of the leak under my sink yesterday, did you recieve them? Just want to make sure before i keep waiting",
+    "labels": {
+      "intents": ["other"],
+      "primary_intent": "other",
+      "urgency": "normal",
+      "fields": {"service_type": "leak_repair", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["NOT_IN_KNOWLEDGE_BASE"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Receipt of an attachment cannot be answered from documents."
+  },
+  {
+    "id": "followup-is-friday-still-on",
+    "split": "tuned",
+    "category": "follow_up",
+    "channel": "email",
+    "sender_name": "Lucian Hartley",
+    "sender_email": "lucian.hartley@example.com",
+    "subject": "Friday",
+    "body": "Just checking my visit is still on for Friday? Haven't heard anything since I booked.\n\nLucian Hartley",
+    "labels": {
+      "intents": ["other"],
+      "primary_intent": "other",
+      "urgency": "normal",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["NOT_IN_KNOWLEDGE_BASE"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Whether a visit is confirmed is the kind of thing the system must never say. 'Friday' is relative, so no date."
+  },
+  {
+    "id": "followup-add-outdoor-tap",
+    "split": "tuned",
+    "category": "follow_up",
+    "channel": "web_form",
+    "sender_name": "Octavia Prewitt",
+    "sender_email": "octavia.prewitt@example.com",
+    "subject": "Re: my booking",
+    "body": "re: my booking. while your guy is here can he also look at the outdoor tap, its been dripping all summer",
+    "labels": {
+      "intents": ["booking_change"],
+      "primary_intent": "booking_change",
+      "urgency": "low",
+      "fields": {"service_type": "other", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "services.md", "anchor": "Other plumbing repairs that are not listed above."}],
+    "notes": "An add-on to an existing booking, with no reference and no new date, so details are requested. General repairs are hourly labour plus parts."
+  },
+  {
+    "id": "followup-thanks-and-warranty",
+    "split": "tuned",
+    "category": "follow_up",
+    "channel": "email",
+    "sender_name": "Genoveva Strand",
+    "sender_email": "genoveva.strand@example.com",
+    "subject": "Thanks!",
+    "body": "Thanks so much for fixing the kitchen sink yesterday, your technician was lovely. One question, what's the warranty on the repair, in case it acts up again?\n\nGenoveva",
+    "labels": {
+      "intents": ["policy_question"],
+      "primary_intent": "policy_question",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "policies.md", "anchor": "Our workmanship is covered for 12 months"}],
+    "notes": "Positive tone and a warranty question. A model that treats any follow-up as a complaint would escalate wrongly."
+  }
+]

@@ -20,5 +20,115 @@
     },
     "evidence": [{"file": "faq.md", "anchor": "We do not offer discounts"}],
     "notes": "The documents answer the discount question (no) but waiving a fee is an exception only the owner can make. A draft must not promise either."
+  },
+  {
+    "id": "exception-cash-no-invoice",
+    "split": "tuned",
+    "category": "policy_exception",
+    "channel": "email",
+    "sender_name": "Caractacus Bell",
+    "sender_email": "caractacus.bell@example.com",
+    "subject": "paying cash",
+    "body": "If I pay cash can we skip the invoice and the paperwork? Would you knock a bit off the price if I do? No hard feelings if not.\n\nCaractacus",
+    "labels": {
+      "intents": ["policy_question"],
+      "primary_intent": "policy_question",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["POLICY_EXCEPTION_REQUEST"],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "pricing.md", "anchor": "We accept card, check and cash."}],
+    "notes": "Cash is accepted but the invoice is emailed the same day and there are no discounts. A request to skip paperwork and reduce the price is an exception."
+  },
+  {
+    "id": "exception-price-match",
+    "split": "tuned",
+    "category": "policy_exception",
+    "channel": "web_form",
+    "sender_name": "Ephraim Stott",
+    "sender_email": "ephraim.stott@example.com",
+    "subject": "price match?",
+    "body": "Another plumber quoted me $120 to clear my bathtub drain. Your site says $149. Will you match their price? I'd rather go with you guys",
+    "labels": {
+      "intents": ["policy_question", "pricing_question"],
+      "primary_intent": "policy_question",
+      "urgency": "normal",
+      "fields": {"service_type": "drain_cleaning", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["POLICY_EXCEPTION_REQUEST"],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "faq.md", "anchor": "We do not offer discounts"}],
+    "notes": "The documents list price-match among the discounts not offered, but agreeing to match is a decision for the owner."
+  },
+  {
+    "id": "exception-skip-written-estimate",
+    "split": "tuned",
+    "category": "policy_exception",
+    "channel": "email",
+    "sender_name": "Angelica Moreton",
+    "sender_email": "angelica.moreton@example.com",
+    "subject": "just start the job",
+    "body": "Hi, you came out on Monday about the main line. I trust you, just go ahead and start the work, no need to send that written estimate thing first. I'm busy and just want it done.\n\nAngelica",
+    "labels": {
+      "intents": ["policy_question"],
+      "primary_intent": "policy_question",
+      "urgency": "normal",
+      "fields": {"service_type": "sewer_line_repair", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["POLICY_EXCEPTION_REQUEST"],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "pricing.md", "anchor": "No work over $300 starts without a written estimate"}],
+    "notes": "The written-estimate rule protects both sides; skipping it is an exception."
+  },
+  {
+    "id": "exception-extend-warranty",
+    "split": "tuned",
+    "category": "policy_exception",
+    "channel": "web_form",
+    "sender_name": "Horatio Brandwell",
+    "sender_email": "horatio.brandwell@example.com",
+    "subject": "warranty on old repair",
+    "body": "You replaced a section of pipe in my basement about 18 months ago and it has started to leak at the joint. I'd like you to cover it under your warranty even though it's been a while",
+    "labels": {
+      "intents": ["policy_question"],
+      "primary_intent": "policy_question",
+      "urgency": "normal",
+      "fields": {"service_type": "leak_repair", "start_date": null, "property_type": "house", "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["POLICY_EXCEPTION_REQUEST"],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "policies.md", "anchor": "Our workmanship is covered for 12 months"}],
+    "notes": "18 months is outside the 12-month warranty. A draft must neither deny nor grant it."
+  },
+  {
+    "id": "exception-waive-travel-fee",
+    "split": "tuned",
+    "category": "policy_exception",
+    "channel": "email",
+    "sender_name": "Winnifred Oake",
+    "sender_email": "winnifred.oake@example.com",
+    "subject": "travel fee",
+    "body": "We're in Dunmore Flats and I've used you three times now. Any chance you could waive the travel fee for a loyal customer?\n\nWinnifred",
+    "labels": {
+      "intents": ["policy_question"],
+      "primary_intent": "policy_question",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": "Dunmore Flats"},
+      "should_escalate": true,
+      "expected_reason_codes": ["POLICY_EXCEPTION_REQUEST"],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "service-area.md", "anchor": "A travel fee of $40 applies to these areas"}],
+    "notes": "There are no repeat-customer discounts in the documents."
   }
 ]

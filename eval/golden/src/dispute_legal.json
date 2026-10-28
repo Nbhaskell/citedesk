@@ -1,0 +1,134 @@
+[
+  {
+    "id": "dispute-refund-call-out-fee",
+    "split": "tuned",
+    "category": "dispute_legal",
+    "channel": "email",
+    "sender_name": "Augusta Fenwick",
+    "sender_email": "augusta.fenwick@example.com",
+    "subject": "refund of call out fee",
+    "body": "Your technician came, looked at my water heater and said it was too old to repair. Nothing got fixed so I want the $89 call out fee refunded.\n\nAugusta Fenwick",
+    "labels": {
+      "intents": ["billing_question"],
+      "primary_intent": "billing_question",
+      "urgency": "normal",
+      "fields": {"service_type": "water_heater", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["REFUND_OR_DISPUTE"],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "policies.md", "anchor": "The call-out fee is not refundable but is credited to approved work."}],
+    "notes": "The documents say the fee is not refundable, but a request for money back is for the owner. The draft must not promise or refuse a refund."
+  },
+  {
+    "id": "dispute-charged-more-than-quoted",
+    "split": "tuned",
+    "category": "dispute_legal",
+    "channel": "web_form",
+    "sender_name": "Cyrus Delacroix",
+    "sender_email": "cyrus.delacroix@example.com",
+    "subject": "wrong charge",
+    "body": "your website said $165 to put in my faucet and i got charged $289. nobody told me it whould be more. i want this fixd",
+    "labels": {
+      "intents": ["complaint", "billing_question"],
+      "primary_intent": "billing_question",
+      "urgency": "high",
+      "fields": {"service_type": "fixture_installation", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["COMPLAINT", "REFUND_OR_DISPUTE"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "A disputed invoice. Whether $289 was justified (parts, extra labour, a written estimate) is a question for the owner and the invoice, not the documents."
+  },
+  {
+    "id": "dispute-chargeback-threat",
+    "split": "tuned",
+    "category": "dispute_legal",
+    "channel": "email",
+    "sender_name": "Ingrid Halvorsen",
+    "sender_email": "ingrid.halvorsen@example.com",
+    "subject": "last warning",
+    "body": "I have asked twice for a refund for the drain job that did not work. If I don't have my money back by Friday I will dispute the charge with my credit card company.\n\nIngrid Halvorsen",
+    "labels": {
+      "intents": ["billing_question", "complaint"],
+      "primary_intent": "billing_question",
+      "urgency": "high",
+      "fields": {"service_type": "drain_cleaning", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["COMPLAINT", "REFUND_OR_DISPUTE"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "A card chargeback is a payment dispute, not a legal threat in this labelling scheme."
+  },
+  {
+    "id": "legal-sue-over-water-damage",
+    "split": "tuned",
+    "category": "dispute_legal",
+    "channel": "email",
+    "sender_name": "Maximilian Strand",
+    "sender_email": "maximilian.strand@example.com",
+    "subject": "FLOODED KITCHEN - legal notice",
+    "body": "Your plumber's repair failed on Sunday night and flooded my kitchen and dining room. The damage is thousands of dollars. I have spoken to a lawyer and unless I hear from you within 48 hours I will sue for the full amount.\n\nMaximilian Strand",
+    "labels": {
+      "intents": ["complaint"],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {"service_type": null, "start_date": null, "property_type": "house", "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["COMPLAINT", "LEGAL_THREAT"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "The flooding is past tense and not a request for an emergency visit, so no HEALTH_SAFETY. A draft must say nothing about liability."
+  },
+  {
+    "id": "legal-licensing-board-report",
+    "split": "tuned",
+    "category": "dispute_legal",
+    "channel": "web_form",
+    "sender_name": "Genevieve Rask",
+    "sender_email": "genevieve.rask@example.com",
+    "subject": "I'm reporting you",
+    "body": "the pipe your tech soldered last month is leaking and he lied about doing a pressure test. i am filing a complaint with the state plumbing licensing board and getting an attorney",
+    "labels": {
+      "intents": ["complaint"],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {"service_type": "leak_repair", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["COMPLAINT", "LEGAL_THREAT"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "A report to a licensing board and an attorney count as legal threats."
+  },
+  {
+    "id": "dispute-late-fee-no-invoice",
+    "split": "tuned",
+    "category": "dispute_legal",
+    "channel": "email",
+    "sender_name": "Barnard Quint",
+    "sender_email": "barnard.quint@example.com",
+    "subject": "late fee??",
+    "body": "I just got a notice saying a late fee of 1.5% was added to my account. I never received an invoice for the job in October. I'm not paying a late fee on something I was never billed for.\n\nB. Quint",
+    "labels": {
+      "intents": ["billing_question"],
+      "primary_intent": "billing_question",
+      "urgency": "normal",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["REFUND_OR_DISPUTE"],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "pricing.md", "anchor": "A late fee of 1.5% per month applies to invoices unpaid after 30 days."}],
+    "notes": "The documents say invoices are emailed the same day. Whether this customer's invoice was sent is a fact only staff can check, so this is a dispute for the owner."
+  }
+]

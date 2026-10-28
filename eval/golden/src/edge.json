@@ -1,0 +1,69 @@
+[
+  {
+    "id": "edge-card-number-in-message",
+    "split": "tuned",
+    "category": "edge",
+    "channel": "email",
+    "sender_name": "Jocasta Wynne",
+    "sender_email": "jocasta.wynne@example.com",
+    "subject": "paying my invoice",
+    "body": "Hi, I'd like to pay my invoice now so it's done. My card is 4111 1111 1111 1111, expiry 09/28, security code 123. Please run it and let me know.\n\nJocasta Wynne",
+    "labels": {
+      "intents": ["billing_question"],
+      "primary_intent": "billing_question",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true,
+      "contains_sensitive_data": true
+    },
+    "evidence": [{"file": "pricing.md", "anchor": "We accept card, check and cash."}],
+    "notes": "4111 1111 1111 1111 is a published test card number and passes the Luhn check. It must be masked before storage and before any model sees it. The draft should tell the customer not to send card details by email."
+  },
+  {
+    "id": "edge-forwarded-long-thread",
+    "split": "tuned",
+    "category": "edge",
+    "channel": "email",
+    "sender_name": "Constance Ashdown",
+    "sender_email": "constance.ashdown@example.com",
+    "subject": "Fwd: Fwd: Re: water heater options",
+    "body": "hi can you answer the question at the bottom? my husband started this thread, I just want the number\n\n---------- Forwarded message ---------\nFrom: Peter Ashdown <peter.ashdown@example.com>\nDate: Mon, Oct 26\nSubject: Re: water heater options\n\n> thanks mike, so the brand doesnt matter then?\n>\n> > On Sat, Oct 24, Mike wrote:\n> > yeah the brand honestly doesnt matter, any of the big ones are fine. the main thing is the\n> > size for your household and getting a decent install. we have a 4 person house and went with\n> > the bigger tank and its been great\n> >\n> > > Peter wrote:\n> > > we are replacing ours, 12 years old. family of 4, 2 bathrooms. what size would you get?\n>\n> ok. last thing, what does a 50 gallon one installed cost with Kestrel Hollow Plumbing? thats who our neighbour used",
+    "labels": {
+      "intents": ["pricing_question"],
+      "primary_intent": "pricing_question",
+      "urgency": "low",
+      "fields": {"service_type": "water_heater", "start_date": null, "property_type": "house", "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "pricing.md", "anchor": "Water heater replacement, 50-gallon tank, installed: $1,650"}],
+    "notes": "The real question is at the bottom of a quoted chain, and the chain contains figures and opinions (brand, size) that are not the business's. The draft must answer only the price."
+  },
+  {
+    "id": "edge-gibberish-low-confidence",
+    "split": "tuned",
+    "category": "edge",
+    "channel": "web_form",
+    "sender_name": "ujk",
+    "sender_email": null,
+    "subject": "re",
+    "body": "asdkj hello?? did u get this lol ok ok the thing from before",
+    "labels": {
+      "intents": ["other"],
+      "primary_intent": "other",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": true,
+      "expected_reason_codes": ["LOW_CONFIDENCE"],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Too unclear to classify. LOW_CONFIDENCE depends on the model reporting low confidence, so this label is the one most likely to disagree with a run."
+  }
+]

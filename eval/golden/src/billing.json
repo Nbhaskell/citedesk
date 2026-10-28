@@ -1,0 +1,115 @@
+[
+  {
+    "id": "billing-why-175-call-out",
+    "split": "tuned",
+    "category": "billing",
+    "channel": "email",
+    "sender_name": "Rosemary Aldridge",
+    "sender_email": "rosemary.aldridge@example.com",
+    "subject": "charge on my invoice",
+    "body": "Hi, I called late on Sunday night about my toilet and my invoice has a $175 call out fee. Your website says $89. Can you explain the difference?\n\nRosemary Aldridge",
+    "labels": {
+      "intents": ["billing_question"],
+      "primary_intent": "billing_question",
+      "urgency": "normal",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "pricing.md", "anchor": "The emergency call-out fee is $175."}],
+    "notes": "A question, not a demand for a refund. The documents explain the emergency fee. If she disputed it, it would escalate."
+  },
+  {
+    "id": "billing-resend-invoice",
+    "split": "tuned",
+    "category": "billing",
+    "channel": "web_form",
+    "sender_name": "Thaddeus Wren",
+    "sender_email": "thaddeus.wren@example.com",
+    "subject": "invoice",
+    "body": "I never recieved the emailed invoice for the work last week, can you send it again? need it for my records",
+    "labels": {
+      "intents": ["billing_question"],
+      "primary_intent": "billing_question",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "pricing.md", "anchor": "The invoice is emailed the same day."}],
+    "notes": "The draft can say invoices are emailed the same day and that staff will resend; it cannot say it has been resent."
+  },
+  {
+    "id": "billing-tax-on-parts",
+    "split": "tuned",
+    "category": "billing",
+    "channel": "email",
+    "sender_name": "Henrietta Cobb",
+    "sender_email": "henrietta.cobb@example.com",
+    "subject": "tax?",
+    "body": "Quick question about my bill: is there sales tax on the faucet parts, and is the labour taxed as well?",
+    "labels": {
+      "intents": ["billing_question"],
+      "primary_intent": "billing_question",
+      "urgency": "low",
+      "fields": {"service_type": "fixture_installation", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "pricing.md", "anchor": "Sales tax on parts is 7%."}],
+    "notes": "Parts carry 7% tax and labour does not. A draft that applies the rate to a specific amount makes a derived figure."
+  },
+  {
+    "id": "billing-call-out-credit",
+    "split": "tuned",
+    "category": "billing",
+    "channel": "web_form",
+    "sender_name": "Montgomery Ash",
+    "sender_email": "montgomery.ash@example.com",
+    "subject": "call out fee question",
+    "body": "if i go ahead with the repair after you look at it, do i still pay the call out fee on top?",
+    "labels": {
+      "intents": ["billing_question"],
+      "primary_intent": "billing_question",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "pricing.md", "anchor": "credited toward the work if the customer approves the work during the same visit"}],
+    "notes": "The fee is credited toward approved work in the same visit, so the customer does not pay it twice."
+  },
+  {
+    "id": "billing-when-to-pay",
+    "split": "tuned",
+    "category": "billing",
+    "channel": "email",
+    "sender_name": "Seraphina Dunmore",
+    "sender_email": "seraphina.dunmore@example.com",
+    "subject": "When do I pay",
+    "body": "Hello, when do I have to pay for the work, before you start or after? And is there a late fee if I take a few weeks?\n\nSeraphina",
+    "labels": {
+      "intents": ["billing_question"],
+      "primary_intent": "billing_question",
+      "urgency": "low",
+      "fields": {"service_type": null, "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {"file": "pricing.md", "anchor": "Payment is due on completion of the visit."},
+      {"file": "pricing.md", "anchor": "A late fee of 1.5% per month applies to invoices unpaid after 30 days."}
+    ],
+    "notes": "Payment is due on completion, and late fees begin after 30 days. 'A few weeks' is under 30 days only if it is under 4 weeks; the draft should state the rule, not decide."
+  }
+]

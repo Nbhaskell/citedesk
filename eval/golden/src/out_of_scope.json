@@ -1,0 +1,178 @@
+[
+  {
+    "id": "oos-air-conditioner-repair",
+    "split": "tuned",
+    "category": "out_of_scope",
+    "channel": "web_form",
+    "sender_name": "Barclay Hobbs",
+    "sender_email": "barclay.hobbs@example.com",
+    "subject": "AC",
+    "body": "do you guys also do AC repair? ours stoped cooling yesterday",
+    "labels": {
+      "intents": ["service_question"],
+      "primary_intent": "service_question",
+      "urgency": "normal",
+      "fields": {"service_type": "other", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "policies.md", "anchor": "We do not do heating or air conditioning work."}],
+    "notes": "The documents say no. The draft should decline politely and not invent a referral."
+  },
+  {
+    "id": "oos-dead-outlet-near-sink",
+    "split": "tuned",
+    "category": "out_of_scope",
+    "channel": "email",
+    "sender_name": "Winthrop Gale",
+    "sender_email": "winthrop.gale@example.com",
+    "subject": "outlet",
+    "body": "Since you're already coming to fix the sink, could your plumber also look at a dead outlet right next to it? It stopped working after the leak.\n\nWinthrop",
+    "labels": {
+      "intents": ["service_question"],
+      "primary_intent": "service_question",
+      "urgency": "normal",
+      "fields": {"service_type": "other", "start_date": null, "property_type": null, "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "policies.md", "anchor": "We do not do electrical work."}],
+    "notes": "An outlet that died after a leak is also a possible electrical hazard, but nothing says so in the message. Labelled out of scope, not HEALTH_SAFETY."
+  },
+  {
+    "id": "oos-cafe-grease-trap",
+    "split": "tuned",
+    "category": "out_of_scope",
+    "channel": "web_form",
+    "sender_name": "Octavian Merle",
+    "sender_email": "octavian.merle@example.com",
+    "subject": "cafe drain",
+    "body": "I run a small cafe and our grease trap keeps backing up. do you do work for businesses or just homes?",
+    "labels": {
+      "intents": ["service_question"],
+      "primary_intent": "service_question",
+      "urgency": "normal",
+      "fields": {"service_type": "other", "start_date": null, "property_type": "commercial", "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "policies.md", "anchor": "We do not work on commercial or industrial buildings."}],
+    "notes": "The documents say no commercial buildings. 'Backing up' is a grease trap, not sewage coming into a home. The word 'cafe' does not appear in the documents, which is the kind of gap retrieval can miss."
+  },
+  {
+    "id": "oos-dental-office-booking",
+    "split": "tuned",
+    "category": "out_of_scope",
+    "channel": "email",
+    "sender_name": "Roderick Ellsworth",
+    "sender_email": "roderick.ellsworth@example.com",
+    "subject": "Drain cleaning for our office",
+    "body": "Hello,\n\nPlease book a drain cleaning for our dental office on Friday Nov 6th. We're in Millrace. The reception sink is draining badly.\n\nRoderick Ellsworth\nOffice manager",
+    "labels": {
+      "intents": ["booking_request"],
+      "primary_intent": "booking_request",
+      "urgency": "normal",
+      "fields": {"service_type": "drain_cleaning", "start_date": "2026-11-06", "property_type": "commercial", "address_area": "Millrace"},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "policies.md", "anchor": "We do not work on commercial or industrial buildings."}],
+    "notes": "All booking fields are present, so by the current routing rules this is draft_reply. The correct reply declines, because the business does not work on commercial buildings. There is no routing rule for property_type commercial; Phase 4 should decide whether to add one."
+  },
+  {
+    "id": "oos-six-unit-building",
+    "split": "tuned",
+    "category": "out_of_scope",
+    "channel": "email",
+    "sender_name": "Leontine Aubry",
+    "sender_email": "leontine.aubry@example.com",
+    "subject": "multi unit building",
+    "body": "Hi, I own a 6 unit apartment building in Old Quarry and the water heater for the whole building is failing. Is that something you do?\n\nLeontine",
+    "labels": {
+      "intents": ["service_question"],
+      "primary_intent": "service_question",
+      "urgency": "high",
+      "fields": {"service_type": "water_heater", "start_date": null, "property_type": "apartment", "address_area": "Old Quarry"},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "service-area.md", "anchor": "We serve homes and small residential buildings of up to 4 units."}],
+    "notes": "Tricky inference: the documents say up to 4 units, and this building has 6, so the answer is no. A draft that says yes because it is residential is wrong."
+  },
+  {
+    "id": "oos-outside-service-area",
+    "split": "tuned",
+    "category": "out_of_scope",
+    "channel": "web_form",
+    "sender_name": "Isolde Penrose",
+    "sender_email": "isolde.penrose@example.com",
+    "subject": "do you come to Fairmount",
+    "body": "We live in Fairmount, about 30 mins from you. Can you come out there for a drain job?",
+    "labels": {
+      "intents": ["service_question"],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {"service_type": "drain_cleaning", "start_date": null, "property_type": null, "address_area": "Fairmount"},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "service-area.md", "anchor": "We do not serve anywhere else."}],
+    "notes": "Fairmount is not on either area list, so the documents say no."
+  },
+  {
+    "id": "oos-septic-tank-full",
+    "split": "tuned",
+    "category": "out_of_scope",
+    "channel": "email",
+    "sender_name": "Bertrand Colley",
+    "sender_email": "bertrand.colley@example.com",
+    "subject": "septic",
+    "body": "Our septic tank is full and the yard is soggy. Can you pump it out or do you know someone who does?\n\nBertrand",
+    "labels": {
+      "intents": ["service_question"],
+      "primary_intent": "service_question",
+      "urgency": "normal",
+      "fields": {"service_type": "other", "start_date": null, "property_type": "house", "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "policies.md", "anchor": "We do not pump out septic tanks."}],
+    "notes": "The documents say no and name no one to recommend. The draft must not invent a referral."
+  },
+  {
+    "id": "oos-roof-drip-attic",
+    "split": "tuned",
+    "category": "out_of_scope",
+    "channel": "web_form",
+    "sender_name": "Ulrich Danvers",
+    "sender_email": "ulrich.danvers@example.com",
+    "subject": "roof leak",
+    "body": "after the storm i have a drip in my attic coming from the roof. is that something you can fix? thx",
+    "labels": {
+      "intents": ["service_question"],
+      "primary_intent": "service_question",
+      "urgency": "normal",
+      "fields": {"service_type": "other", "start_date": null, "property_type": "house", "address_area": null},
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [{"file": "policies.md", "anchor": "We do not repair roof leaks."}],
+    "notes": "A leak, but from the roof, so out of scope; the model may over-match 'leak' to the leak services."
+  }
+]

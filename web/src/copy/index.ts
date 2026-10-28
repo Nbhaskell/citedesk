@@ -180,3 +180,196 @@ export const queue = {
   newInquiries: (count: number): string =>
     count === 1 ? "1 new inquiry" : `${count} new inquiries`,
 } as const;
+
+export const sentiment: Words<Schemas["Sentiment"]> = {
+  positive: "Positive",
+  neutral: "Neutral",
+  negative: "Unhappy",
+  angry: "Angry",
+};
+
+export const confidence: Words<Schemas["Confidence"]> = {
+  high: "sure",
+  medium: "fairly sure",
+  low: "not sure",
+};
+
+export const service: Words<Schemas["ServiceType"]> = {
+  emergency_repair: "Emergency repair",
+  drain_cleaning: "Drain cleaning",
+  leak_repair: "Leak repair",
+  sewer_line_repair: "Sewer line repair",
+  water_heater: "Water heater",
+  fixture_installation: "Fixture installation",
+  inspection: "Inspection",
+  other: "Other work",
+  unknown: "Not stated",
+};
+
+export const property: Words<Schemas["PropertyType"]> = {
+  house: "House",
+  apartment: "Apartment",
+  commercial: "Business premises",
+  other: "Other",
+  unknown: "Not stated",
+};
+
+export const fieldLabel: Words<keyof Schemas["ExtractedFields"]> = {
+  service_type: "Service",
+  start_date: "Date wanted",
+  property_type: "Property",
+  address_area: "Area",
+  preferred_contact: "Preferred contact",
+  booking_reference: "Booking reference",
+  dates_as_written: "Date, as written",
+};
+
+/** What the draft will ask the customer for, by the name of the missing field. */
+export const missingField: Record<string, string> = {
+  service_type: "The kind of work",
+  start_date: "The date they would like us to visit",
+  property_type: "Whether it is a house, an apartment or something else",
+  address_area: "The neighbourhood or area",
+  booking_reference: "Their booking reference",
+};
+
+/** What the pipeline is doing with an inquiry that is not waiting for a person yet. */
+export function processingWords(
+  inquiryStatus: Schemas["InquiryStatus"],
+  hasRetrievals: boolean,
+): string {
+  switch (inquiryStatus) {
+    case "received":
+      return "Checking the message";
+    case "screened":
+      return "Reading the message";
+    case "classified":
+      return "Deciding what to do";
+    case "routed":
+      return hasRetrievals ? "Writing a draft" : "Looking up your documents";
+    default:
+      return "Checking the draft";
+  }
+}
+
+export const detail = {
+  title: "Inquiry",
+  back: "Back to the queue",
+  jumpToMessage: "Jump to the original message",
+  loading: "Loading the inquiry",
+  notFound: "No inquiry has that number.",
+  sections: {
+    understood: "Understood as",
+    draft: "Draft reply",
+    checks: "Checks",
+    sources: "Sources",
+    message: "Original message",
+    history: "History",
+  },
+  message: {
+    from: "From",
+    channel: "Received by",
+    masked: "A card or ID number was removed from this message before it was stored.",
+    repeatOf: "A repeat of an earlier message:",
+    alsoSent: "The same message was also sent as:",
+    injection: "This message tries to give instructions to the system.",
+  },
+  understood: {
+    notRead: "The model has not read this message.",
+    notReadInjection: "It was not shown to the model because it tries to give it instructions.",
+    wants: "Wants",
+    urgency: "Urgency",
+    tone: "Tone",
+    found: "Found in the message",
+    notStated: "Not stated",
+    missing: "Missing, so the draft asks for",
+    nothingMissing: "Nothing is missing.",
+    route: "What happens next",
+    reasons: "Why it needs you",
+  },
+  draft: {
+    subject: "Subject",
+    body: "Reply",
+    words: (count: number, limit: number): string =>
+      count > limit ? `${count} words. The limit is ${limit}.` : `${count} of ${limit} words`,
+    editNote: "Edits are not checked again. You are the check.",
+    facts: "Facts in this draft",
+    kind: {
+      reply: "Written from your documents",
+      request_details: "Asks the customer for details",
+      holding_reply: "A holding reply. It does not answer the question.",
+    },
+    forReference: "For reference, not checked for sending",
+  },
+  checks: {
+    failed: "Needs attention",
+    warning: "Worth a look",
+    passed: "Passed",
+    none: "The checks have not run.",
+  },
+  sources: {
+    none: "No passages were used.",
+    expand: "Show the whole passage",
+    collapse: "Show less",
+    open: (n: number): string => `Open source ${n}`,
+    heading: (n: number): string => `Source ${n}`,
+    page: (page: number): string => `page ${page}`,
+  },
+  actions: {
+    saving: "Saving your decision…",
+    undoIn: (seconds: number): string => `Saved in ${seconds} seconds unless you undo.`,
+    failed: "Your decision was not saved. Your edit is kept.",
+    reasonLabel: "Why are you rejecting it?",
+    reasonRequired: "Say why, so the next draft can be better.",
+    noteLabel: "What should the owner know?",
+    noteRequired: "Add a note for the owner.",
+    resolveNote: "Note (optional)",
+    send: "Reject draft",
+    sendEscalate: "Send to the owner",
+    cancel: "Cancel",
+  },
+  processing: {
+    title: "Being prepared",
+    body: "This page updates by itself when the draft is ready.",
+  },
+  failed: {
+    title: "This inquiry stopped",
+    at: (stage: string): string => `It failed while ${stage}.`,
+    retryHint: "Retry restarts it from the step that failed. Nothing was sent.",
+  },
+  escalated: {
+    title: "This needs you",
+    body: "A person has to handle this one. Citedesk has not replied to the customer.",
+    resolveHint: "When you have dealt with it outside Citedesk, mark it resolved.",
+  },
+  blocked: {
+    title: "Not ready to send",
+    body: "The draft failed a check that must pass. It cannot be approved.",
+  },
+  refusal: {
+    title: "The documents don't cover this question",
+    body: "Citedesk will not answer from memory. A person has to answer this one.",
+    holding: "A holding reply was written. It promises an answer and gives none.",
+  },
+  rejected: {
+    title: "Draft rejected",
+    body: "Ask for a new draft, or close this inquiry without a reply.",
+    guidanceLabel: "What should the new draft do differently?",
+    guidanceRequired: "Say what to change.",
+    redraft: "Write a new draft",
+    writing: "Writing a new draft. This can take up to a minute.",
+    close: "Close without a reply",
+  },
+  approved: {
+    title: "Reply approved",
+    subject: "Subject",
+    hint: "Copy the reply and paste it into your email. Citedesk does not send it.",
+    copyFailed: "Couldn't copy. Select the text above and copy it yourself.",
+    copiedTitle: "Copied",
+  },
+  closed: {
+    resolved: "This inquiry was marked resolved.",
+    exported: "The reply was copied. Nothing was sent from Citedesk.",
+    archived: "This inquiry was archived.",
+  },
+} as const;

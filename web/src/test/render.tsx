@@ -3,7 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { App } from "../App";
 import type { ApiClient } from "../api/client";
 import { ApiProvider } from "../api/context";
-import type { InquirySummary, StatusResponse } from "../api/types";
+import type { InquiryDetail, InquirySummary, SettingsView, StatusResponse } from "../api/types";
 
 export function statusFixture(over: Partial<StatusResponse> = {}): StatusResponse {
   return {
@@ -44,6 +44,178 @@ export function inquiryFixture(over: Partial<InquirySummary> = {}): InquirySumma
   };
 }
 
+export const DRAFT_BODY =
+  "Hi Priya,\n\nThanks for getting in touch. Drain cleaning for one fixture starts at $149.\n\nKind regards,\nKestrel Hollow Plumbing";
+export const PASSAGE =
+  "Drain cleaning, one fixture (sink, tub, shower or toilet): $149 (starting price)";
+const T = "2026-10-28T12:00:00Z";
+
+/** A detail waiting for review: a ready draft, all checks passed, one source. Override per test. */
+export function detailFixture(over: Partial<InquiryDetail> = {}): InquiryDetail {
+  const base: InquiryDetail = {
+    inquiry: {
+      id: 1,
+      external_id: null,
+      channel: "web_form",
+      received_at: new Date(Date.now() - 4 * 60_000).toISOString(),
+      sender_name: "Priya S.",
+      sender_email: "priya@example.com",
+      subject: "Kitchen drain, how much?",
+      body: "Hi, how much to clear a slow kitchen drain? Can someone come this week?",
+      thread_id: null,
+      duplicate_of: null,
+      status: "needs_review",
+      route: "draft_reply",
+      urgency: "normal",
+      primary_intent: "pricing_question",
+      failure_stage: null,
+      failure_message: null,
+      is_synthetic: true,
+      created_at: T,
+      updated_at: T,
+    },
+    screening: {
+      id: 1,
+      inquiry_id: 1,
+      spam_score: 0,
+      injection_flags: [],
+      sensitive_data_masked: false,
+      result: "clean",
+      created_at: T,
+    },
+    classification: {
+      id: 1,
+      inquiry_id: 1,
+      attempt: 1,
+      model: "fake",
+      prompt_version: "understand-v1",
+      intents: [
+        { intent: "pricing_question", confidence: "high" },
+        { intent: "availability_question", confidence: "medium" },
+      ],
+      primary_intent: "pricing_question",
+      primary_confidence: "high",
+      urgency: "normal",
+      sentiment: "neutral",
+      summary: "Asks how much a kitchen drain costs and if someone can come this week.",
+      safety_net_hit: false,
+      raw_response: "{}",
+      duration_ms: 1,
+      created_at: T,
+    },
+    extraction: {
+      id: 1,
+      inquiry_id: 1,
+      classification_id: 1,
+      fields: {
+        service_type: "drain_cleaning",
+        start_date: null,
+        property_type: "house",
+        address_area: null,
+        preferred_contact: null,
+        booking_reference: null,
+        dates_as_written: "this week",
+      },
+      missing_fields: [],
+      created_at: T,
+    },
+    escalations: [],
+    retrievals: [
+      {
+        id: 1,
+        inquiry_id: 1,
+        question: "How much does drain cleaning cost?",
+        declined: false,
+        kb_answer: "It starts at $149.",
+        sources: [{ file: "pricing.md", section: "Pricing > Drains", page: null, text: PASSAGE }],
+        duration_ms: 1,
+        created_at: T,
+      },
+    ],
+    draft: {
+      id: 11,
+      inquiry_id: 1,
+      version: 1,
+      kind: "reply",
+      subject: "Re: Kitchen drain, how much?",
+      body: DRAFT_BODY,
+      claims: [{ text: "starts at $149", source_index: 0 }],
+      model: "fake",
+      prompt_version: "draft-v1",
+      guidance: null,
+      status: "ready",
+      duration_ms: 1,
+      created_at: T,
+    },
+    checks: [
+      {
+        id: 1,
+        draft_id: 11,
+        check_code: "FIGURES_GROUNDED",
+        blocking: true,
+        passed: true,
+        detail: { ungrounded: [], derived: [], grounded: ["$149"] },
+        created_at: T,
+      },
+      {
+        id: 2,
+        draft_id: 11,
+        check_code: "NO_COMMITMENT",
+        blocking: true,
+        passed: true,
+        detail: { matched_patterns: [] },
+        created_at: T,
+      },
+      {
+        id: 3,
+        draft_id: 11,
+        check_code: "NO_INJECTION_ECHO",
+        blocking: true,
+        passed: true,
+        detail: { system_prompt_echo: false, injection_patterns: [], foreign_links: [] },
+        created_at: T,
+      },
+      {
+        id: 4,
+        draft_id: 11,
+        check_code: "STRUCTURE",
+        blocking: false,
+        passed: true,
+        detail: { words: 17, max_words: 200, missing: [], jargon: [] },
+        created_at: T,
+      },
+      {
+        id: 5,
+        draft_id: 11,
+        check_code: "CLAIMS_HAVE_SOURCES",
+        blocking: false,
+        passed: true,
+        detail: { bad_indices: [], no_claims: false },
+        created_at: T,
+      },
+    ],
+    history: [],
+    duplicates: [],
+  };
+  return { ...base, ...over };
+}
+
+export function settingsFixture(over: Partial<SettingsView> = {}): SettingsView {
+  return {
+    business: {
+      name: "Kestrel Hollow Plumbing",
+      phone: "555-0171",
+      emergency_phone: "555-0172",
+      email: "kestrelhollow@example.com",
+    },
+    draft_max_words: 200,
+    model: "qwen3:8b",
+    synthetic_data: true,
+    rules: [],
+    ...over,
+  };
+}
+
 /** A client whose answers a test controls. Anything a test does not set up fails loudly. */
 export function fakeClient(over: Partial<ApiClient> = {}): ApiClient {
   const unexpected = (name: string) => () => {
@@ -51,6 +223,16 @@ export function fakeClient(over: Partial<ApiClient> = {}): ApiClient {
   };
   return {
     listInquiries: async () => ({ items: [], next_cursor: null }),
+    inquiry: async () => detailFixture(),
+    approve: unexpected("approve"),
+    reject: unexpected("reject"),
+    redraft: unexpected("redraft"),
+    escalate: unexpected("escalate"),
+    resolve: unexpected("resolve"),
+    reprocess: unexpected("reprocess"),
+    exportText: unexpected("exportText"),
+    recordExport: unexpected("recordExport"),
+    settings: async () => settingsFixture(),
     status: async () => statusFixture(),
     checkStatus: unexpected("checkStatus"),
     ...over,

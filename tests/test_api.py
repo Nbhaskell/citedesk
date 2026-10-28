@@ -566,3 +566,41 @@ def test_with_a_model_the_worker_takes_a_posted_inquiry_all_the_way_to_routing(
     assert detail["classification"]["prompt_version"] == "understand-v1"
     assert detail["extraction"]["missing_fields"] == []
     assert detail["inquiry"]["route"] == "draft_reply"
+
+
+def test_with_a_knowledge_base_the_worker_drafts_and_checks_a_reply(api_settings: Settings) -> None:
+    from citedesk.business import Business
+    from citedesk.knowledge import FakeKB
+    from citedesk.providers import FakeLLM
+    from tests.helpers import model_reply
+
+    draft = {
+        "subject": "Re: Question",
+        "body": "Hi,\n\nDrain cleaning starts at $149.\n\nKind regards,\nKestrel Hollow Plumbing",
+        "claims": [{"text": "starts at $149", "source_index": 0}],
+    }
+    llm = FakeLLM(lambda call: draft if "claims" in call.schema["properties"] else model_reply())
+    kb = FakeKB(lambda q: FakeKB.answered("$149", ["pricing.md"], text="Drain cleaning: $149"))
+    business = Business(
+        "Kestrel Hollow Plumbing", "555-0171", "555-0172", "kestrelhollow@example.com"
+    )
+    with TestClient(
+        create_app(
+            api_settings,
+            start_worker=True,
+            worker_poll_seconds=0.05,
+            llm=llm,
+            kb=kb,
+            business=business,
+        )
+    ) as client:
+        created = post(client).json()
+        deadline = time.monotonic() + 5
+        status = "received"
+        while time.monotonic() < deadline and status not in ("needs_review", "escalated", "failed"):
+            status = client.get(f"/api/inquiries/{created['id']}").json()["inquiry"]["status"]
+            time.sleep(0.02)
+        detail = client.get(f"/api/inquiries/{created['id']}").json()
+    assert status == "needs_review"
+    assert detail["draft"]["status"] == "ready"
+    assert len(detail["checks"]) == 5 and detail["retrievals"][0]["sources"]

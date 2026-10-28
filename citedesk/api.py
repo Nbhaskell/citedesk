@@ -29,6 +29,7 @@ from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from citedesk import __version__, events, intake, repo
+from citedesk.business import Business
 from citedesk.config import Settings
 from citedesk.db import connect, migrate
 from citedesk.intake import (
@@ -38,6 +39,7 @@ from citedesk.intake import (
     InvalidInquiry,
     NewInquiry,
 )
+from citedesk.knowledge import KnowledgeBase
 from citedesk.models import (
     AuditEvent,
     Channel,
@@ -220,8 +222,11 @@ def create_app(
     start_worker: bool = True,
     worker_poll_seconds: float = 2.0,
     llm: LLMProvider | None = None,
+    kb: KnowledgeBase | None = None,
+    business: Business | None = None,
 ) -> FastAPI:
-    """Build the API. The worker reads inquiries with `llm`; without one it only screens them."""
+    """Build the API. The worker reads inquiries with `llm`; without one it only screens them.
+    With `kb` and `business` as well it goes on to retrieve, draft and check a reply."""
     settings = settings or Settings()
 
     @asynccontextmanager
@@ -233,7 +238,9 @@ def create_app(
         finally:
             conn.close()
         worker = (
-            PipelineWorker(settings, poll_seconds=worker_poll_seconds, llm=llm)
+            PipelineWorker(
+                settings, poll_seconds=worker_poll_seconds, llm=llm, kb=kb, business=business
+            )
             if start_worker
             else None
         )

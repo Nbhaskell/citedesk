@@ -1,0 +1,16 @@
+{
+  "name": "citedesk-web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Citedesk review UI. Only the generated API types exist so far (Phase 6).",
+  "scripts": {
+    "gen:api": "openapi-typescript openapi.json -o src/api/schema.d.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "check:api": "node scripts/check-api-types.mjs && npm run typecheck"
+  },
+  "devDependencies": {
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3"
+  }
+}

@@ -16,7 +16,7 @@ Labelled inquiries for the invented plumbing company in `universe/`. They are th
 .\.venv\Scripts\python.exe -m tools.golden schema     # regenerate golden.schema.json
 ```
 
-To load the messages into the running app (from Phase 3, when `POST /api/inquiries` exists):
+To load the messages into the running app (start it first with `python -m citedesk`):
 
 ```powershell
 .\.venv\Scripts\python.exe -m tools.import_inquiries --dry-run   # validate and count; sends nothing

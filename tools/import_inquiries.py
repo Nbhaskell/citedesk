@@ -10,8 +10,8 @@ Each record is posted to POST /api/inquiries as JSON with these fields only: ext
 sender_name, sender_email (optional), subject (optional), body. Labels, notes, categories and
 evidence never leave the golden file, so the system under test is not given the answers.
 
-The endpoint arrives in Phase 3; this payload is the contract that endpoint should accept. It
-refuses any address that is not loopback, and prints ids and counts only, never message text.
+A 409 answer means the inquiry was already imported. The tool refuses any address that is not
+loopback, and prints ids and counts only, never message text.
 """
 
 import argparse

@@ -264,7 +264,10 @@ def test_list_filters(client: TestClient, api_settings: Settings) -> None:
             ("c", "normal", "2026-10-28T06:00:00Z", "archived", "archive"),
         ],
     )
-    got = lambda query: [i["id"] for i in client.get(f"/api/inquiries?{query}").json()["items"]]  # noqa: E731
+
+    def got(query: str) -> list[int]:
+        return [i["id"] for i in client.get(f"/api/inquiries?{query}").json()["items"]]
+
     assert got("status=escalated") == [ids[0]]
     assert got("status=escalated&status=archived") == [ids[0], ids[2]]
     assert got("route=draft_reply") == [ids[1]]
@@ -276,9 +279,11 @@ def test_list_text_search(client: TestClient) -> None:
     post(client, subject="Leaking Toilet", body="x")
     post(client, subject="other", body="the boiler is broken")
     post(client, subject="3rd", body="price is 50% off", sender_name="Sam")
-    texts = lambda q: [
-        i["subject"] for i in client.get("/api/inquiries", params={"q": q}).json()["items"]
-    ]  # noqa: E731
+
+    def texts(q: str) -> list[str]:
+        items = client.get("/api/inquiries", params={"q": q}).json()["items"]
+        return [i["subject"] for i in items]
+
     assert texts("toilet") == ["Leaking Toilet"]
     assert texts("BOILER") == ["other"]
     assert texts("%") == ["3rd"]
@@ -433,7 +438,11 @@ def test_bad_lines_are_reported_by_line_and_code_only(client: TestClient) -> Non
 
 
 def test_a_csv_file_is_imported(client: TestClient) -> None:
-    text = 'external_id,sender_name,subject,body\nc-1,Alex,"Re: hi","line one\nline two"\nc-2,Sam,,second\n'
+    text = (
+        "external_id,sender_name,subject,body\n"
+        'c-1,Alex,"Re: hi","line one\nline two"\n'
+        "c-2,Sam,,second\n"
+    )
     body = upload(client, text, "text/csv").json()
     assert body["created"] == 2
     detail = client.get(f"/api/inquiries/{body['ids'][0]}").json()

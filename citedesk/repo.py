@@ -146,6 +146,23 @@ def find_by_external_id(
     )
 
 
+def has_clean_history(
+    conn: sqlite3.Connection, sender_email: str | None, *, exclude_id: int
+) -> bool:
+    """True if this sender has an earlier inquiry that screening judged clean (a known customer).
+
+    v1 has no customer table; a sender is known by email and by having sent something real."""
+    if not sender_email:
+        return False
+    row = conn.execute(
+        "SELECT 1 FROM inquiries i JOIN screenings s ON s.inquiry_id = i.id "
+        "WHERE i.sender_email = ? AND i.id != ? AND i.duplicate_of IS NULL AND s.result = 'clean' "
+        "LIMIT 1",
+        (sender_email.lower(), exclude_id),
+    ).fetchone()
+    return row is not None
+
+
 UPDATABLE = {
     "route": Route,
     "urgency": Urgency,

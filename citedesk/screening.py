@@ -240,6 +240,20 @@ BUSINESS = re.compile(
 )
 
 
+SPAM_SIGNALS = (
+    "phrases",
+    "links",
+    "link_only",
+    "exclamations",
+    "caps",
+    "money_hype",
+    "phishing_combo",
+    "no_business_words",
+)
+# Flags that do not come from a named pattern in STRONG or WEAK.
+DERIVED_FLAGS = ("encoded_instruction", "long_encoded_blob")
+
+
 @dataclass(frozen=True)
 class SpamResult:
     score: float

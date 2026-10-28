@@ -168,6 +168,51 @@ def test_review_queue_holds_only_items_needing_attention_in_priority_order(
     assert order == [urgent_old, urgent_new, high, normal_old, low, no_urgency]
 
 
+def clean_screening(conn: sqlite3.Connection, inquiry_id: int, result: ScreeningResult) -> None:
+    repo.upsert_screening(
+        conn,
+        inquiry_id=inquiry_id,
+        spam_score=0.0,
+        injection_flags=[],
+        sensitive_data_masked=False,
+        result=result,
+        now=T1,
+    )
+
+
+def test_a_sender_with_an_earlier_clean_inquiry_is_known(conn: sqlite3.Connection) -> None:
+    earlier = new_inquiry(conn, sender_email="alex@example.com")
+    clean_screening(conn, earlier, ScreeningResult.clean)
+    later = new_inquiry(conn, sender_email="alex@example.com")
+    assert repo.has_clean_history(conn, "alex@example.com", exclude_id=later) is True
+    assert repo.has_clean_history(conn, "ALEX@example.com", exclude_id=later) is True
+
+
+def test_a_sender_is_not_known_from_spam_unknown_email_or_themselves(
+    conn: sqlite3.Connection,
+) -> None:
+    spam = new_inquiry(conn, sender_email="bot@example.com")
+    clean_screening(conn, spam, ScreeningResult.spam)
+    injected = new_inquiry(conn, sender_email="inj@example.com")
+    clean_screening(conn, injected, ScreeningResult.injection_suspected)
+    only = new_inquiry(conn, sender_email="new@example.com")
+    clean_screening(conn, only, ScreeningResult.clean)
+    now_id = new_inquiry(conn, sender_email="bot@example.com")
+    assert repo.has_clean_history(conn, "bot@example.com", exclude_id=now_id) is False
+    assert repo.has_clean_history(conn, "inj@example.com", exclude_id=now_id) is False
+    assert repo.has_clean_history(conn, "nobody@example.com", exclude_id=now_id) is False
+    assert repo.has_clean_history(conn, "new@example.com", exclude_id=only) is False  # only itself
+    assert repo.has_clean_history(conn, None, exclude_id=now_id) is False
+
+
+def test_a_duplicate_does_not_make_a_sender_known(conn: sqlite3.Connection) -> None:
+    original = new_inquiry(conn, sender_email="dup@example.com")
+    copy = new_inquiry(conn, sender_email="dup@example.com", duplicate_of=original)
+    clean_screening(conn, copy, ScreeningResult.clean)
+    probe = new_inquiry(conn, sender_email="dup@example.com")
+    assert repo.has_clean_history(conn, "dup@example.com", exclude_id=probe) is False
+
+
 # --- screenings ------------------------------------------------------------------------------
 
 

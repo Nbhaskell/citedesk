@@ -370,6 +370,13 @@ def test_score_is_between_zero_and_one_and_signals_are_names() -> None:
     assert result.signals and all(re.fullmatch(r"[a-z_]+", s) for s in result.signals)
 
 
+def test_spam_signals_are_always_from_the_declared_list() -> None:
+    emitted = {
+        s for subject, body in [*SPAMMY, *NOT_SPAM] for s in spam_score(subject, body).signals
+    }
+    assert emitted and emitted <= set(screening.SPAM_SIGNALS)
+
+
 def test_an_ordinary_message_has_no_signals() -> None:
     assert (
         spam_score("drain price", "How much does it cost to clear a kitchen drain?").signals == []

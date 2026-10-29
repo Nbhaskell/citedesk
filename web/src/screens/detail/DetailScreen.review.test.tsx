@@ -44,7 +44,8 @@ describe("Detail: a draft waiting for review", () => {
     expect(within(understood).getByText("Drain cleaning")).toBeInTheDocument();
     expect(within(understood).getByText("House")).toBeInTheDocument();
     expect(within(understood).getByText("this week")).toBeInTheDocument();
-    expect(within(understood).getByText("Draft ready")).toBeInTheDocument();
+    expect(within(understood).getByText("What Citedesk decided")).toBeInTheDocument();
+    expect(within(understood).getByText("Write a reply from your documents")).toBeInTheDocument();
 
     expect(screen.getByLabelText("Reply")).toHaveValue(DRAFT_BODY);
     expect(screen.getByText(/Re: Kitchen drain, how much\?/)).toBeInTheDocument();

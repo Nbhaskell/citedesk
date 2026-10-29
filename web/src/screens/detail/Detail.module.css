@@ -18,6 +18,9 @@
     grid-template-areas:
       "message understood primary"
       "message sources primary";
+    /* The draft spans both rows. Without a flexible second row, its height is shared out between
+       the two, and Sources is pushed down past a gap under "Understood as". */
+    grid-template-rows: auto 1fr;
     align-items: start;
   }
 
@@ -70,6 +73,7 @@
   margin-bottom: var(--space-4);
 }
 
+/* The link to the original message: shown only where that message is not already beside the draft. */
 .jump {
   display: inline-flex;
   align-items: center;

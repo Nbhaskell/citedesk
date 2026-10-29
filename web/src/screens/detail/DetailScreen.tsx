@@ -245,7 +245,6 @@ export function DetailScreen() {
       <p className={styles.stateLine}>
         {detail.inquiry.urgency ? <UrgencyTag urgency={detail.inquiry.urgency} /> : null}{" "}
         <span>{stateWords(detail.inquiry.status, detail.inquiry.route)}</span>
-        {" · "}
         <a href="#original-message" className={styles.jump}>
           {words.jumpToMessage}
         </a>

@@ -17,7 +17,7 @@ import {
   missingField,
   property,
   reasonWords,
-  route,
+  routeDecision,
   sentiment,
   service,
 } from "../../copy";
@@ -125,6 +125,14 @@ function fieldValue(extraction: Extraction, name: keyof Extraction["fields"]): s
   return String(value);
 }
 
+// For these two the system's own detail only restates the reason ("the documents do not cover the
+// question", "1 figure(s) in the draft are not in the sources"). The Sources panel and the failed
+// check already show the specifics, so the detail is left out rather than said twice.
+const DETAIL_REPEATS_REASON: ReadonlySet<Escalation["reason_code"]> = new Set([
+  "NOT_IN_KNOWLEDGE_BASE",
+  "UNVERIFIED_FIGURE",
+]);
+
 const FIELD_ORDER: (keyof Extraction["fields"])[] = [
   "service_type",
   "start_date",
@@ -193,7 +201,7 @@ export function UnderstoodAs({ detail }: { detail: InquiryDetail }) {
         </>
       ) : null}
       <h3>{words.understood.route}</h3>
-      <p>{inquiry.route ? route[inquiry.route] : "Not decided yet"}</p>
+      <p>{inquiry.route ? routeDecision[inquiry.route] : words.understood.notDecided}</p>
       {open.length > 0 ? (
         <>
           <h3>{words.understood.reasons}</h3>
@@ -201,7 +209,9 @@ export function UnderstoodAs({ detail }: { detail: InquiryDetail }) {
             {open.map((e) => (
               <li key={e.id}>
                 {reasonWords(e.reason_code, e.source)}
-                {e.detail ? <span className={styles.faint}> — {e.detail}</span> : null}
+                {e.detail && !DETAIL_REPEATS_REASON.has(e.reason_code) ? (
+                  <span className={styles.faint}> — {e.detail}</span>
+                ) : null}
               </li>
             ))}
           </ul>

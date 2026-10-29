@@ -58,6 +58,15 @@ export const route: Words<Schemas["Route"]> = {
   archive: "Archived",
 };
 
+// What Citedesk decided to do with an inquiry: a decision, not a state. The state of the inquiry
+// ("Draft rejected", "Reply approved") is shown beside the title and may have moved on since.
+export const routeDecision: Words<Schemas["Route"]> = {
+  draft_reply: "Write a reply from your documents",
+  request_details: "Ask the customer for details",
+  escalate: "Hand it to you",
+  archive: "Archive it",
+};
+
 export const status: Words<Schemas["InquiryStatus"]> = {
   received: "Waiting to be read",
   screened: "Reading the message",
@@ -292,7 +301,8 @@ export const detail = {
     notStated: "Not stated",
     missing: "Missing, so the draft asks for",
     nothingMissing: "Nothing is missing.",
-    route: "What happens next",
+    route: "What Citedesk decided",
+    notDecided: "Not decided yet",
     reasons: "Why it needs you",
   },
   draft: {

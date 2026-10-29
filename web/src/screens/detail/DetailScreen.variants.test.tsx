@@ -520,3 +520,65 @@ describe("Detail: loading, errors and bad addresses", () => {
     expect(await screen.findByText("No inquiry has that number.")).toBeInTheDocument();
   });
 });
+
+describe("Detail: the reasons it needs you", () => {
+  const withReason = (code: Escalation["reason_code"], detail: string) =>
+    detailClient(
+      make("escalated", {}, { escalations: [escalation({ reason_code: code, detail })] }),
+    ).client;
+
+  it.each([
+    [
+      "NOT_IN_KNOWLEDGE_BASE",
+      "The documents don't cover this question",
+      "the documents do not cover the question",
+    ],
+    [
+      "UNVERIFIED_FIGURE",
+      "A price or date in the draft isn't in your documents",
+      "1 figure(s) in the draft are not in the sources",
+    ],
+  ] as const)("does not say %s twice", async (code, words, detail) => {
+    await open(withReason(code, detail));
+    const understood = screen.getByRole("region", { name: "Understood as" });
+    expect(within(understood).getByText(words)).toBeInTheDocument();
+    expect(understood).not.toHaveTextContent(detail);
+  });
+
+  it("still shows a detail that says more than the reason does", async () => {
+    await open(withReason("HEALTH_SAFETY", "terms: gas, hissing"));
+    const understood = screen.getByRole("region", { name: "Understood as" });
+    expect(understood).toHaveTextContent("terms: gas, hissing");
+  });
+});
+
+describe("Detail: what Citedesk decided", () => {
+  it.each([
+    ["draft_reply", "Write a reply from your documents"],
+    ["request_details", "Ask the customer for details"],
+    ["escalate", "Hand it to you"],
+    ["archive", "Archive it"],
+  ] as const)("says %s as a decision, not as a state", async (route, words) => {
+    const base = detailFixture();
+    const detail: InquiryDetail = { ...base, inquiry: { ...base.inquiry, route } };
+    await open(detailClient(detail).client);
+    expect(
+      within(screen.getByRole("region", { name: "Understood as" })).getByText(words),
+    ).toBeInTheDocument();
+  });
+
+  it("does not call a rejected draft 'Draft ready'", async () => {
+    await open(detailClient(inState("rejected")).client);
+    const understood = screen.getByRole("region", { name: "Understood as" });
+    expect(understood).not.toHaveTextContent("Draft ready");
+    expect(understood).toHaveTextContent("Write a reply from your documents");
+  });
+
+  it("says nothing has been decided before a route exists", async () => {
+    const base = detailFixture();
+    await open(detailClient({ ...base, inquiry: { ...base.inquiry, route: null } }).client);
+    expect(
+      within(screen.getByRole("region", { name: "Understood as" })).getByText("Not decided yet"),
+    ).toBeInTheDocument();
+  });
+});

@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     spam_threshold: float = Field(0.8, ge=0, le=1, validation_alias="SPAM_THRESHOLD")
     duplicate_window_hours: int = Field(24, ge=0, validation_alias="DUPLICATE_WINDOW_HOURS")
     max_body_chars: int = Field(10000, gt=0, validation_alias="MAX_BODY_CHARS")
+    intake_rate_limit_per_minute: int = Field(
+        300, ge=0, validation_alias="INTAKE_RATE_LIMIT_PER_MINUTE"
+    )  # 0 turns the limit off
     draft_max_words: int = Field(200, gt=0, validation_alias="DRAFT_MAX_WORDS")
     enable_thinking: bool = Field(True, validation_alias="ENABLE_THINKING")
     synthetic_data: bool = Field(True, validation_alias="SYNTHETIC_DATA")

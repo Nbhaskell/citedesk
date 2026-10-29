@@ -31,7 +31,7 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager, contextmanager
 from typing import Annotated, Any, Literal
 
-from fastapi import FastAPI, Query, Request
+from fastapi import Depends, FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, ConfigDict
@@ -42,6 +42,7 @@ from citedesk import __version__, events, health, insights, intake, pipeline, re
 from citedesk.business import Business, load_business
 from citedesk.config import Settings
 from citedesk.db import connect, migrate, utc_now
+from citedesk.guards import BodyLimit, RateLimiter, max_json_bytes
 from citedesk.insights import Insights
 from citedesk.intake import (
     DuplicateExternalId,
@@ -74,6 +75,7 @@ from citedesk.providers import LLMProvider, LLMStepFailed
 logger = logging.getLogger("citedesk.api")
 
 MAX_IMPORT_BYTES = 5 * 1024 * 1024
+IMPORT_PATH = "/api/inquiries/import"
 JSONL_TYPES = {"application/x-ndjson", "application/jsonl", "application/json-lines", "text/jsonl"}
 IMPORT_REASONS = {
     "no_header": "the file has no header row",
@@ -230,21 +232,26 @@ class ImportResponse(BaseModel):
 
 
 class ApiError(Exception):
-    def __init__(self, status: int, code: str, message: str) -> None:
+    def __init__(
+        self, status: int, code: str, message: str, headers: dict[str, str] | None = None
+    ) -> None:
         super().__init__(message)
         self.status, self.code, self.message = status, code, message
+        self.headers = headers or {}
 
 
 def request_id_of(request: Request) -> str:
     return str(getattr(request.state, "request_id", None) or uuid.uuid4().hex)
 
 
-def error_response(request: Request, status: int, code: str, message: str) -> JSONResponse:
+def error_response(
+    request: Request, status: int, code: str, message: str, headers: dict[str, str] | None = None
+) -> JSONResponse:
     rid = request_id_of(request)
     return JSONResponse(
         {"error": {"code": code, "message": message, "request_id": rid}},
         status_code=status,
-        headers={"X-Request-ID": rid},
+        headers={**(headers or {}), "X-Request-ID": rid},
     )
 
 
@@ -337,6 +344,24 @@ def create_app(
     app.state.worker = None
     app.state.checks = None  # (model, knowledge base, time) after the first POST /api/status/check
 
+    json_limit = max_json_bytes(settings.max_body_chars)
+    # Added before the request-id middleware below, so it sits inside it and its 413 gets an id.
+    app.add_middleware(
+        BodyLimit,
+        limit_for=lambda path: MAX_IMPORT_BYTES if path == IMPORT_PATH else json_limit,
+    )
+    limiter = RateLimiter(settings.intake_rate_limit_per_minute)
+
+    def limit_intake_rate() -> None:
+        wait = limiter.check()
+        if wait is not None:
+            raise ApiError(
+                429,
+                "rate_limited",
+                f"Inquiries are arriving too fast. Try again in {wait} seconds.",
+                headers={"Retry-After": str(wait)},
+            )
+
     @contextmanager
     def db() -> Iterator[sqlite3.Connection]:
         conn = connect(settings.db_path)
@@ -367,7 +392,7 @@ def create_app(
 
     @app.exception_handler(ApiError)
     async def handle_api_error(request: Request, error: ApiError) -> JSONResponse:
-        return error_response(request, error.status, error.code, error.message)
+        return error_response(request, error.status, error.code, error.message, error.headers)
 
     @app.exception_handler(RequestValidationError)
     async def handle_validation(request: Request, error: RequestValidationError) -> JSONResponse:
@@ -390,7 +415,11 @@ def create_app(
             413: "payload_too_large",
             415: "unsupported_media_type",
         }
-        phrases = {404: "Not found.", 405: "That method is not allowed here."}
+        phrases = {
+            404: "Not found.",
+            405: "That method is not allowed here.",
+            413: "The request is larger than this server accepts.",
+        }
         return error_response(
             request,
             error.status_code,
@@ -536,7 +565,12 @@ def create_app(
             ],
         )
 
-    @app.post("/api/inquiries", status_code=201, response_model=SubmitResponse)
+    @app.post(
+        "/api/inquiries",
+        status_code=201,
+        response_model=SubmitResponse,
+        dependencies=[Depends(limit_intake_rate)],
+    )
     def create_inquiry(payload: NewInquiry) -> SubmitResponse:
         with db() as conn:
             result = intake.submit(conn, payload, settings)
@@ -548,7 +582,7 @@ def create_app(
             sensitive_data_masked=result.sensitive_data_masked,
         )
 
-    @app.post("/api/inquiries/import", response_model=ImportResponse)
+    @app.post(IMPORT_PATH, response_model=ImportResponse, dependencies=[Depends(limit_intake_rate)])
     async def import_inquiries(request: Request) -> ImportResponse:
         media = request.headers.get("content-type", "").split(";")[0].strip().lower()
         if media in JSONL_TYPES:

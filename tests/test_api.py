@@ -12,6 +12,7 @@ from citedesk import api, intake, pipeline
 from citedesk.api import create_app
 from citedesk.config import Settings
 from citedesk.db import connect
+from tests.golden_data import tuned_golden
 from tools.import_inquiries import golden_to_inbox
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -480,7 +481,7 @@ def test_a_file_over_the_size_limit_is_refused(
 def test_importing_the_synthetic_inbox_through_the_api_ends_where_the_labels_say(
     client: TestClient, api_settings: Settings
 ) -> None:
-    golden = json.loads((REPO_ROOT / "eval/golden/citedesk_v1.json").read_text("utf-8"))
+    golden = tuned_golden()
     # The tuned split: these counts were checked against the labels. The held-out split is not
     # read by any test (it is run once, by the evaluation).
     inbox = golden_to_inbox(golden, split="tuned")

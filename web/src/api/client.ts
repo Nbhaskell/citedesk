@@ -9,6 +9,7 @@ import type {
   InquiryDetail,
   InquiryList,
   InquiryStatus,
+  Insights,
   SettingsView,
   StatusResponse,
   Urgency,
@@ -69,6 +70,8 @@ export interface ApiClient {
   exportText(draftId: number, signal?: AbortSignal): Promise<ExportText>;
   /** Record that the approved text was copied; the inquiry becomes "exported". */
   recordExport(draftId: number): Promise<ExportText>;
+  /** Counts and times only; no customer text. */
+  insights(signal?: AbortSignal): Promise<Insights>;
   settings(signal?: AbortSignal): Promise<SettingsView>;
   status(signal?: AbortSignal): Promise<StatusResponse>;
   checkStatus(): Promise<StatusResponse>;
@@ -161,6 +164,7 @@ export function createHttpClient(fetchFn: FetchFn = fetch, base = ""): ApiClient
     reprocess: (id) => request<InquiryDetail>("POST", `${inquiry(id)}/reprocess`),
     exportText: (id, signal) => request<ExportText>("GET", `${draft(id)}/export`, { signal }),
     recordExport: (id) => request<ExportText>("POST", `${draft(id)}/export`),
+    insights: (signal) => request<Insights>("GET", "/api/insights", { signal }),
     settings: (signal) => request<SettingsView>("GET", "/api/settings", { signal }),
     status: (signal) => request<StatusResponse>("GET", "/api/status", { signal }),
     checkStatus: () => request<StatusResponse>("POST", "/api/status/check"),

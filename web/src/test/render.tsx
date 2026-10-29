@@ -3,7 +3,13 @@ import { MemoryRouter } from "react-router-dom";
 import { App } from "../App";
 import type { ApiClient } from "../api/client";
 import { ApiProvider } from "../api/context";
-import type { InquiryDetail, InquirySummary, SettingsView, StatusResponse } from "../api/types";
+import type {
+  InquiryDetail,
+  InquirySummary,
+  Insights,
+  SettingsView,
+  StatusResponse,
+} from "../api/types";
 
 export function statusFixture(over: Partial<StatusResponse> = {}): StatusResponse {
   return {
@@ -216,6 +222,47 @@ export function settingsFixture(over: Partial<SettingsView> = {}): SettingsView 
   };
 }
 
+const ROUTES = ["draft_reply", "request_details", "escalate", "archive"];
+const DECISIONS = ["approve", "edit_approve", "reject", "escalate", "resolve"];
+const REASONS = [
+  "HEALTH_SAFETY",
+  "COMPLAINT",
+  "REFUND_OR_DISPUTE",
+  "LEGAL_THREAT",
+  "POLICY_EXCEPTION_REQUEST",
+  "INJECTION_SUSPECTED",
+  "LOW_CONFIDENCE",
+  "NOT_IN_KNOWLEDGE_BASE",
+  "UNVERIFIED_FIGURE",
+  "MANUAL",
+];
+
+/** Every code with a count, zero for those not named, as the API returns them. */
+export function counts(codes: string[], named: Record<string, number> = {}) {
+  return codes.map((code) => ({ code, count: named[code] ?? 0 }));
+}
+
+/** 41 inquiries, 25 decided: enough that the shares are shown. Override per test. */
+export function insightsFixture(over: Partial<Insights> = {}): Insights {
+  return {
+    total_inquiries: 41,
+    by_status: counts(["needs_review", "approved", "exported"], { needs_review: 5, approved: 20 }),
+    by_route: counts(ROUTES, { draft_reply: 28, request_details: 6, escalate: 5, archive: 2 }),
+    decisions: counts(DECISIONS, { approve: 15, edit_approve: 5, reject: 3, escalate: 2 }),
+    escalations_by_reason: counts(REASONS, { HEALTH_SAFETY: 3, NOT_IN_KNOWLEDGE_BASE: 2 }),
+    approved_unchanged_share: 0.75,
+    edited_share: 0.25,
+    median_review_seconds: 95,
+    review_time_sample: 20,
+    median_seconds_to_draft: 12,
+    draft_time_sample: 33,
+    period_start: "2026-10-20T09:00:00Z",
+    period_end: "2026-10-28T11:30:00Z",
+    synthetic_data: true,
+    ...over,
+  };
+}
+
 /** A client whose answers a test controls. Anything a test does not set up fails loudly. */
 export function fakeClient(over: Partial<ApiClient> = {}): ApiClient {
   const unexpected = (name: string) => () => {
@@ -232,6 +279,7 @@ export function fakeClient(over: Partial<ApiClient> = {}): ApiClient {
     reprocess: unexpected("reprocess"),
     exportText: unexpected("exportText"),
     recordExport: unexpected("recordExport"),
+    insights: async () => insightsFixture(),
     settings: async () => settingsFixture(),
     status: async () => statusFixture(),
     checkStatus: unexpected("checkStatus"),

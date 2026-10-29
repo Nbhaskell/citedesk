@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { ErrorPanel } from "../../components/ErrorPanel";
 import { useStatus } from "../../components/StatusProvider";
-import { errors, queue as words } from "../../copy";
+import { queue as words } from "../../copy";
 import { useDebounced } from "../../hooks/useDebounced";
 import { useNow } from "../../hooks/useNow";
 import { shortcutKey } from "../../hooks/shortcuts";
@@ -74,20 +75,7 @@ export function QueueScreen() {
       </div>
     );
   } else if (!queue.hasData) {
-    const unreachable = queue.error?.unreachable ?? false;
-    body = (
-      <div className={styles.message}>
-        <p>{unreachable ? errors.unreachable : (queue.error?.message ?? errors.unreachable)}</p>
-        {queue.error?.requestId ? (
-          <p className={styles.meta}>
-            {errors.requestId} {queue.error.requestId}
-          </p>
-        ) : null}
-        <button type="button" className={styles.button} onClick={queue.reload}>
-          {errors.retry}
-        </button>
-      </div>
-    );
+    body = <ErrorPanel error={queue.error} onRetry={queue.reload} />;
   } else if (queue.items.length === 0) {
     body = narrowed ? (
       <div className={styles.message}>

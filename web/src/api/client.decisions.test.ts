@@ -78,6 +78,8 @@ describe("ApiClient calls", () => {
     expect([last().url, last().init.method]).toEqual(["/api/drafts/5/export", "GET"]);
     await client.settings();
     expect([last().url, last().init.method]).toEqual(["/api/settings", "GET"]);
+    await client.insights();
+    expect([last().url, last().init.method]).toEqual(["/api/insights", "GET"]);
   });
 
   it("keeps a decision alive if the page is left, and not a read", async () => {

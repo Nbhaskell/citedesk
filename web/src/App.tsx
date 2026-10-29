@@ -3,7 +3,8 @@ import { LiveRegionProvider } from "./components/LiveRegion";
 import { Shell } from "./components/Shell";
 import { DetailScreen } from "./screens/detail/DetailScreen";
 import { QueueScreen } from "./screens/queue/QueueScreen";
-import { InsightsScreen, NotFoundScreen, SettingsScreen } from "./screens/Placeholder";
+import { InsightsScreen } from "./screens/insights/InsightsScreen";
+import { NotFoundScreen, SettingsScreen } from "./screens/Placeholder";
 
 /** The routes. The router and the API client are provided by the caller (main.tsx, or a test). */
 export function App() {

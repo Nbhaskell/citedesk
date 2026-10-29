@@ -11,10 +11,6 @@ export function Placeholder({ title, children }: { title: string; children: stri
   );
 }
 
-export function InsightsScreen() {
-  return <Placeholder title="Insights">Counts and review times will be shown here.</Placeholder>;
-}
-
 export function SettingsScreen() {
   return <Placeholder title="Settings">What is in force will be shown here.</Placeholder>;
 }

@@ -373,3 +373,53 @@ export const detail = {
     archived: "This inquiry was archived.",
   },
 } as const;
+
+// What a reviewer did. The API sends these as plain codes, so a code with no words here is shown
+// as it is rather than dropped.
+export const decisionWords: Record<string, string> = {
+  approve: "Approved as written",
+  edit_approve: "Approved after editing",
+  reject: "Rejected",
+  escalate: "Sent to the owner",
+  resolve: "Marked resolved",
+};
+
+export const insights = {
+  title: "Insights",
+  loading: "Loading the figures",
+  empty: "No inquiries yet.",
+  summary: (total: number, period: string): string =>
+    `${total === 1 ? "1 inquiry" : `${total} inquiries`}${period ? `, ${period}` : ""}.`,
+  reviews: "How replies were reviewed",
+  asWritten: "Approved as written",
+  afterEditing: "Approved after editing",
+  shareOf: (approved: number): string =>
+    approved === 1 ? "of 1 approved reply" : `of ${approved} approved replies`,
+  tooFewShare: (approved: number): string =>
+    `Too few approved replies to show a share (${approved} so far)`,
+  medianReview: "Median time to review",
+  medianDraft: "Median time to draft",
+  reviewSample: (n: number): string =>
+    n === 1 ? "of 1 reviewed reply" : `of ${n} reviewed replies`,
+  draftSample: (n: number): string => (n === 1 ? "of 1 inquiry" : `of ${n} inquiries`),
+  fewTimes: (n: number): string => `Only ${n} so far, so treat this as a rough guide`,
+  noTimes: "Nothing to measure yet",
+  byRoute: "What Citedesk did with each inquiry",
+  byDecision: "What reviewers decided",
+  byReason: "Why inquiries were escalated",
+  noReasons: "No inquiry has been escalated.",
+  colWhat: "What",
+  colCount: "Inquiries",
+  colDecisions: "Decisions",
+  colShare: "Share of all",
+  saved: {
+    title: "Time saved",
+    label: "Minutes per inquiry without the tool (your assumption)",
+    hint: "Your own number. It stays in this browser and is not sent anywhere.",
+    invalid: "Enter a number of minutes, more than 0 and at most 1440.",
+    needsReview: "Needs at least one reviewed reply to work out.",
+    result: (saved: string): string => `About ${saved} saved.`,
+    basis: (replies: number, without: string, median: string): string =>
+      `Estimate based on your assumption: ${replies} approved ${replies === 1 ? "reply" : "replies"} × (${without} without the tool − ${median} median review).`,
+  },
+} as const;

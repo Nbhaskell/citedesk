@@ -15,6 +15,13 @@ export function ageText(iso: string, now: number = Date.now()): string {
   if (seconds < DAY) return `${Math.floor(seconds / HOUR)} h ago`;
   const days = Math.floor(seconds / DAY);
   if (days < 30) return days === 1 ? "1 day ago" : `${days} days ago`;
+  return dayText(iso);
+}
+
+/** "20 Oct 2026": the calendar day in UTC, so the same message reads the same on every machine. */
+export function dayText(iso: string): string {
+  const then = Date.parse(iso);
+  if (Number.isNaN(then)) return "";
   return new Date(then).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",

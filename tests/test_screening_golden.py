@@ -5,20 +5,16 @@ them, not how it generalises. The held-out set, written after the prototype exis
 honest test. Failures list every mismatching item id, not just the first.
 """
 
-import json
 import re
-from pathlib import Path
 from typing import Any
 
 import pytest
 
 from citedesk.models import ScreeningResult
 from citedesk.screening import screen
+from tests.golden_data import tuned_golden
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-ITEMS: list[dict[str, Any]] = json.loads(
-    (REPO_ROOT / "eval/golden/citedesk_v1.json").read_text("utf-8")
-)["items"]
+ITEMS: list[dict[str, Any]] = tuned_golden()["items"]
 THRESHOLD = 0.8
 
 

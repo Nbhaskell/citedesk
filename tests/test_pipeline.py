@@ -1,4 +1,3 @@
-import json
 import sqlite3
 import threading
 import time
@@ -19,6 +18,7 @@ from citedesk.models import (
     Stage,
     Urgency,
 )
+from tests.golden_data import tuned_golden
 from tools.import_inquiries import golden_to_inbox
 
 S = InquiryStatus
@@ -318,7 +318,7 @@ def test_run_pending_respects_a_limit(conn: sqlite3.Connection, settings: Settin
 def test_the_synthetic_inbox_ends_up_where_its_labels_say(
     conn: sqlite3.Connection, settings: Settings
 ) -> None:
-    golden = json.loads((REPO_ROOT / "eval/golden/citedesk_v1.json").read_text("utf-8"))
+    golden = tuned_golden()
     records = [
         ParsedRecord(n, r, None) for n, r in enumerate(golden_to_inbox(golden, split="all"), 1)
     ]

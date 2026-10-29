@@ -36,10 +36,14 @@ def record(**over: Any) -> dict[str, Any]:
 # --- converting the golden set to an inbox ---------------------------------------------------
 
 
+TUNED = [i for i in GOLDEN["items"] if i["split"] == "tuned"]
+HELDOUT = [i for i in GOLDEN["items"] if i["split"] == "heldout"]
+
+
 def test_every_golden_item_becomes_one_record() -> None:
     inbox = golden_to_inbox(GOLDEN, split="tuned")
-    assert len(inbox) == len(GOLDEN["items"])
-    assert [r["external_id"] for r in inbox] == [i["id"] for i in GOLDEN["items"]]
+    assert len(inbox) == len(TUNED)
+    assert [r["external_id"] for r in inbox] == [i["id"] for i in TUNED]
 
 
 def test_labels_and_hints_never_leave_the_golden_file() -> None:
@@ -59,12 +63,16 @@ def test_labels_and_hints_never_leave_the_golden_file() -> None:
 def test_no_note_text_leaks_into_any_record() -> None:
     blob = json.dumps(golden_to_inbox(GOLDEN, split="all"))
     for item in GOLDEN["items"]:
-        assert item["notes"] not in blob
+        if item.get("notes"):
+            assert item["notes"] not in blob
 
 
 def test_split_filter() -> None:
-    assert golden_to_inbox(GOLDEN, split="heldout") == []
+    assert [r["external_id"] for r in golden_to_inbox(GOLDEN, split="heldout")] == [
+        i["id"] for i in HELDOUT
+    ]
     assert len(golden_to_inbox(GOLDEN, split="all")) == len(GOLDEN["items"])
+    assert len(TUNED) + len(HELDOUT) == len(GOLDEN["items"])
 
 
 def test_missing_optional_fields_are_omitted_not_null() -> None:

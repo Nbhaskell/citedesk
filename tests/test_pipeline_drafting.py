@@ -6,7 +6,6 @@ ends in `needs_review` with sources or in `escalated` with a named reason (the l
 good the real drafts are is judged by reading them, not asserted.
 """
 
-import json
 import sqlite3
 from pathlib import Path
 from typing import Any
@@ -33,6 +32,7 @@ from citedesk.models import (
 from citedesk.providers import FakeLLM
 from citedesk.screening import screen
 from citedesk.state import transition
+from tests.golden_data import tuned_golden
 from tests.helpers import model_reply, perfect_reply
 
 S = InquiryStatus
@@ -663,7 +663,7 @@ def test_run_pending_continues_routed_and_drafted_inquiries(
 def test_the_inbox_ends_in_review_with_sources_or_escalated_with_a_reason(
     conn: sqlite3.Connection, settings: Settings
 ) -> None:
-    golden = json.loads((REPO_ROOT / "eval/golden/citedesk_v1.json").read_text("utf-8"))
+    golden = tuned_golden()
     by_body = {
         screen(i.get("subject"), i["body"], spam_threshold=0.8).body.strip(): i
         for i in golden["items"]

@@ -29,6 +29,7 @@ from citedesk.providers import FakeLLM, LLMTimeout
 from citedesk.screening import screen
 from citedesk.state import transition
 from citedesk.understand import UnderstandFailed
+from tests.golden_data import tuned_golden
 from tests.helpers import model_reply, perfect_reply
 
 S = InquiryStatus
@@ -558,7 +559,7 @@ def test_run_pending_without_a_model_only_screens(
 def test_the_synthetic_inbox_reaches_routed_escalated_or_archived_without_a_crash(
     conn: sqlite3.Connection, settings: Settings
 ) -> None:
-    golden = json.loads((REPO_ROOT / "eval/golden/citedesk_v1.json").read_text("utf-8"))
+    golden = tuned_golden()
     by_body = {
         screen(item.get("subject"), item["body"], spam_threshold=0.8).body.strip(): item
         for item in golden["items"]

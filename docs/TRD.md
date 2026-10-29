@@ -172,7 +172,7 @@ Errors use one shape: `{ "error": { "code": "...", "message": "...", "request_id
 
 ## 7. Configuration
 
-Environment variables with defaults in `.env.example`: `CITEDESK_DB_PATH`, `CITEDESK_PORT=8100`, `OLLAMA_URL`, `LLM_MODEL=qwen3:8b`, `RAG_URL`, `ESCALATE_ON_LOW_CONFIDENCE=true`, `SPAM_THRESHOLD`, `DRAFT_MAX_WORDS`, `ENABLE_THINKING=false` (v1 starts without thinking for speed and tests the effect in evaluation), `SYNTHETIC_DATA=true`.
+Environment variables with defaults in `.env.example`: `CITEDESK_DB_PATH`, `CITEDESK_PORT=8100`, `OLLAMA_URL`, `LLM_MODEL=qwen3:8b`, `RAG_URL`, `ESCALATE_ON_LOW_CONFIDENCE=true`, `SPAM_THRESHOLD`, `DRAFT_MAX_WORDS`, `ENABLE_THINKING=true` (v1 started with it off for speed; the tuned comparison favoured on but could not prove it, so on is the default from D-063; the understand step only, the retry never thinks), `SYNTHETIC_DATA=true`.
 
 ## 8. Security and privacy
 

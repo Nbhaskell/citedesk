@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     duplicate_window_hours: int = Field(24, ge=0, validation_alias="DUPLICATE_WINDOW_HOURS")
     max_body_chars: int = Field(10000, gt=0, validation_alias="MAX_BODY_CHARS")
     draft_max_words: int = Field(200, gt=0, validation_alias="DRAFT_MAX_WORDS")
-    enable_thinking: bool = Field(False, validation_alias="ENABLE_THINKING")
+    enable_thinking: bool = Field(True, validation_alias="ENABLE_THINKING")
     synthetic_data: bool = Field(True, validation_alias="SYNTHETIC_DATA")
     business_facts_path: Path = Field(
         Path("universe/facts.json"), validation_alias="BUSINESS_FACTS_PATH"

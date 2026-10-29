@@ -372,7 +372,7 @@ def test_the_run_file_records_where_it_came_from(run: dict[str, Any]) -> None:
     header = run["header"]
     assert header["prompt_version"] == "understand-v1" and header["model"] == "fake-model"
     assert header["split"] == "tuned" and header["reference_date"] == "2026-10-28"
-    assert len(header["golden_sha256"]) == 64 and header["settings"]["enable_thinking"] is False
+    assert len(header["golden_sha256"]) == 64 and header["settings"]["enable_thinking"] is True
     assert {"commit", "dirty"} <= set(header["git"])
 
 

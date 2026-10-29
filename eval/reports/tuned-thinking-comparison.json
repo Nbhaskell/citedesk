@@ -1,0 +1,188 @@
+{
+  "labels": [
+    "think-off",
+    "think-on"
+  ],
+  "result": {
+    "escalation_precision": {
+      "a": {
+        "n": 3,
+        "mean": 0.7053036986444311,
+        "sd": 0.017721371583165457,
+        "min": 0.6923076923076923,
+        "max": 0.7254901960784313,
+        "half_width_95": 0.04402588052794669
+      },
+      "b": {
+        "n": 3,
+        "mean": 0.7159858543506342,
+        "sd": 0.011815991338498236,
+        "min": 0.7037037037037037,
+        "max": 0.7272727272727273,
+        "half_width_95": 0.029354918751444317
+      },
+      "diff": -0.010682155706203122,
+      "pass_interval_half_width": 0.03912974554045173,
+      "pass_interval_df": 3,
+      "bootstrap": {
+        "n_items": 135,
+        "diff": -0.010921177587844277,
+        "ci_low": -0.07857371136374014,
+        "ci_high": 0.056372549019607865,
+        "resamples": 10000,
+        "skipped": 0
+      },
+      "verdict": {
+        "call": "unclear",
+        "why": "the difference is within the pass spread and the paired bootstrap includes zero",
+        "higher": null,
+        "smallest_detectable": 0.067473130191674,
+        "note": null
+      }
+    },
+    "escalation_recall": {
+      "a": {
+        "n": 3,
+        "mean": 0.7801418439716312,
+        "sd": 0.012284048280630353,
+        "min": 0.7659574468085106,
+        "max": 0.7872340425531915,
+        "half_width_95": 0.030517730496453947
+      },
+      "b": {
+        "n": 3,
+        "mean": 0.8226950354609929,
+        "sd": 0.024568096561260706,
+        "min": 0.8085106382978723,
+        "max": 0.851063829787234,
+        "half_width_95": 0.061035460992907895
+      },
+      "diff": -0.04255319148936165,
+      "pass_interval_half_width": 0.06823971990908942,
+      "pass_interval_df": 2,
+      "bootstrap": {
+        "n_items": 135,
+        "diff": -0.042553191489361764,
+        "ci_low": -0.13675213675213682,
+        "ci_high": 0.04385964912280693,
+        "resamples": 10000,
+        "skipped": 0
+      },
+      "verdict": {
+        "call": "unclear",
+        "why": "the difference is within the pass spread and the paired bootstrap includes zero",
+        "higher": null,
+        "smallest_detectable": 0.09030589293747188,
+        "note": null
+      }
+    },
+    "health_safety_recall": {
+      "a": {
+        "n": 3,
+        "mean": 1.0,
+        "sd": 0.0,
+        "min": 1.0,
+        "max": 1.0,
+        "half_width_95": 0.0
+      },
+      "b": {
+        "n": 3,
+        "mean": 1.0,
+        "sd": 0.0,
+        "min": 1.0,
+        "max": 1.0,
+        "half_width_95": 0.0
+      },
+      "diff": 0.0,
+      "pass_interval_half_width": 0.0,
+      "pass_interval_df": 4,
+      "bootstrap": {
+        "n_items": 135,
+        "diff": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "resamples": 9998,
+        "skipped": 2
+      },
+      "verdict": {
+        "call": "unclear",
+        "why": "the difference is within the pass spread and the paired bootstrap includes zero",
+        "higher": null,
+        "smallest_detectable": 0.0,
+        "note": "the passes had no spread between them, so only the bootstrap decides"
+      }
+    },
+    "primary_intent": {
+      "a": {
+        "n": 3,
+        "mean": 0.7723577235772358,
+        "sd": 0.0,
+        "min": 0.7723577235772358,
+        "max": 0.7723577235772358,
+        "half_width_95": 0.0
+      },
+      "b": {
+        "n": 3,
+        "mean": 0.8346883468834688,
+        "sd": 0.004693904627557958,
+        "min": 0.8292682926829268,
+        "max": 0.8373983739837398,
+        "half_width_95": 0.011661246612466187
+      },
+      "diff": -0.06233062330623307,
+      "pass_interval_half_width": 0.011661246612466187,
+      "pass_interval_df": 2,
+      "bootstrap": {
+        "n_items": 135,
+        "diff": -0.06233062330623307,
+        "ci_low": -0.1382113821138211,
+        "ci_high": 0.008264462809917328,
+        "resamples": 10000,
+        "skipped": 0
+      },
+      "verdict": {
+        "call": "unclear",
+        "why": "the paired bootstrap includes zero",
+        "higher": null,
+        "smallest_detectable": 0.07323792246186922,
+        "note": null
+      }
+    },
+    "route": {
+      "a": {
+        "n": 3,
+        "mean": 0.7432098765432098,
+        "sd": 0.011315001715940362,
+        "min": 0.7333333333333333,
+        "max": 0.7555555555555555,
+        "half_width_95": 0.028110291090150494
+      },
+      "b": {
+        "n": 3,
+        "mean": 0.780246913580247,
+        "sd": 0.011315001715940362,
+        "min": 0.7703703703703704,
+        "max": 0.7925925925925926,
+        "half_width_95": 0.028110291090150494
+      },
+      "diff": -0.0370370370370372,
+      "pass_interval_half_width": 0.025646520754776483,
+      "pass_interval_df": 4,
+      "bootstrap": {
+        "n_items": 135,
+        "diff": -0.03703703703703709,
+        "ci_low": -0.0864197530864198,
+        "ci_high": 0.00987654320987652,
+        "resamples": 10000,
+        "skipped": 0
+      },
+      "verdict": {
+        "call": "unclear",
+        "why": "the paired bootstrap includes zero",
+        "higher": null,
+        "smallest_detectable": 0.04814814814814816,
+        "note": null
+      }
+    }
+  }
+}

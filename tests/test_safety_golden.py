@@ -5,16 +5,12 @@ the labels on them, not how it generalises; the held-out set is the honest test.
 extension the net missed one safety item and fired on two ordinary ones.
 """
 
-import json
-from pathlib import Path
 from typing import Any
 
 from citedesk.safety import emergency_hits
+from tests.golden_data import tuned_golden
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-ITEMS: list[dict[str, Any]] = json.loads(
-    (REPO_ROOT / "eval/golden/citedesk_v1.json").read_text("utf-8")
-)["items"]
+ITEMS: list[dict[str, Any]] = tuned_golden()["items"]
 
 # Fires on "flooded my kitchen" in a legal threat about a repair that failed days earlier. Nothing
 # in the clause says it is over, so the net cannot tell; the item escalates anyway (LEGAL_THREAT).

@@ -15,7 +15,7 @@ def test_defaults_match_the_documented_stack() -> None:
     assert s.rag_url == "http://127.0.0.1:8000"
     assert s.ollama_url == "http://127.0.0.1:11434"
     assert s.escalate_on_low_confidence is True
-    assert s.enable_thinking is False
+    assert s.enable_thinking is True
     assert s.synthetic_data is True
     assert s.db_path == Path("data/citedesk.db")
 
@@ -23,13 +23,13 @@ def test_defaults_match_the_documented_stack() -> None:
 def test_environment_overrides_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("CITEDESK_PORT", "9001")
     monkeypatch.setenv("LLM_MODEL", "other-model")
-    monkeypatch.setenv("ENABLE_THINKING", "true")
+    monkeypatch.setenv("ENABLE_THINKING", "false")
     monkeypatch.setenv("SYNTHETIC_DATA", "false")
     monkeypatch.setenv("CITEDESK_DB_PATH", "somewhere/else.db")
     s = Settings(_env_file=None)
     assert s.port == 9001
     assert s.llm_model == "other-model"
-    assert s.enable_thinking is True
+    assert s.enable_thinking is False
     assert s.synthetic_data is False
     assert s.db_path == Path("somewhere/else.db")
 

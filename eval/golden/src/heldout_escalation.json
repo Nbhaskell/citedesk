@@ -1,0 +1,624 @@
+[
+  {
+    "id": "complaint-waited-all-day-nobody-came",
+    "split": "heldout",
+    "category": "angry_complaint",
+    "channel": "email",
+    "sender_name": "Fatima Haddad",
+    "sender_email": "fatima.haddad@example.com",
+    "subject": "waited all day",
+    "body": "I took the day off work for the 8-10 window on Tuesday. Nobody came and nobody called. When I rang the office I was told the technician had been 'reassigned'. This is the second time. I would like someone to explain this.",
+    "labels": {
+      "intents": [
+        "complaint"
+      ],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "COMPLAINT"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": []
+  },
+  {
+    "id": "complaint-old-heater-left-in-driveway",
+    "split": "heldout",
+    "category": "angry_complaint",
+    "channel": "email",
+    "sender_name": "Winston Achebe",
+    "sender_email": "winston.achebe@example.com",
+    "subject": "Following up on the heater install",
+    "body": "Dear Kestrel Hollow team,\n\nI wanted to share some feedback on the new 50-gallon heater installed last Thursday. The installers were punctual but left the old unit sitting in the driveway, though your site says removal is included. It is now collecting rainwater and the neighbours have commented. I would appreciate a call from someone senior.\n\nRegards,\nWinston Achebe",
+    "labels": {
+      "intents": [
+        "complaint"
+      ],
+      "primary_intent": "complaint",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "water_heater",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "COMPLAINT"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Polite, but a complaint about service received."
+  },
+  {
+    "id": "complaint-drain-still-clogged-after-200",
+    "split": "heldout",
+    "category": "angry_complaint",
+    "channel": "web_form",
+    "sender_name": "Colm Fitzgerald",
+    "sender_email": "colm.fitzgerald@example.com",
+    "subject": ".",
+    "body": "your company is a joke. paid 200 bucks and the drain is STILL clogged. dont bother replying just fix it",
+    "labels": {
+      "intents": [
+        "complaint"
+      ],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {
+        "service_type": "drain_cleaning",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "COMPLAINT"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": []
+  },
+  {
+    "id": "complaint-hole-left-in-hallway-wall",
+    "split": "heldout",
+    "category": "angry_complaint",
+    "channel": "web_form",
+    "sender_name": "Lucinda Barros",
+    "sender_email": "lucinda.barros@example.com",
+    "subject": "hole in my wall",
+    "body": "Your technician cut a hole in my hallway wall to get at the pipe and left it open. Nobody told me it would need drywall repair after and now I'm being told that's 'not our job'. Nobody told me that up front!! I want to talk to whoever is in charge.",
+    "labels": {
+      "intents": [
+        "complaint"
+      ],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "COMPLAINT"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": []
+  },
+  {
+    "id": "refund-waive-short-notice-cancellation",
+    "split": "heldout",
+    "category": "dispute_legal",
+    "channel": "email",
+    "sender_name": "Nadia Petrov",
+    "sender_email": "nadia.petrov@example.com",
+    "subject": "cancellation fee",
+    "body": "I cancelled my Friday visit on Thursday afternoon, so you billed me $45. I only found out Friday morning that my daughter was being discharged and had no way of calling earlier. Could you please waive the fee, or refund it? Thank you for considering.",
+    "labels": {
+      "intents": [
+        "billing_question",
+        "policy_question"
+      ],
+      "primary_intent": "billing_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "REFUND_OR_DISPUTE",
+        "POLICY_EXCEPTION_REQUEST"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "policies.md",
+        "anchor": "With less notice, a fee of $45 applies"
+      }
+    ],
+    "notes": "Asks for money back and for an exception; both reasons apply."
+  },
+  {
+    "id": "dispute-charged-twice-same-visit",
+    "split": "heldout",
+    "category": "dispute_legal",
+    "channel": "web_form",
+    "sender_name": "Terrence Obi",
+    "sender_email": "terrence.obi@example.com",
+    "subject": "charged twice",
+    "body": "I see two charges of $149 on my card statement for the same drain visit on the 20th. I want one of them refunded straight away.",
+    "labels": {
+      "intents": [
+        "billing_question"
+      ],
+      "primary_intent": "billing_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "drain_cleaning",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "REFUND_OR_DISPUTE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": []
+  },
+  {
+    "id": "dispute-invoice-higher-than-estimate",
+    "split": "heldout",
+    "category": "dispute_legal",
+    "channel": "email",
+    "sender_name": "Sylvester Kane",
+    "sender_email": "sylvester.kane@example.com",
+    "subject": "invoice does not match estimate",
+    "body": "The written estimate I signed said $480. The invoice says $690. Your tech mentioned 'extra parts' as he left but I never agreed to anything extra. I won't be paying the difference until someone explains it to me.",
+    "labels": {
+      "intents": [
+        "billing_question"
+      ],
+      "primary_intent": "billing_question",
+      "urgency": "high",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "REFUND_OR_DISPUTE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": []
+  },
+  {
+    "id": "refund-no-access-fee-but-i-was-home",
+    "split": "heldout",
+    "category": "dispute_legal",
+    "channel": "web_form",
+    "sender_name": "Phoebe Lindgren",
+    "sender_email": "phoebe.lindgren@example.com",
+    "subject": "fee for nothing",
+    "body": "Tech knocked once at 9, I was in the shower and by the time I got to the door he'd gone. Then I was charged $89 for 'no access'. Please refund it, I was home!",
+    "labels": {
+      "intents": [
+        "billing_question"
+      ],
+      "primary_intent": "billing_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "REFUND_OR_DISPUTE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "policies.md",
+        "anchor": "If no one is home or the technician cannot get in, the call-out fee of $89 is charged"
+      }
+    ]
+  },
+  {
+    "id": "refund-rusty-water-after-flush",
+    "split": "heldout",
+    "category": "dispute_legal",
+    "channel": "email",
+    "sender_name": "Hollis Brandt",
+    "sender_email": "hollis.brandt@example.com",
+    "subject": "money back",
+    "body": "I paid $129 for a water heater flush on the 14th and the water is still rusty colored. Money back please.",
+    "labels": {
+      "intents": [
+        "billing_question"
+      ],
+      "primary_intent": "billing_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "water_heater",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "REFUND_OR_DISPUTE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": []
+  },
+  {
+    "id": "legal-attorney-notice-subfloor-damage",
+    "split": "heldout",
+    "category": "dispute_legal",
+    "channel": "email",
+    "sender_name": "Cassius Whitlock",
+    "sender_email": "cassius.whitlock@example.com",
+    "subject": "Notice of claim",
+    "body": "To whom it may concern,\n\nThis is formal notice that I have retained an attorney in connection with the damage to my bathroom subfloor following your company's pipe repair on 12 October. You will be hearing from her office. Do not contact me directly.",
+    "labels": {
+      "intents": [
+        "complaint"
+      ],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "COMPLAINT",
+        "LEGAL_THREAT"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": []
+  },
+  {
+    "id": "legal-small-claims-340",
+    "split": "heldout",
+    "category": "dispute_legal",
+    "channel": "web_form",
+    "sender_name": "Imelda Strand",
+    "sender_email": "imelda.strand@example.com",
+    "subject": "small claims",
+    "body": "if i dont get my $340 back by friday im filing in small claims court. you charged me for a part you never installed",
+    "labels": {
+      "intents": [
+        "billing_question",
+        "complaint"
+      ],
+      "primary_intent": "billing_question",
+      "urgency": "high",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "COMPLAINT",
+        "REFUND_OR_DISPUTE",
+        "LEGAL_THREAT"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": []
+  },
+  {
+    "id": "legal-state-plumbing-board-shower-valve",
+    "split": "heldout",
+    "category": "dispute_legal",
+    "channel": "email",
+    "sender_name": "Montgomery Pike",
+    "sender_email": "montgomery.pike@example.com",
+    "subject": "Licence board",
+    "body": "I'll be filing a complaint with the state plumbing board about the work your technician did on my shower valve. It's not to code and I have photos. I'd rather resolve this with you directly first, call me on 555-0162.",
+    "labels": {
+      "intents": [
+        "complaint"
+      ],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "COMPLAINT",
+        "LEGAL_THREAT"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": []
+  },
+  {
+    "id": "exception-landlord-rate-six-rentals",
+    "split": "heldout",
+    "category": "policy_exception",
+    "channel": "email",
+    "sender_name": "Aurelio Santana",
+    "sender_email": "aurelio.santana@example.com",
+    "subject": "bulk pricing for my rentals",
+    "body": "I own six small rental houses in Old Quarry and expect to have a few jobs a year. Do you do a landlord rate or volume discount? Otherwise I'll have to keep shopping around.",
+    "labels": {
+      "intents": [
+        "pricing_question",
+        "policy_question"
+      ],
+      "primary_intent": "policy_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": "house",
+        "address_area": "Old Quarry"
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "POLICY_EXCEPTION_REQUEST"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "pricing.md",
+        "anchor": "We do not offer discounts"
+      }
+    ]
+  },
+  {
+    "id": "exception-guarantee-noon-and-price-in-writing",
+    "split": "heldout",
+    "category": "policy_exception",
+    "channel": "web_form",
+    "sender_name": "Leandra Moss",
+    "sender_email": "leandra.moss@example.com",
+    "subject": "guarantee a time",
+    "body": "Can you guarantee someone will be here by noon tomorrow and that the price won't change from what you say on the phone? I need it in writing.",
+    "labels": {
+      "intents": [
+        "availability_question",
+        "pricing_question",
+        "policy_question"
+      ],
+      "primary_intent": "policy_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "POLICY_EXCEPTION_REQUEST"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "policies.md",
+        "anchor": "A reply is never an automatic confirmation or a price guarantee"
+      }
+    ]
+  },
+  {
+    "id": "exception-pay-in-three-instalments",
+    "split": "heldout",
+    "category": "policy_exception",
+    "channel": "email",
+    "sender_name": "Barnaby Okoro",
+    "sender_email": "barnaby.okoro@example.com",
+    "subject": "payment terms",
+    "body": "Our household is between paychecks. Would you let me pay the invoice in three instalments over the next two months instead of on the day? I can sign something.",
+    "labels": {
+      "intents": [
+        "policy_question",
+        "billing_question"
+      ],
+      "primary_intent": "policy_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "POLICY_EXCEPTION_REQUEST"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "pricing.md",
+        "anchor": "Payment is due on completion of the visit"
+      }
+    ]
+  },
+  {
+    "id": "exception-gas-connector-just-this-once",
+    "split": "heldout",
+    "category": "policy_exception",
+    "channel": "web_form",
+    "sender_name": "Valentin Dragan",
+    "sender_email": "valentin.dragan@example.com",
+    "subject": "just this once",
+    "body": "I know you say you dont do gas but my regular guy retired and its only a 6 inch flex connector for my dryer. Can your tech just swap it, I'll sign whatever waiver you want.",
+    "labels": {
+      "intents": [
+        "policy_question",
+        "booking_request"
+      ],
+      "primary_intent": "policy_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "other",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "POLICY_EXCEPTION_REQUEST"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "policies.md",
+        "anchor": "We do not do gas line or gas appliance work"
+      }
+    ],
+    "notes": "No smell or leak is described, so this is an exception request and not HEALTH_SAFETY."
+  },
+  {
+    "id": "exception-charge-only-five-minutes",
+    "split": "heldout",
+    "category": "policy_exception",
+    "channel": "email",
+    "sender_name": "Rosalyn Eze",
+    "sender_email": "rosalyn.eze@example.com",
+    "subject": "Labour minimum",
+    "body": "My tap just needs a washer tightened, which takes 5 minutes. Surely I shouldn't pay a full hour of labour for that? Could your technician charge just for the time actually spent?",
+    "labels": {
+      "intents": [
+        "pricing_question",
+        "policy_question"
+      ],
+      "primary_intent": "policy_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "other",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "POLICY_EXCEPTION_REQUEST"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "pricing.md",
+        "anchor": "with a minimum of 1 hour"
+      }
+    ]
+  },
+  {
+    "id": "lowconf-same-as-last-time-the-other-one",
+    "split": "heldout",
+    "category": "edge",
+    "channel": "web_form",
+    "sender_name": "Quentin Sparks",
+    "sender_email": "quentin.sparks@example.com",
+    "body": "ok so about the thing we talked about, same as last time but the other one, thanks",
+    "labels": {
+      "intents": [
+        "other"
+      ],
+      "primary_intent": "other",
+      "urgency": "low",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "LOW_CONFIDENCE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Too unclear to classify. LOW_CONFIDENCE depends on the model reporting low confidence."
+  },
+  {
+    "id": "lowconf-times-and-a-blue-one",
+    "split": "heldout",
+    "category": "edge",
+    "channel": "email",
+    "sender_name": "Tamsin Rooke",
+    "sender_email": "tamsin.rooke@example.com",
+    "subject": "re: re:",
+    "body": "jjjj ok?? 3pm tuesday maybe or not. lol. and then the blue one",
+    "labels": {
+      "intents": [
+        "other"
+      ],
+      "primary_intent": "other",
+      "urgency": "low",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "LOW_CONFIDENCE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Model-dependent, like every LOW_CONFIDENCE label."
+  }
+]

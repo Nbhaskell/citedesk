@@ -1,0 +1,324 @@
+[
+  {
+    "id": "unanswerable-lead-free-and-low-flow",
+    "split": "heldout",
+    "category": "unanswerable",
+    "channel": "web_form",
+    "sender_name": "Marianne Doyle",
+    "sender_email": "marianne.doyle@example.com",
+    "subject": "green options",
+    "body": "do you use lead free solder and low flow fixtures? we're trying to be careful with our water and materials",
+    "labels": {
+      "intents": [
+        "service_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "NOT_IN_KNOWLEDGE_BASE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Not in the documents."
+  },
+  {
+    "id": "unanswerable-years-in-business-certified",
+    "split": "heldout",
+    "category": "unanswerable",
+    "channel": "email",
+    "sender_name": "Cyrus Ahn",
+    "sender_email": "cyrus.ahn@example.com",
+    "subject": "about the company",
+    "body": "How many years have you been in business and are your technicians certified? I'm choosing between a few companies.",
+    "labels": {
+      "intents": [
+        "service_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "NOT_IN_KNOWLEDGE_BASE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "The documents say licensed and insured, but nothing about years or certification."
+  },
+  {
+    "id": "unanswerable-source-a-moen-faucet",
+    "split": "heldout",
+    "category": "unanswerable",
+    "channel": "web_form",
+    "sender_name": "Delphine Arnaud",
+    "sender_email": "delphine.arnaud@example.com",
+    "subject": "faucet brands",
+    "body": "Do you install Moen or Delta faucets and can you source a Moen one for me?",
+    "labels": {
+      "intents": [
+        "service_question",
+        "pricing_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": "fixture_installation",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "NOT_IN_KNOWLEDGE_BASE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "The documents cover installing a faucet the customer supplies; nothing about brands or sourcing."
+  },
+  {
+    "id": "unanswerable-free-saturday-morning-old-quarry",
+    "split": "heldout",
+    "category": "unanswerable",
+    "channel": "web_form",
+    "sender_name": "Thelonius Gray",
+    "sender_email": "thelonius.gray@example.com",
+    "subject": "free saturday?",
+    "body": "Are you free to do a drain job on Saturday 7 November in the morning? It's in Old Quarry.",
+    "labels": {
+      "intents": [
+        "availability_question"
+      ],
+      "primary_intent": "availability_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "drain_cleaning",
+        "start_date": "2026-11-07",
+        "property_type": null,
+        "address_area": "Old Quarry"
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "NOT_IN_KNOWLEDGE_BASE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Live availability is not in the documents."
+  },
+  {
+    "id": "oos-lawn-sprinkler-head",
+    "split": "heldout",
+    "category": "out_of_scope",
+    "channel": "web_form",
+    "sender_name": "Winnie Tran",
+    "sender_email": "winnie.tran@example.com",
+    "subject": "sprinkler",
+    "body": "one of our lawn sprinkler heads is broken and spraying the driveway. can you swing by and replace it?",
+    "labels": {
+      "intents": [
+        "service_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": "other",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "policies.md",
+        "anchor": "We do not work on irrigation or sprinkler systems"
+      }
+    ]
+  },
+  {
+    "id": "oos-well-pump-cycling",
+    "split": "heldout",
+    "category": "out_of_scope",
+    "channel": "email",
+    "sender_name": "Thaddeus Mbeki",
+    "sender_email": "thaddeus.mbeki@example.com",
+    "subject": "no pressure from my well",
+    "body": "We're on a well and the pump seems to be cycling constantly. I'm guessing that's a plumbing issue. Do you handle well pumps?",
+    "labels": {
+      "intents": [
+        "service_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "policies.md",
+        "anchor": "We do not work on well pumps"
+      }
+    ]
+  },
+  {
+    "id": "followup-have-you-got-me-down-for-tuesday",
+    "split": "heldout",
+    "category": "follow_up",
+    "channel": "email",
+    "sender_name": "Lavinia Cho",
+    "sender_email": "lavinia.cho@example.com",
+    "subject": "Re: Tuesday",
+    "body": "Hi, just checking you have me down for Tuesday 10 November? I haven't had a confirmation. Cheers",
+    "labels": {
+      "intents": [
+        "other"
+      ],
+      "primary_intent": "other",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": "2026-11-10",
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "NOT_IN_KNOWLEDGE_BASE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "v1 cannot look up a booking, so a person must answer."
+  },
+  {
+    "id": "vague-cost-of-all-the-plumbing",
+    "split": "heldout",
+    "category": "vague_missing_details",
+    "channel": "web_form",
+    "sender_name": "Albertina Cruz",
+    "sender_email": "albertina.cruz@example.com",
+    "subject": "estimate",
+    "body": "how much will it cost to do all the plumbing work in my house",
+    "labels": {
+      "intents": [
+        "pricing_question"
+      ],
+      "primary_intent": "pricing_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": "house",
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "services.md",
+        "anchor": "Other plumbing repairs that are not listed above"
+      }
+    ]
+  },
+  {
+    "id": "vague-damp-patch-on-basement-wall",
+    "split": "heldout",
+    "category": "vague_missing_details",
+    "channel": "web_form",
+    "sender_name": "Lysander Beck",
+    "sender_email": "lysander.beck@example.com",
+    "subject": "damp wall",
+    "body": "there is a damp patch on the basement wall near where the pipes run. not sure what is causing it. could you take a look?",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "services.md",
+        "anchor": "To book a visit, please tell us"
+      }
+    ],
+    "notes": "The customer does not say what work is wanted, so service_type is null."
+  },
+  {
+    "id": "vague-neighbour-fixed-her-shower",
+    "split": "heldout",
+    "category": "vague_missing_details",
+    "channel": "email",
+    "sender_name": "Cordelia Voss",
+    "sender_email": "cordelia.voss@example.com",
+    "subject": "recommendation",
+    "body": "My neighbour says you fixed her shower last spring. I have something similar going on. How do I get started?",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "low",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "services.md",
+        "anchor": "To book a visit, please tell us"
+      }
+    ]
+  }
+]

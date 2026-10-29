@@ -217,7 +217,11 @@ export function settingsFixture(over: Partial<SettingsView> = {}): SettingsView 
     draft_max_words: 200,
     model: "qwen3:8b",
     synthetic_data: true,
-    rules: [],
+    rules: REASONS.map((code) => ({
+      code: code as SettingsView["rules"][number]["code"],
+      enabled: true,
+      set_by: code === "LOW_CONFIDENCE" ? "environment" : "code",
+    })),
     ...over,
   };
 }

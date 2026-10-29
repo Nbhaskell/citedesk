@@ -423,3 +423,79 @@ export const insights = {
       `Estimate based on your assumption: ${replies} approved ${replies === 1 ? "reply" : "replies"} × (${without} without the tool − ${median} median review).`,
   },
 } as const;
+
+// What the health check reports when something is wrong, by the reason code the API gives.
+const healthReason: Record<string, string> = {
+  unreachable: "Citedesk could not reach it.",
+  not_local: "Its address is not on this computer, so Citedesk will not use it.",
+  bad_response: "It answered in a way Citedesk did not understand.",
+};
+
+export const settings = {
+  title: "Settings",
+  intro: "What Citedesk is using right now. Only the keyboard shortcuts can be changed here.",
+  loading: "Loading the settings",
+  business: {
+    title: "Your business",
+    name: "Name",
+    phone: "Phone",
+    emergencyPhone: "Emergency phone",
+    email: "Email",
+    missing: "The business details could not be read, so replies cannot name the business.",
+  },
+  replies: {
+    title: "Replies",
+    limit: (words: number): string =>
+      `A reply must stay under ${words} words, open with a greeting and end with a sign-off. This is checked in code.`,
+    neverSent: "Citedesk never sends anything. You copy an approved reply into your own email.",
+  },
+  services: {
+    title: "Services",
+    model: (name: string): string => `Language model (${name})`,
+    documents: "Documents service",
+    database: "Database",
+    worker: "Background worker",
+    ok: "Working",
+    error: "Not working",
+    notChecked: "Not checked yet",
+    running: "Running",
+    stopped: "Stopped",
+    reason: (code: string | null | undefined): string => {
+      if (code === "model_missing") return "The model is not installed on the model server.";
+      if (code === "not_indexed") return "The documents have not been indexed yet.";
+      return (code ? healthReason[code] : undefined) ?? "No reason was given.";
+    },
+    notCheckedHint: (service: "model" | "documents"): string =>
+      service === "model"
+        ? "Citedesk has not asked the model server yet."
+        : "Citedesk has not asked the documents service yet.",
+    checkedAt: (age: string): string => `Last checked ${age}.`,
+    checkAgain: "Check again",
+    checking: "Checking…",
+    checkDone: "Check finished.",
+    checkFailed: "Couldn't run the check.",
+    stale: "Connection lost. What is shown may be out of date.",
+  },
+  rules: {
+    title: "When Citedesk escalates to you",
+    note: "These rules can't be changed on this screen. Most are fixed in code; any set in the server's settings say so.",
+    colRule: "Rule",
+    colState: "State",
+    colSetBy: "Set by",
+    on: "On",
+    off: "Off",
+    code: "Fixed in code",
+    environment: "The server's settings",
+  },
+  data: {
+    title: "Data",
+    synthetic: "Demo data. All customers and messages are invented.",
+    real: "Real data. These are real customers' messages.",
+  },
+  browser: {
+    title: "This browser",
+    shortcuts: "Use keyboard shortcuts",
+    shortcutsHint: "Single keys such as j, k and a. Turn them off if they get in the way.",
+    notSaved: "Couldn't keep this choice in this browser. It will reset when the page reloads.",
+  },
+} as const;

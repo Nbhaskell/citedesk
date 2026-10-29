@@ -4,7 +4,8 @@ import { Shell } from "./components/Shell";
 import { DetailScreen } from "./screens/detail/DetailScreen";
 import { QueueScreen } from "./screens/queue/QueueScreen";
 import { InsightsScreen } from "./screens/insights/InsightsScreen";
-import { NotFoundScreen, SettingsScreen } from "./screens/Placeholder";
+import { NotFoundScreen } from "./screens/NotFoundScreen";
+import { SettingsScreen } from "./screens/settings/SettingsScreen";
 
 /** The routes. The router and the API client are provided by the caller (main.tsx, or a test). */
 export function App() {

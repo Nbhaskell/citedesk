@@ -29,3 +29,30 @@ jobs:
         run: python -m mypy
       - name: Tests
         run: python -m pytest
+      - name: OpenAPI file is current
+        run: python -m tools.export_openapi --check
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install pinned dependencies
+        run: npm ci
+      - name: Generated API types are current and compile
+        run: npm run check:api
+      - name: Lint
+        run: npm run lint
+      - name: Format check
+        run: npm run format:check
+      - name: Tests
+        run: npm test
+      - name: Build
+        run: npm run build

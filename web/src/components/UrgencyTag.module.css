@@ -1,0 +1,32 @@
+.tag {
+  display: inline-block;
+  min-width: 4.5rem;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius);
+  font-size: var(--size-small);
+  line-height: 1.75;
+  text-align: center;
+}
+
+/* The one loud tag. It is the only place capitals are used. */
+.urgent {
+  background: var(--signal);
+  color: #fff;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.high {
+  background: var(--amber-tint);
+  color: var(--amber-ink);
+  font-weight: 700;
+}
+
+.normal {
+  background: var(--slate-tint);
+  color: var(--slate-ink);
+}
+
+.low {
+  color: var(--slate);
+}

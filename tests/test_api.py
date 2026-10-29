@@ -214,6 +214,7 @@ def test_list_items_are_summaries_without_the_message(client: TestClient) -> Non
         "received_at",
         "sender_name",
         "subject",
+        "summary",
         "status",
         "route",
         "urgency",

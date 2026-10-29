@@ -1,0 +1,34 @@
+.footer {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 var(--space-4);
+  padding: 0 var(--gutter);
+  background: var(--sheet);
+  border-top: 1px solid var(--rule);
+}
+
+/* The notice takes what is left and wraps beside the button, so the bar stays two lines high on a phone. */
+.note {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: var(--space-2) 0;
+  color: var(--slate);
+  font-size: var(--size-small);
+}
+
+.shortcuts {
+  flex-shrink: 0;
+  min-height: var(--target);
+  padding: 0 var(--space-2);
+  background: none;
+  border: 0;
+  color: var(--patina);
+  font-size: var(--size-small);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}

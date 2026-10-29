@@ -1,0 +1,81 @@
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-6);
+  padding: var(--space-2) var(--gutter);
+  background: var(--sheet);
+  border-bottom: 1px solid var(--rule);
+}
+
+.brand {
+  min-height: var(--target);
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink);
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.link {
+  min-height: var(--target);
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-3);
+  border-bottom: 3px solid transparent;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.link:hover {
+  background: var(--paper);
+}
+
+.link[aria-current="page"] {
+  border-bottom-color: var(--patina);
+  font-weight: 700;
+}
+
+.right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* The one loud element: an urgent item cannot be scrolled out of sight. */
+.urgent {
+  min-height: var(--target);
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius);
+  background: var(--signal);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.quiet {
+  color: var(--slate);
+}
+
+.lost {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius);
+  background: var(--amber-tint);
+  color: var(--amber-ink);
+}
+
+@media (max-width: 40rem) {
+  .right {
+    margin-left: 0;
+    width: 100%;
+  }
+}

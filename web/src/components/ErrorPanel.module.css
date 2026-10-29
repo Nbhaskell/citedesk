@@ -1,0 +1,23 @@
+.panel {
+  padding: var(--space-8) var(--space-4);
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+}
+
+.meta {
+  color: var(--slate);
+  font-size: var(--size-small);
+}
+
+.button {
+  min-height: var(--target);
+  padding: 0 var(--space-4);
+  background: var(--sheet);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.button:hover {
+  background: var(--patina-mist);
+}

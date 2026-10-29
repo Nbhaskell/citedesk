@@ -29,6 +29,7 @@ def no_model(monkeypatch: pytest.MonkeyPatch) -> None:
 
     monkeypatch.setattr("citedesk.providers.ollama.http_post_json", refuse)
     monkeypatch.setattr("citedesk.knowledge.http_post_json", refuse)
+    monkeypatch.setattr("citedesk.health.http_get_json", refuse)
 
 
 @pytest.fixture

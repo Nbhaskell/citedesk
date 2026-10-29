@@ -32,6 +32,8 @@ def test_status_body_shape(client: TestClient) -> None:
         "components",
         "queue_depth",
         "worker_running",
+        "attention",
+        "checked_at",
     }
 
 
@@ -39,7 +41,7 @@ def test_the_database_is_really_checked_and_the_rest_honestly_are_not(client: Te
     components = client.get("/api/status").json()["components"]
     assert set(components) == {"database", "model", "knowledge_base"}
     assert components["database"]["status"] == "ok"
-    assert components["model"]["status"] == "not_checked"
+    assert components["model"]["status"] == "not_checked"  # until POST /api/status/check
     assert components["knowledge_base"]["status"] == "not_checked"
 
 

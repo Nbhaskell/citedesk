@@ -1,0 +1,79 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--space-6) var(--gutter);
+  background: rgb(31 42 48 / 60%);
+  overflow-y: auto;
+}
+
+.dialog:focus {
+  outline: none; /* focus is here only so the dialog is announced and opens at its top */
+}
+
+.dialog {
+  width: 100%;
+  max-width: 34rem;
+  padding: var(--space-6);
+  background: var(--sheet);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+}
+
+.off {
+  padding: var(--space-2) var(--space-3);
+  background: var(--amber-tint);
+  color: var(--amber-ink);
+}
+
+.group {
+  margin-bottom: var(--space-4);
+}
+
+.group h3 {
+  margin-bottom: var(--space-2);
+  font-size: var(--size-body);
+}
+
+.group dl {
+  margin: 0;
+}
+
+.entry {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: baseline;
+  padding: var(--space-1) 0;
+}
+
+.entry dt,
+.entry dd {
+  margin: 0;
+}
+
+.key {
+  display: inline-block;
+  min-width: 2rem;
+  padding: 0 var(--space-2);
+  background: var(--paper);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  text-align: center;
+}
+
+.close {
+  min-height: var(--target);
+  padding: 0 var(--space-6);
+  background: var(--patina);
+  border: 1px solid var(--patina);
+  border-radius: var(--radius);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}

@@ -1,10 +1,19 @@
-"""The HTTP API (docs/TRD.md section 6), as far as Phase 3 goes.
+"""The HTTP API (docs/TRD.md section 6), as far as Phase 6 goes (no endpoint sends anything).
 
     GET  /api/status                 health, queue depth, whether the worker runs
     POST /api/inquiries              store one inquiry (answers at once; the pipeline runs later)
     POST /api/inquiries/import       a JSONL or CSV file as the request body
     GET  /api/inquiries              list, filtered and paged in review-queue order
     GET  /api/inquiries/{id}         everything known about one inquiry
+    POST /api/drafts/{id}/approve    approve a draft, optionally with the reviewer's edit
+    POST /api/drafts/{id}/reject     reject a draft (a reason is required)
+    POST /api/drafts/{id}/redraft    write the next version of a rejected draft from guidance
+    POST /api/inquiries/{id}/reprocess  put a failed inquiry back to where its stage started
+    POST /api/inquiries/{id}/escalate   send an item waiting for review to the owner (note required)
+    POST /api/inquiries/{id}/resolve    close an escalated or rejected item
+    GET  /api/drafts/{id}/export     the approved text; changes nothing
+    POST /api/drafts/{id}/export     record that the approved text was copied
+    GET  /api/insights               counts and review times
 
 Every response carries an `X-Request-ID`. Every error has the one shape
 `{"error": {"code", "message", "request_id"}}`, and a message never repeats what the caller sent.
@@ -18,20 +27,22 @@ import logging
 import sqlite3
 import uuid
 from collections.abc import AsyncIterator, Iterator
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager, contextmanager
 from typing import Annotated, Any, Literal
 
 from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from citedesk import __version__, events, intake, repo
-from citedesk.business import Business
+from citedesk import __version__, events, health, insights, intake, pipeline, repo, review
+from citedesk.business import Business, load_business
 from citedesk.config import Settings
-from citedesk.db import connect, migrate
+from citedesk.db import connect, migrate, utc_now
+from citedesk.insights import Insights
 from citedesk.intake import (
     DuplicateExternalId,
     ImportFormatError,
@@ -51,13 +62,14 @@ from citedesk.models import (
     Inquiry,
     InquiryStatus,
     Intent,
+    ReasonCode,
     Retrieval,
     Route,
     Screening,
     Urgency,
 )
 from citedesk.pipeline import PipelineWorker
-from citedesk.providers import LLMProvider
+from citedesk.providers import LLMProvider, LLMStepFailed
 
 logger = logging.getLogger("citedesk.api")
 
@@ -76,12 +88,20 @@ IMPORT_REASONS = {
 
 class ComponentStatus(BaseModel):
     status: Literal["ok", "error", "not_checked"]
+    reason: str | None = None
 
 
 class Components(BaseModel):
     database: ComponentStatus
     model: ComponentStatus
     knowledge_base: ComponentStatus
+
+
+class Attention(BaseModel):
+    needs_review: int
+    escalated: int
+    failed: int
+    urgent_open: int
 
 
 class StatusResponse(BaseModel):
@@ -93,6 +113,8 @@ class StatusResponse(BaseModel):
     components: Components
     queue_depth: int
     worker_running: bool
+    attention: Attention
+    checked_at: str | None
 
 
 class SubmitResponse(BaseModel):
@@ -109,6 +131,7 @@ class InquirySummary(BaseModel):
     received_at: str
     sender_name: str | None
     subject: str | None
+    summary: str | None
     status: InquiryStatus
     route: Route | None
     urgency: Urgency | None
@@ -133,6 +156,61 @@ class InquiryDetail(BaseModel):
     checks: list[DraftCheck]
     history: list[AuditEvent]
     duplicates: list[int]
+
+
+class ApproveBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    edited_body: str | None = None
+    review_seconds: int | None = None
+
+
+class RejectBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    reason: str
+    review_seconds: int | None = None
+
+
+class BusinessOut(BaseModel):
+    name: str
+    phone: str
+    emergency_phone: str
+    email: str
+
+
+class RuleOut(BaseModel):
+    code: ReasonCode
+    enabled: bool
+    set_by: Literal["code", "environment"]
+
+
+class SettingsView(BaseModel):
+    business: BusinessOut | None
+    draft_max_words: int
+    model: str
+    synthetic_data: bool
+    rules: list[RuleOut]
+
+
+class RedraftBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    guidance: str
+
+
+class EscalateBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    note: str
+
+
+class ResolveBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    note: str | None = None
+
+
+class ExportText(BaseModel):
+    inquiry_id: int
+    draft_id: int
+    subject: str | None
+    body: str
 
 
 class RejectionOut(BaseModel):
@@ -224,6 +302,7 @@ def create_app(
     llm: LLMProvider | None = None,
     kb: KnowledgeBase | None = None,
     business: Business | None = None,
+    get_json: health.GetFn | None = None,
 ) -> FastAPI:
     """Build the API. The worker reads inquiries with `llm`; without one it only screens them.
     With `kb` and `business` as well it goes on to retrieve, draft and check a reply."""
@@ -256,6 +335,7 @@ def create_app(
 
     app = FastAPI(title="Citedesk", version=__version__, lifespan=lifespan)
     app.state.worker = None
+    app.state.checks = None  # (model, knowledge base, time) after the first POST /api/status/check
 
     @contextmanager
     def db() -> Iterator[sqlite3.Connection]:
@@ -310,6 +390,28 @@ def create_app(
             phrases.get(error.status_code, "The request could not be handled."),
         )
 
+    @app.exception_handler(review.NotFound)
+    async def handle_review_not_found(request: Request, error: review.NotFound) -> JSONResponse:
+        return error_response(request, 404, "not_found", str(error))
+
+    @app.exception_handler(review.WrongState)
+    async def handle_wrong_state(request: Request, error: review.WrongState) -> JSONResponse:
+        return error_response(request, 409, "wrong_state", str(error))
+
+    @app.exception_handler(review.InvalidReview)
+    async def handle_invalid_review(request: Request, error: review.InvalidReview) -> JSONResponse:
+        return error_response(request, 422, "invalid_review", str(error))
+
+    @app.exception_handler(LLMStepFailed)
+    async def handle_model_failed(request: Request, error: LLMStepFailed) -> JSONResponse:
+        logger.warning("model step failed: %s", error.reason)
+        return error_response(
+            request,
+            502,
+            "model_failed",
+            "The model gave no usable reply. Nothing was changed; try again.",
+        )
+
     @app.exception_handler(DuplicateExternalId)
     async def handle_duplicate(request: Request, error: DuplicateExternalId) -> JSONResponse:
         message = (
@@ -339,32 +441,96 @@ def create_app(
 
     # --- routes ---
 
-    @app.get("/api/status", response_model=StatusResponse)
-    def status() -> StatusResponse:
+    def build_status() -> StatusResponse:
         database = "ok"
         depth = 0
+        counts = {"needs_review": 0, "escalated": 0, "failed": 0, "urgent_open": 0}
         try:
             with db() as conn:
                 row = conn.execute(
-                    "SELECT COUNT(*) AS n FROM inquiries WHERE status = 'received'"
+                    "SELECT "
+                    "COALESCE(SUM(status = 'received'), 0) AS queued, "
+                    "COALESCE(SUM(status = 'needs_review'), 0) AS needs_review, "
+                    "COALESCE(SUM(status = 'escalated'), 0) AS escalated, "
+                    "COALESCE(SUM(status = 'failed'), 0) AS failed, "
+                    "COALESCE(SUM(urgency = 'urgent' AND status IN "
+                    "('needs_review', 'escalated', 'failed')), 0) AS urgent_open "
+                    "FROM inquiries"
                 ).fetchone()
-                depth = int(row["n"])
+                depth = int(row["queued"])
+                counts = {name: int(row[name]) for name in counts}
         except sqlite3.Error:
             database = "error"
         worker: PipelineWorker | None = app.state.worker
+        cached: tuple[health.Check, health.Check, str] | None = app.state.checks
+        if cached is None:
+            model_part = ComponentStatus(status="not_checked")
+            kb_part = ComponentStatus(status="not_checked")
+        else:
+            model_part = ComponentStatus(status=cached[0].status, reason=cached[0].reason)
+            kb_part = ComponentStatus(status=cached[1].status, reason=cached[1].reason)
+        failing = "error" in (database, model_part.status, kb_part.status)
         return StatusResponse(
-            status="ok" if database == "ok" else "degraded",
+            status="degraded" if failing else "ok",
             app="citedesk",
             version=__version__,
             synthetic_data=settings.synthetic_data,
             model=settings.llm_model,
             components=Components(
                 database=ComponentStatus(status="ok" if database == "ok" else "error"),
-                model=ComponentStatus(status="not_checked"),
-                knowledge_base=ComponentStatus(status="not_checked"),
+                model=model_part,
+                knowledge_base=kb_part,
             ),
             queue_depth=depth,
             worker_running=worker is not None and worker.running,
+            attention=Attention(**counts),
+            checked_at=None if cached is None else cached[2],
+        )
+
+    @app.get("/api/status", response_model=StatusResponse)
+    def status() -> StatusResponse:
+        return build_status()
+
+    @app.post("/api/status/check", response_model=StatusResponse)
+    def check_status() -> StatusResponse:
+        """Ask the model server and the knowledge base now (short, loopback only, no text sent)."""
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            model_job = pool.submit(health.check_model, settings, get_json)
+            kb_job = pool.submit(health.check_knowledge_base, settings, get_json)
+            app.state.checks = (model_job.result(), kb_job.result(), utc_now())
+        return build_status()
+
+    @app.get("/api/settings", response_model=SettingsView)
+    def read_settings() -> SettingsView:
+        """What is in force, read-only. The escalation rules are fixed in code (D-050)."""
+        details = business
+        if details is None:
+            try:
+                details = load_business(settings.business_facts_path)
+            except (OSError, ValueError):
+                details = None
+        return SettingsView(
+            business=None
+            if details is None
+            else BusinessOut(
+                name=details.name,
+                phone=details.phone,
+                emergency_phone=details.emergency_phone,
+                email=details.email,
+            ),
+            draft_max_words=settings.draft_max_words,
+            model=settings.llm_model,
+            synthetic_data=settings.synthetic_data,
+            rules=[
+                RuleOut(
+                    code=code,
+                    enabled=settings.escalate_on_low_confidence
+                    if code is ReasonCode.LOW_CONFIDENCE
+                    else True,
+                    set_by="environment" if code is ReasonCode.LOW_CONFIDENCE else "code",
+                )
+                for code in ReasonCode
+            ],
         )
 
     @app.post("/api/inquiries", status_code=201, response_model=SubmitResponse)
@@ -444,6 +610,8 @@ def create_app(
                 after=after,
             )
         page = rows[:limit]
+        with db() as conn:
+            summaries = repo.latest_summaries(conn, [i.id for i in page])
         return InquiryList(
             items=[
                 InquirySummary(
@@ -453,6 +621,7 @@ def create_app(
                     received_at=i.received_at,
                     sender_name=i.sender_name,
                     subject=i.subject,
+                    summary=summaries.get(i.id),
                     status=i.status,
                     route=i.route,
                     urgency=i.urgency,
@@ -465,24 +634,111 @@ def create_app(
             next_cursor=encode_cursor(page[-1]) if len(rows) > limit else None,
         )
 
+    def detail_of(conn: sqlite3.Connection, inquiry_id: int) -> InquiryDetail:
+        inquiry = repo.get_inquiry(conn, inquiry_id)
+        if inquiry is None:
+            raise ApiError(404, "not_found", "No inquiry has that id.")
+        draft = repo.latest_draft(conn, inquiry_id)
+        return InquiryDetail(
+            inquiry=inquiry,
+            screening=repo.get_screening(conn, inquiry_id),
+            classification=repo.latest_classification(conn, inquiry_id),
+            extraction=repo.latest_extraction(conn, inquiry_id),
+            escalations=repo.list_escalations(conn, inquiry_id),
+            retrievals=repo.list_retrievals(conn, inquiry_id),
+            draft=draft,
+            checks=repo.list_draft_checks(conn, draft.id) if draft else [],
+            history=events.list_events(conn, inquiry_id),
+            duplicates=repo.list_duplicates_of(conn, inquiry_id),
+        )
+
     @app.get("/api/inquiries/{inquiry_id}", response_model=InquiryDetail)
     def inquiry_detail(inquiry_id: int) -> InquiryDetail:
         with db() as conn:
-            inquiry = repo.get_inquiry(conn, inquiry_id)
-            if inquiry is None:
-                raise ApiError(404, "not_found", "No inquiry has that id.")
-            draft = repo.latest_draft(conn, inquiry_id)
-            return InquiryDetail(
-                inquiry=inquiry,
-                screening=repo.get_screening(conn, inquiry_id),
-                classification=repo.latest_classification(conn, inquiry_id),
-                extraction=repo.latest_extraction(conn, inquiry_id),
-                escalations=repo.list_escalations(conn, inquiry_id),
-                retrievals=repo.list_retrievals(conn, inquiry_id),
-                draft=draft,
-                checks=repo.list_draft_checks(conn, draft.id) if draft else [],
-                history=events.list_events(conn, inquiry_id),
-                duplicates=repo.list_duplicates_of(conn, inquiry_id),
+            return detail_of(conn, inquiry_id)
+
+    # --- review ---
+
+    @app.post("/api/drafts/{draft_id}/approve", response_model=InquiryDetail)
+    def approve_draft(draft_id: int, request: Request, body: ApproveBody) -> InquiryDetail:
+        with db() as conn:
+            decision = review.approve(
+                conn,
+                draft_id,
+                edited_body=body.edited_body,
+                review_seconds=body.review_seconds,
+                request_id=request_id_of(request),
             )
+            return detail_of(conn, decision.inquiry_id)
+
+    @app.post("/api/drafts/{draft_id}/reject", response_model=InquiryDetail)
+    def reject_draft(draft_id: int, request: Request, body: RejectBody) -> InquiryDetail:
+        with db() as conn:
+            decision = review.reject(
+                conn,
+                draft_id,
+                reason=body.reason,
+                review_seconds=body.review_seconds,
+                request_id=request_id_of(request),
+            )
+            return detail_of(conn, decision.inquiry_id)
+
+    @app.post("/api/inquiries/{inquiry_id}/escalate", response_model=InquiryDetail)
+    def escalate_inquiry(inquiry_id: int, request: Request, body: EscalateBody) -> InquiryDetail:
+        with db() as conn:
+            review.escalate(conn, inquiry_id, note=body.note, request_id=request_id_of(request))
+            return detail_of(conn, inquiry_id)
+
+    @app.post("/api/inquiries/{inquiry_id}/resolve", response_model=InquiryDetail)
+    def resolve_inquiry(inquiry_id: int, request: Request, body: ResolveBody) -> InquiryDetail:
+        with db() as conn:
+            review.resolve(conn, inquiry_id, note=body.note, request_id=request_id_of(request))
+            return detail_of(conn, inquiry_id)
+
+    @app.post("/api/drafts/{draft_id}/redraft", response_model=InquiryDetail)
+    def redraft_draft(draft_id: int, request: Request, body: RedraftBody) -> InquiryDetail:
+        if llm is None or business is None:
+            raise ApiError(503, "model_unavailable", "Redrafting needs the model, which is off.")
+        with db() as conn:
+            pipeline.redraft_stage(
+                conn,
+                draft_id,
+                body.guidance,
+                settings,
+                llm,
+                business,
+                request_id=request_id_of(request),
+            )
+            draft = repo.get_draft(conn, draft_id)
+            return detail_of(conn, draft.inquiry_id if draft else 0)
+
+    @app.post("/api/inquiries/{inquiry_id}/reprocess", response_model=InquiryDetail)
+    def reprocess_inquiry(inquiry_id: int, request: Request) -> InquiryDetail:
+        with db() as conn:
+            pipeline.retry_failed(conn, inquiry_id, request_id=request_id_of(request))
+            detail = detail_of(conn, inquiry_id)
+        wake_worker()
+        return detail
+
+    @app.get("/api/drafts/{draft_id}/export", response_model=ExportText)
+    def read_export(draft_id: int) -> ExportText:
+        with db() as conn:
+            text = review.approved_text(conn, draft_id)
+        return ExportText(
+            inquiry_id=text.inquiry_id, draft_id=text.draft_id, subject=text.subject, body=text.body
+        )
+
+    @app.post("/api/drafts/{draft_id}/export", response_model=ExportText)
+    def record_export(draft_id: int, request: Request) -> ExportText:
+        with db() as conn:
+            text = review.export(conn, draft_id, request_id=request_id_of(request))
+        return ExportText(
+            inquiry_id=text.inquiry_id, draft_id=text.draft_id, subject=text.subject, body=text.body
+        )
+
+    @app.get("/api/insights", response_model=Insights)
+    def read_insights() -> Insights:
+        with db() as conn:
+            return insights.compute(conn, synthetic_data=settings.synthetic_data)
 
     return app

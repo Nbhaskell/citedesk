@@ -1,9 +1,16 @@
 """Shared builders for tests that need a scripted model reply."""
 
+import sqlite3
 from typing import Any
 
-from citedesk.models import ReasonCode
+from citedesk import repo
+from citedesk.models import CheckCode, DraftStatus, InquiryStatus, ReasonCode
 from citedesk.routing import MODEL_SIGNALS
+from citedesk.state import transition
+
+S = InquiryStatus
+T1 = "2026-10-28T10:00:00Z"
+DRAFT_BODY = "Hello,\n\nA drain clearing starts at $175.\n\nKind regards,\nBrightwater"
 
 FIELD_KEYS = (
     "service_type",
@@ -45,3 +52,40 @@ def perfect_reply(item: dict[str, Any]) -> dict[str, Any]:
         "escalation_signals": sorted(code.value for code in reasons & MODEL_SIGNALS),
         "fields": dict.fromkeys(FIELD_KEYS) | labels["fields"],
     }
+
+
+def walk(conn: sqlite3.Connection, inquiry_id: int, *path: S) -> None:
+    for step in path:
+        transition(conn, inquiry_id, step, now=T1)
+
+
+def in_review(conn: sqlite3.Connection, *, blocked: bool = False) -> tuple[int, int]:
+    """An inquiry waiting for review with a ready draft (or a blocked one that escalated)."""
+    inquiry_id = repo.insert_inquiry(
+        conn, channel="web_form", body="How much for a drain?", sender_name="Alex", now=T1
+    )
+    walk(conn, inquiry_id, S.screened, S.classified, S.routed, S.drafted)
+    draft_id = repo.insert_draft(
+        conn,
+        inquiry_id=inquiry_id,
+        kind="reply",
+        subject="Re: Drain",
+        body=DRAFT_BODY,
+        model="fake",
+        prompt_version="draft-v1",
+        now=T1,
+    )
+    repo.upsert_draft_check(
+        conn,
+        draft_id=draft_id,
+        check_code=CheckCode.FIGURES_GROUNDED,
+        blocking=True,
+        passed=not blocked,
+        now=T1,
+    )
+    if blocked:
+        walk(conn, inquiry_id, S.escalated)
+    else:
+        repo.set_draft_status(conn, draft_id, DraftStatus.ready)
+        walk(conn, inquiry_id, S.needs_review)
+    return inquiry_id, draft_id

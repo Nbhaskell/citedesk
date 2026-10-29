@@ -156,14 +156,16 @@ Base `http://127.0.0.1:8100`. All JSON. Request and response models are Pydantic
 | `POST /api/inquiries/import` | Upload JSONL or CSV |
 | `GET /api/inquiries` | List with filters `status`, `route`, `urgency`, `q`, cursor pagination |
 | `GET /api/inquiries/{id}` | Full detail: message, screening, classification, extraction, escalations, retrieval, latest draft with checks, history |
-| `POST /api/inquiries/{id}/reprocess` | Re-run from a named stage |
+| `POST /api/inquiries/{id}/reprocess` | Retry a `failed` inquiry from the stage that failed (no body; D-051) |
 | `POST /api/drafts/{id}/approve` | Body: optional `edited_body`; records review |
 | `POST /api/drafts/{id}/reject` | Body: `reason` |
-| `POST /api/drafts/{id}/redraft` | Body: `guidance`; creates a new draft version |
+| `POST /api/drafts/{id}/redraft` | Body: `guidance`; writes the next draft version in the request and checks it (D-051) |
 | `POST /api/inquiries/{id}/escalate` | Manual escalation with note |
 | `POST /api/inquiries/{id}/resolve` | Close an escalated item handled outside the tool |
 | `GET /api/drafts/{id}/export` | Returns approved text for copying |
 | `GET /api/insights` | Aggregates |
+| `POST /api/status/check` | Ask the model server and the knowledge base now; the result is remembered and shown by `GET /api/status` (D-053) |
+| `GET /api/settings` | Read-only: business details, draft word limit, model, data mode, escalation rules and who sets each (D-053) |
 | `GET /api/status` | Model, knowledge base and database health, synthetic-data flag |
 
 Errors use one shape: `{ "error": { "code": "...", "message": "...", "request_id": "..." } }`.

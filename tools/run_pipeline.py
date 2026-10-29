@@ -137,7 +137,8 @@ def main(argv: list[str]) -> int:
     if args.split != "tuned":
         print(
             "The held-out split is run once, in Phase 7, and never used to tune. "
-            "This script runs the tuned split only.",
+            "This script runs the tuned split only; the evaluation runs it with "
+            "`python -m tools.eval_run --split heldout --allow-heldout` (D-061, D-062).",
             file=sys.stderr,
         )
         return 2

@@ -123,7 +123,7 @@ def test_the_header_names_the_system_and_the_data(finished: dict[str, Any]) -> N
     assert h["format"] == "eval-run-v1"
     assert h["stages"] == ["screen", "understand", "route", "retrieve", "draft", "check"]
     assert h["prompt_versions"] == {"understand": "understand-v1", "draft": "draft-v1"}
-    assert h["model"] == "fake-model" and h["settings"]["enable_thinking"] is False
+    assert h["model"] == "fake-model" and h["settings"]["enable_thinking"] is True
     assert h["git"]["code_tree"] == "a" * 40 and h["rag"]["chunks"] == 83
     assert h["golden_sha256"] == "e" * 64 and h["golden"]["docs_sha256"] == "d" * 64
     assert h["split_sha256"] == ec.split_sha256(ITEMS)
@@ -250,7 +250,7 @@ def test_resuming_without_the_database_is_refused(tmp_path: Path) -> None:
 @pytest.mark.parametrize(
     "change",
     [
-        {"settings": Settings(_env_file=None, enable_thinking=True)},
+        {"settings": Settings(_env_file=None, enable_thinking=False)},
         {"model": "another-model"},
         {"rag": RAG | {"chunks": 99}},
         {"git": GIT | {"code_tree": "f" * 40}},

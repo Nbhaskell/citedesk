@@ -114,9 +114,21 @@ def collect(
     classification = repo.latest_classification(conn, inquiry_id)
     extraction = repo.latest_extraction(conn, inquiry_id)
     attempts = None
+    stage_ms: dict[str, int] = {}
+    route_events: list[dict[str, Any]] = []
     for event in events.list_events(conn, inquiry_id):
         if event.event_type is AuditEventType.stage_finished and event.stage is Stage.understand:
             attempts = event.payload.get("attempts")
+        if event.event_type is AuditEventType.stage_finished and event.stage is not None:
+            stage_ms[event.stage.value] = event.duration_ms or 0
+        if event.event_type is AuditEventType.route_decided and event.stage is not None:
+            route_events.append(
+                {
+                    "stage": event.stage.value,
+                    "route": event.payload.get("route"),
+                    "reason_codes": event.payload.get("reason_codes", []),
+                }
+            )
     record: dict[str, Any] = {
         "id": item_id,
         "status": inquiry.status.value,
@@ -130,6 +142,8 @@ def collect(
         ],
         "failure_stage": inquiry.failure_stage.value if inquiry.failure_stage else None,
         "failure_message": inquiry.failure_message,
+        "stage_ms": stage_ms,
+        "route_events": route_events,
     }
     if classification is not None and extraction is not None:
         model_said = json.loads(classification.raw_response)

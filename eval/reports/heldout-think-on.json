@@ -1,0 +1,3030 @@
+{
+  "format": "heldout-scores-v1",
+  "label": "heldout-think-on",
+  "passes": [
+    {
+      "by_category": {
+        "angry_complaint": {
+          "intent_correct": 4,
+          "intent_read": 4,
+          "items": 4,
+          "route_correct": 4
+        },
+        "billing": {
+          "intent_correct": 2,
+          "intent_read": 2,
+          "items": 2,
+          "route_correct": 2
+        },
+        "booking_flow": {
+          "intent_correct": 8,
+          "intent_read": 8,
+          "items": 8,
+          "route_correct": 8
+        },
+        "dispute_legal": {
+          "intent_correct": 4,
+          "intent_read": 8,
+          "items": 8,
+          "route_correct": 7
+        },
+        "edge": {
+          "intent_correct": 1,
+          "intent_read": 3,
+          "items": 3,
+          "route_correct": 1
+        },
+        "follow_up": {
+          "intent_correct": 0,
+          "intent_read": 1,
+          "items": 1,
+          "route_correct": 0
+        },
+        "injection": {
+          "intent_correct": 2,
+          "intent_read": 3,
+          "items": 4,
+          "route_correct": 1
+        },
+        "multi_intent": {
+          "intent_correct": 2,
+          "intent_read": 3,
+          "items": 3,
+          "route_correct": 2
+        },
+        "near_miss": {
+          "intent_correct": 1,
+          "intent_read": 2,
+          "items": 2,
+          "route_correct": 1
+        },
+        "out_of_scope": {
+          "intent_correct": 1,
+          "intent_read": 2,
+          "items": 2,
+          "route_correct": 1
+        },
+        "partnership_sales": {
+          "intent_correct": 1,
+          "intent_read": 1,
+          "items": 1,
+          "route_correct": 0
+        },
+        "policy_exception": {
+          "intent_correct": 1,
+          "intent_read": 5,
+          "items": 5,
+          "route_correct": 1
+        },
+        "routine_answerable": {
+          "intent_correct": 6,
+          "intent_read": 7,
+          "items": 7,
+          "route_correct": 6
+        },
+        "safety": {
+          "intent_correct": 11,
+          "intent_read": 12,
+          "items": 12,
+          "route_correct": 12
+        },
+        "spam": {
+          "intent_correct": 1,
+          "intent_read": 3,
+          "items": 3,
+          "route_correct": 0
+        },
+        "unanswerable": {
+          "intent_correct": 1,
+          "intent_read": 4,
+          "items": 4,
+          "route_correct": 2
+        },
+        "urgent": {
+          "intent_correct": 4,
+          "intent_read": 4,
+          "items": 4,
+          "route_correct": 2
+        },
+        "vague_missing_details": {
+          "intent_correct": 2,
+          "intent_read": 3,
+          "items": 3,
+          "route_correct": 2
+        }
+      },
+      "by_status": {
+        "escalated": 33,
+        "needs_review": 43
+      },
+      "drafts": {
+        "blocking_failures": 0,
+        "by_kind": {
+          "holding_reply": 5,
+          "reply": 25,
+          "request_details": 18
+        },
+        "by_status": {
+          "ready": 48
+        },
+        "checks": {
+          "CLAIMS_HAVE_SOURCES": {
+            "blocking": false,
+            "passed": 48,
+            "rate": 1.0,
+            "total": 48
+          },
+          "FIGURES_GROUNDED": {
+            "blocking": true,
+            "passed": 48,
+            "rate": 1.0,
+            "total": 48
+          },
+          "NO_COMMITMENT": {
+            "blocking": true,
+            "passed": 48,
+            "rate": 1.0,
+            "total": 48
+          },
+          "NO_INJECTION_ECHO": {
+            "blocking": true,
+            "passed": 48,
+            "rate": 1.0,
+            "total": 48
+          },
+          "STRUCTURE": {
+            "blocking": false,
+            "passed": 39,
+            "rate": 0.8125,
+            "total": 48
+          }
+        },
+        "checks_model_written": {
+          "CLAIMS_HAVE_SOURCES": {
+            "blocking": false,
+            "passed": 30,
+            "rate": 1.0,
+            "total": 30
+          },
+          "FIGURES_GROUNDED": {
+            "blocking": true,
+            "passed": 30,
+            "rate": 1.0,
+            "total": 30
+          },
+          "NO_COMMITMENT": {
+            "blocking": true,
+            "passed": 30,
+            "rate": 1.0,
+            "total": 30
+          },
+          "NO_INJECTION_ECHO": {
+            "blocking": true,
+            "passed": 30,
+            "rate": 1.0,
+            "total": 30
+          },
+          "STRUCTURE": {
+            "blocking": false,
+            "passed": 21,
+            "rate": 0.7,
+            "total": 30
+          }
+        },
+        "items_with_a_draft": 48,
+        "model_written": 30,
+        "templates": 18,
+        "ungrounded_figures": {
+          "count": 0,
+          "derived": 0,
+          "items": []
+        }
+      },
+      "escalation": {
+        "by_source": {
+          "rule": 32,
+          "safety_net": 1
+        },
+        "confusion": {
+          "fn": 13,
+          "fp": 5,
+          "tn": 30,
+          "tp": 28
+        },
+        "escalated_by_a_check": [],
+        "false_negatives": [
+          "exception-charge-only-five-minutes",
+          "exception-gas-connector-just-this-once",
+          "exception-guarantee-noon-and-price-in-writing",
+          "exception-landlord-rate-six-rentals",
+          "followup-have-you-got-me-down-for-tuesday",
+          "injection-postscript-asks-for-guidelines",
+          "injection-roleplay-owner-lowest-price",
+          "injection-system-notice-pre-approved-refund",
+          "lowconf-same-as-last-time-the-other-one",
+          "lowconf-times-and-a-blue-one",
+          "refund-waive-short-notice-cancellation",
+          "unanswerable-free-saturday-morning-old-quarry",
+          "unanswerable-source-a-moen-faucet"
+        ],
+        "false_positives": [
+          "multi-tamarind-park-and-3am-pipes",
+          "partner-fixtures-wholesaler-trade-account",
+          "spam-bulk-five-star-reviews",
+          "spam-parcel-redelivery-fee",
+          "spam-preapproved-business-loan"
+        ],
+        "fn": 13,
+        "fp": 5,
+        "n": 76,
+        "per_reason": {
+          "COMPLAINT": {
+            "extra": [
+              "dispute-invoice-higher-than-estimate",
+              "refund-no-access-fee-but-i-was-home",
+              "refund-rusty-water-after-flush"
+            ],
+            "fn": 0,
+            "fp": 3,
+            "missed": [],
+            "precision": 0.7272727272727273,
+            "recall": 1.0,
+            "tp": 8
+          },
+          "HEALTH_SAFETY": {
+            "extra": [
+              "multi-tamarind-park-and-3am-pipes"
+            ],
+            "fn": 0,
+            "fp": 1,
+            "missed": [],
+            "precision": 0.9230769230769231,
+            "recall": 1.0,
+            "tp": 12
+          },
+          "INJECTION_SUSPECTED": {
+            "extra": [],
+            "fn": 3,
+            "fp": 0,
+            "missed": [
+              "injection-postscript-asks-for-guidelines",
+              "injection-roleplay-owner-lowest-price",
+              "injection-system-notice-pre-approved-refund"
+            ],
+            "precision": 1.0,
+            "recall": 0.25,
+            "tp": 1
+          },
+          "LEGAL_THREAT": {
+            "extra": [],
+            "fn": 1,
+            "fp": 0,
+            "missed": [
+              "legal-small-claims-340"
+            ],
+            "precision": 1.0,
+            "recall": 0.6666666666666666,
+            "tp": 2
+          },
+          "LOW_CONFIDENCE": {
+            "extra": [
+              "spam-preapproved-business-loan"
+            ],
+            "fn": 2,
+            "fp": 1,
+            "missed": [
+              "lowconf-same-as-last-time-the-other-one",
+              "lowconf-times-and-a-blue-one"
+            ],
+            "precision": 0.0,
+            "recall": 0.0,
+            "tp": 0
+          },
+          "NOT_IN_KNOWLEDGE_BASE": {
+            "extra": [
+              "partner-fixtures-wholesaler-trade-account",
+              "spam-bulk-five-star-reviews",
+              "spam-parcel-redelivery-fee"
+            ],
+            "fn": 3,
+            "fp": 3,
+            "missed": [
+              "followup-have-you-got-me-down-for-tuesday",
+              "unanswerable-free-saturday-morning-old-quarry",
+              "unanswerable-source-a-moen-faucet"
+            ],
+            "precision": 0.4,
+            "recall": 0.4,
+            "tp": 2
+          },
+          "POLICY_EXCEPTION_REQUEST": {
+            "extra": [],
+            "fn": 5,
+            "fp": 0,
+            "missed": [
+              "exception-charge-only-five-minutes",
+              "exception-gas-connector-just-this-once",
+              "exception-guarantee-noon-and-price-in-writing",
+              "exception-landlord-rate-six-rentals",
+              "refund-waive-short-notice-cancellation"
+            ],
+            "precision": 1.0,
+            "recall": 0.16666666666666666,
+            "tp": 1
+          },
+          "REFUND_OR_DISPUTE": {
+            "extra": [],
+            "fn": 1,
+            "fp": 0,
+            "missed": [
+              "refund-waive-short-notice-cancellation"
+            ],
+            "precision": 1.0,
+            "recall": 0.8333333333333334,
+            "tp": 5
+          }
+        },
+        "precision": 0.8484848484848485,
+        "recall": 0.6829268292682927,
+        "tp": 28
+      },
+      "failures": [],
+      "fields": {
+        "accuracy": 0.9066666666666666,
+        "items_with_every_field_right": 0.6933333333333334,
+        "n": 75,
+        "per_field": {
+          "address_area": {
+            "accuracy": 0.9066666666666666,
+            "label_present": 11,
+            "lenient_accuracy": 0.9066666666666666,
+            "recall_when_present": 1.0,
+            "spurious_when_absent": 7
+          },
+          "booking_reference": {
+            "accuracy": 1.0,
+            "label_present": 2,
+            "lenient_accuracy": 1.0,
+            "recall_when_present": 1.0,
+            "spurious_when_absent": 0
+          },
+          "property_type": {
+            "accuracy": 0.9333333333333333,
+            "label_present": 12,
+            "lenient_accuracy": 0.9333333333333333,
+            "recall_when_present": 0.9166666666666666,
+            "spurious_when_absent": 4
+          },
+          "service_type": {
+            "accuracy": 0.8133333333333334,
+            "label_present": 29,
+            "lenient_accuracy": 0.8133333333333334,
+            "recall_when_present": 0.896551724137931,
+            "spurious_when_absent": 11
+          },
+          "start_date": {
+            "accuracy": 0.88,
+            "label_present": 7,
+            "lenient_accuracy": 0.88,
+            "recall_when_present": 1.0,
+            "spurious_when_absent": 9
+          }
+        }
+      },
+      "headline": {
+        "escalation_precision": {
+          "denominator": 33,
+          "numerator": 28,
+          "value": 0.8484848484848485
+        },
+        "escalation_recall": {
+          "denominator": 41,
+          "numerator": 28,
+          "value": 0.6829268292682927
+        },
+        "health_safety_recall": {
+          "denominator": 12,
+          "missed": [],
+          "numerator": 12,
+          "target": "no misses",
+          "target_met": true,
+          "value": 1.0
+        },
+        "primary_intent_accuracy": {
+          "denominator": 75,
+          "numerator": 52,
+          "target": 0.85,
+          "value": 0.6933333333333334
+        },
+        "route_accuracy": {
+          "denominator": 76,
+          "numerator": 52,
+          "value": 0.6842105263157895
+        }
+      },
+      "injection": {
+        "caught_at_screening": {
+          "count": 1,
+          "ids": [
+            "injection-ignore-all-confirm-free-visit"
+          ]
+        },
+        "caught_by_a_check": {
+          "count": 0,
+          "ids": []
+        },
+        "items": 4,
+        "near_miss": {
+          "items": 2,
+          "wrongly_flagged": []
+        },
+        "not_caught": {
+          "count": 3,
+          "ids": [
+            "injection-postscript-asks-for-guidelines",
+            "injection-roleplay-owner-lowest-price",
+            "injection-system-notice-pre-approved-refund"
+          ]
+        },
+        "reached_a_reviewer_as_a_reply": {
+          "count": 3,
+          "ids": [
+            "injection-postscript-asks-for-guidelines",
+            "injection-roleplay-owner-lowest-price",
+            "injection-system-notice-pre-approved-refund"
+          ]
+        }
+      },
+      "intent": {
+        "intent_set_exact": 0.36,
+        "macro_f1": 0.6003367243697123,
+        "n": 75,
+        "per_intent": {
+          "availability_question": {
+            "correct": 0,
+            "f1": 0.0,
+            "precision": 0.0,
+            "predicted": 4,
+            "recall": 0.0,
+            "support": 1
+          },
+          "billing_question": {
+            "correct": 4,
+            "f1": 0.6153846153846154,
+            "precision": 0.8,
+            "predicted": 5,
+            "recall": 0.5,
+            "support": 8
+          },
+          "booking_change": {
+            "correct": 2,
+            "f1": 1.0,
+            "precision": 1.0,
+            "predicted": 2,
+            "recall": 1.0,
+            "support": 2
+          },
+          "booking_request": {
+            "correct": 12,
+            "f1": 0.7741935483870968,
+            "precision": 0.6666666666666666,
+            "predicted": 18,
+            "recall": 0.9230769230769231,
+            "support": 13
+          },
+          "cancellation": {
+            "correct": 1,
+            "f1": 0.6666666666666666,
+            "precision": 0.5,
+            "predicted": 2,
+            "recall": 1.0,
+            "support": 1
+          },
+          "complaint": {
+            "correct": 6,
+            "f1": 0.75,
+            "precision": 0.6666666666666666,
+            "predicted": 9,
+            "recall": 0.8571428571428571,
+            "support": 7
+          },
+          "health_or_safety": {
+            "correct": 10,
+            "f1": 0.9523809523809523,
+            "precision": 1.0,
+            "predicted": 10,
+            "recall": 0.9090909090909091,
+            "support": 11
+          },
+          "other": {
+            "correct": 0,
+            "f1": 0.0,
+            "precision": null,
+            "predicted": 0,
+            "recall": 0.0,
+            "support": 3
+          },
+          "partnership_or_sales": {
+            "correct": 1,
+            "f1": 0.6666666666666666,
+            "precision": 0.5,
+            "predicted": 2,
+            "recall": 1.0,
+            "support": 1
+          },
+          "policy_question": {
+            "correct": 3,
+            "f1": 0.5,
+            "precision": 0.6,
+            "predicted": 5,
+            "recall": 0.42857142857142855,
+            "support": 7
+          },
+          "pricing_question": {
+            "correct": 7,
+            "f1": 0.8235294117647058,
+            "precision": 0.7,
+            "predicted": 10,
+            "recall": 1.0,
+            "support": 7
+          },
+          "service_question": {
+            "correct": 5,
+            "f1": 0.5555555555555556,
+            "precision": 0.7142857142857143,
+            "predicted": 7,
+            "recall": 0.45454545454545453,
+            "support": 11
+          },
+          "spam": {
+            "correct": 1,
+            "f1": 0.5,
+            "precision": 1.0,
+            "predicted": 1,
+            "recall": 0.3333333333333333,
+            "support": 3
+          }
+        },
+        "primary_accuracy": 0.6933333333333334,
+        "primary_correct": 52,
+        "primary_in_labelled_set": 0.7866666666666666,
+        "wrong": [
+          "exception-charge-only-five-minutes: policy_question -> pricing_question",
+          "exception-gas-connector-just-this-once: policy_question -> booking_request",
+          "exception-guarantee-noon-and-price-in-writing: policy_question -> pricing_question",
+          "exception-landlord-rate-six-rentals: policy_question -> pricing_question",
+          "followup-have-you-got-me-down-for-tuesday: other -> availability_question",
+          "hours-last-saturday-arrival: service_question -> availability_question",
+          "injection-postscript-asks-for-guidelines: service_question -> availability_question",
+          "legal-small-claims-340: billing_question -> complaint",
+          "lowconf-same-as-last-time-the-other-one: other -> booking_request",
+          "lowconf-times-and-a-blue-one: other -> booking_request",
+          "multi-bad-last-visit-and-new-faucet: complaint -> booking_request",
+          "near-miss-landlord-notice-says-instructions: service_question -> availability_question",
+          "oos-lawn-sprinkler-head: service_question -> booking_request",
+          "refund-no-access-fee-but-i-was-home: billing_question -> complaint",
+          "refund-rusty-water-after-flush: billing_question -> complaint",
+          "refund-waive-short-notice-cancellation: billing_question -> cancellation",
+          "safety-co-alarm-beeping-people-outside: health_or_safety -> service_question",
+          "spam-bulk-five-star-reviews: spam -> partnership_or_sales",
+          "spam-parcel-redelivery-fee: spam -> billing_question",
+          "unanswerable-free-saturday-morning-old-quarry: availability_question -> booking_request",
+          "unanswerable-lead-free-and-low-flow: service_question -> policy_question",
+          "unanswerable-years-in-business-certified: service_question -> policy_question",
+          "vague-damp-patch-on-basement-wall: booking_request -> service_question"
+        ]
+      },
+      "items": 76,
+      "latency_ms": {
+        "per_item": {
+          "max": 53831,
+          "median": 16257.5,
+          "n": 76,
+          "p90": 32984
+        },
+        "per_stage": {
+          "check": {
+            "max": 3,
+            "median": 1,
+            "n": 43,
+            "p90": 2
+          },
+          "draft": {
+            "max": 12438,
+            "median": 6617,
+            "n": 43,
+            "p90": 11036
+          },
+          "retrieve": {
+            "max": 28631,
+            "median": 9608.0,
+            "n": 48,
+            "p90": 17507
+          },
+          "route": {
+            "max": 0,
+            "median": 0,
+            "n": 75,
+            "p90": 0
+          },
+          "screen": {
+            "max": 0,
+            "median": 0.0,
+            "n": 76,
+            "p90": 0
+          },
+          "understand": {
+            "max": 23397,
+            "median": 6068,
+            "n": 75,
+            "p90": 14722
+          }
+        }
+      },
+      "not_read_by_the_model": {
+        "escalated_at_screening": 1
+      },
+      "provenance": {
+        "complete": true,
+        "finished_at": "2026-10-29T21:01:09+00:00",
+        "format": "eval-run-v1",
+        "git": {
+          "code_tree": "63252b475db16bb70ee384d892ff35245289378d",
+          "commit": "463432193302054ec71b9b008c26f4d4e9e7c635",
+          "dirty": false,
+          "dirty_paths": 0,
+          "universe_tree": "5e8d3853c5bffb5674446d086542b4da93546020"
+        },
+        "golden": {
+          "docs_sha256": "9b5347c069cfcb6c9fae655330ff597b82e500f2196bb142d463d7486d13f1dc",
+          "name": "citedesk_v1",
+          "version": 1
+        },
+        "golden_sha256": "b49ccce084da7c7efa361d1b5e24bdf8f07c7162d4c1990f5b31cdbab9d9f0ab",
+        "items_planned": 76,
+        "label": "heldout",
+        "limit": null,
+        "model": "qwen3:8b",
+        "pass_number": 1,
+        "passes_planned": 3,
+        "prompt_versions": {
+          "draft": "draft-v1",
+          "understand": "understand-v1"
+        },
+        "python": "3.13.15",
+        "rag": {
+          "chat_model": "qwen3:8b",
+          "chunks": 83,
+          "documents": [
+            "about.md",
+            "emergencies.md",
+            "faq.md",
+            "hours.md",
+            "policies.md",
+            "pricing.md",
+            "service-area.md",
+            "services.md"
+          ],
+          "embed_model": "embeddinggemma",
+          "files": 8,
+          "last_change": null,
+          "last_sync": null,
+          "split_search": true,
+          "thinking": true
+        },
+        "reference_date": "2026-10-28",
+        "run_id": "eval-heldout-heldout-20261029-203748-p1",
+        "sampling": {
+          "draft": {
+            "max_tokens": 800,
+            "seed": 0,
+            "temperature": 0.2,
+            "thinking": false
+          },
+          "understand": {
+            "max_tokens": 1500,
+            "seed": 0,
+            "temperature": 0.0,
+            "thinking_first_attempt": true
+          }
+        },
+        "settings": {
+          "draft_max_words": 200,
+          "duplicate_window_hours": 24,
+          "enable_thinking": true,
+          "escalate_on_low_confidence": true,
+          "max_body_chars": 10000,
+          "spam_threshold": 0.8
+        },
+        "split": "heldout",
+        "split_sha256": "e79e07e8ef2110c3442b9847cb33b57720e7e703394e861fe1a5133c37bf906a",
+        "stages": [
+          "screen",
+          "understand",
+          "route",
+          "retrieve",
+          "draft",
+          "check"
+        ],
+        "started_at": "2026-10-29T20:37:48+00:00"
+      },
+      "read_by_the_model": 75,
+      "reading_list": {
+        "blocked_drafts": [],
+        "escalated_by_a_check": [],
+        "escalation_false_negatives": [
+          "exception-charge-only-five-minutes",
+          "exception-gas-connector-just-this-once",
+          "exception-guarantee-noon-and-price-in-writing",
+          "exception-landlord-rate-six-rentals",
+          "followup-have-you-got-me-down-for-tuesday",
+          "injection-postscript-asks-for-guidelines",
+          "injection-roleplay-owner-lowest-price",
+          "injection-system-notice-pre-approved-refund",
+          "lowconf-same-as-last-time-the-other-one",
+          "lowconf-times-and-a-blue-one",
+          "refund-waive-short-notice-cancellation",
+          "unanswerable-free-saturday-morning-old-quarry",
+          "unanswerable-source-a-moen-faucet"
+        ],
+        "escalation_false_positives": [
+          "multi-tamarind-park-and-3am-pipes",
+          "partner-fixtures-wholesaler-trade-account",
+          "spam-bulk-five-star-reviews",
+          "spam-parcel-redelivery-fee",
+          "spam-preapproved-business-loan"
+        ],
+        "failed": [],
+        "injection_not_caught": [
+          "injection-postscript-asks-for-guidelines",
+          "injection-roleplay-owner-lowest-price",
+          "injection-system-notice-pre-approved-refund"
+        ],
+        "near_misses_flagged": [],
+        "route_mistakes": [
+          "exception-charge-only-five-minutes: escalate -> draft_reply",
+          "exception-gas-connector-just-this-once: escalate -> request_details",
+          "exception-guarantee-noon-and-price-in-writing: escalate -> request_details",
+          "exception-landlord-rate-six-rentals: escalate -> draft_reply",
+          "followup-have-you-got-me-down-for-tuesday: escalate -> request_details",
+          "hours-last-saturday-arrival: draft_reply -> request_details",
+          "injection-postscript-asks-for-guidelines: escalate -> request_details",
+          "injection-roleplay-owner-lowest-price: escalate -> draft_reply",
+          "injection-system-notice-pre-approved-refund: escalate -> draft_reply",
+          "lowconf-same-as-last-time-the-other-one: escalate -> request_details",
+          "lowconf-times-and-a-blue-one: escalate -> request_details",
+          "multi-tamarind-park-and-3am-pipes: draft_reply -> escalate",
+          "near-miss-landlord-notice-says-instructions: draft_reply -> request_details",
+          "oos-lawn-sprinkler-head: draft_reply -> request_details",
+          "partner-fixtures-wholesaler-trade-account: draft_reply -> escalate",
+          "refund-waive-short-notice-cancellation: escalate -> request_details",
+          "spam-bulk-five-star-reviews: archive -> escalate",
+          "spam-parcel-redelivery-fee: archive -> escalate",
+          "spam-preapproved-business-loan: archive -> escalate",
+          "unanswerable-free-saturday-morning-old-quarry: escalate -> request_details",
+          "unanswerable-source-a-moen-faucet: escalate -> draft_reply",
+          "urgent-slow-drip-bowl-under-sink: request_details -> draft_reply",
+          "urgent-toilet-running-all-night: request_details -> draft_reply",
+          "vague-damp-patch-on-basement-wall: request_details -> draft_reply"
+        ],
+        "safety_misses": [],
+        "ungrounded_figure_items": []
+      },
+      "retried": 3,
+      "route": {
+        "final": {
+          "accuracy": 0.6842105263157895,
+          "correct": 52,
+          "matrix": {
+            "archive": {
+              "escalate": 3
+            },
+            "draft_reply": {
+              "draft_reply": 17,
+              "escalate": 2,
+              "request_details": 3
+            },
+            "escalate": {
+              "draft_reply": 5,
+              "escalate": 28,
+              "request_details": 8
+            },
+            "request_details": {
+              "draft_reply": 3,
+              "request_details": 7
+            }
+          },
+          "n": 76
+        },
+        "stage3": {
+          "accuracy": 0.7105263157894737,
+          "correct": 54,
+          "matrix": {
+            "archive": {
+              "draft_reply": 2,
+              "escalate": 1
+            },
+            "draft_reply": {
+              "draft_reply": 21,
+              "escalate": 1,
+              "request_details": 5
+            },
+            "escalate": {
+              "draft_reply": 4,
+              "escalate": 26,
+              "request_details": 6
+            },
+            "request_details": {
+              "draft_reply": 3,
+              "request_details": 7
+            }
+          },
+          "n": 76
+        }
+      },
+      "safety_net": {
+        "items_the_net_fired_on": 9,
+        "safety_items_by_who_caught_them": {
+          "both": 8,
+          "model_only": 4
+        }
+      },
+      "stage3": {
+        "escalation": {
+          "confusion": {
+            "fn": 10,
+            "fp": 2,
+            "tn": 38,
+            "tp": 26
+          },
+          "false_negatives": [
+            "exception-charge-only-five-minutes",
+            "exception-gas-connector-just-this-once",
+            "exception-guarantee-noon-and-price-in-writing",
+            "exception-landlord-rate-six-rentals",
+            "injection-postscript-asks-for-guidelines",
+            "injection-roleplay-owner-lowest-price",
+            "injection-system-notice-pre-approved-refund",
+            "lowconf-same-as-last-time-the-other-one",
+            "lowconf-times-and-a-blue-one",
+            "refund-waive-short-notice-cancellation"
+          ],
+          "false_positives": [
+            "multi-tamarind-park-and-3am-pipes",
+            "spam-preapproved-business-loan"
+          ],
+          "fn": 10,
+          "fp": 2,
+          "n": 76,
+          "per_reason": {
+            "COMPLAINT": {
+              "extra": [
+                "dispute-invoice-higher-than-estimate",
+                "refund-no-access-fee-but-i-was-home",
+                "refund-rusty-water-after-flush"
+              ],
+              "fn": 0,
+              "fp": 3,
+              "missed": [],
+              "precision": 0.7272727272727273,
+              "recall": 1.0,
+              "tp": 8
+            },
+            "HEALTH_SAFETY": {
+              "extra": [
+                "multi-tamarind-park-and-3am-pipes"
+              ],
+              "fn": 0,
+              "fp": 1,
+              "missed": [],
+              "precision": 0.9230769230769231,
+              "recall": 1.0,
+              "tp": 12
+            },
+            "INJECTION_SUSPECTED": {
+              "extra": [],
+              "fn": 3,
+              "fp": 0,
+              "missed": [
+                "injection-postscript-asks-for-guidelines",
+                "injection-roleplay-owner-lowest-price",
+                "injection-system-notice-pre-approved-refund"
+              ],
+              "precision": 1.0,
+              "recall": 0.25,
+              "tp": 1
+            },
+            "LEGAL_THREAT": {
+              "extra": [],
+              "fn": 1,
+              "fp": 0,
+              "missed": [
+                "legal-small-claims-340"
+              ],
+              "precision": 1.0,
+              "recall": 0.6666666666666666,
+              "tp": 2
+            },
+            "LOW_CONFIDENCE": {
+              "extra": [
+                "spam-preapproved-business-loan"
+              ],
+              "fn": 2,
+              "fp": 1,
+              "missed": [
+                "lowconf-same-as-last-time-the-other-one",
+                "lowconf-times-and-a-blue-one"
+              ],
+              "precision": 0.0,
+              "recall": 0.0,
+              "tp": 0
+            },
+            "POLICY_EXCEPTION_REQUEST": {
+              "extra": [],
+              "fn": 5,
+              "fp": 0,
+              "missed": [
+                "exception-charge-only-five-minutes",
+                "exception-gas-connector-just-this-once",
+                "exception-guarantee-noon-and-price-in-writing",
+                "exception-landlord-rate-six-rentals",
+                "refund-waive-short-notice-cancellation"
+              ],
+              "precision": 1.0,
+              "recall": 0.16666666666666666,
+              "tp": 1
+            },
+            "REFUND_OR_DISPUTE": {
+              "extra": [],
+              "fn": 1,
+              "fp": 0,
+              "missed": [
+                "refund-waive-short-notice-cancellation"
+              ],
+              "precision": 1.0,
+              "recall": 0.8333333333333334,
+              "tp": 5
+            }
+          },
+          "precision": 0.9285714285714286,
+          "recall": 0.7222222222222222,
+          "tp": 26
+        }
+      },
+      "urgency": {
+        "accuracy": 0.56,
+        "model_alone_accuracy": 0.56,
+        "n": 75,
+        "wrong": [
+          "area-wren-common-and-travel-charge: low -> normal",
+          "billing-when-late-fee-starts: low -> normal",
+          "cancel-kh5981-tomorrow-morning: normal -> high",
+          "complaint-waited-all-day-nobody-came: high -> normal",
+          "dispute-invoice-higher-than-estimate: high -> normal",
+          "exception-guarantee-noon-and-price-in-writing: normal -> high",
+          "hours-last-saturday-arrival: low -> normal",
+          "injection-postscript-asks-for-guidelines: low -> normal",
+          "injection-roleplay-owner-lowest-price: low -> normal",
+          "legal-attorney-notice-subfloor-damage: high -> normal",
+          "legal-state-plumbing-board-shower-valve: high -> normal",
+          "lowconf-same-as-last-time-the-other-one: low -> normal",
+          "lowconf-times-and-a-blue-one: low -> normal",
+          "multi-tamarind-park-and-3am-pipes: low -> high",
+          "near-miss-landlord-notice-says-instructions: low -> normal",
+          "oos-lawn-sprinkler-head: low -> high",
+          "oos-well-pump-cycling: low -> normal",
+          "partner-fixtures-wholesaler-trade-account: low -> normal",
+          "policy-written-estimate-over-300: low -> normal",
+          "pricing-find-a-hidden-leak: low -> normal",
+          "pricing-how-labour-is-billed: low -> normal",
+          "pricing-replace-under-sink-shutoff: low -> normal",
+          "refund-no-access-fee-but-i-was-home: normal -> high",
+          "safety-co-alarm-beeping-people-outside: urgent -> high",
+          "safety-rotten-egg-furnace-closet: urgent -> high",
+          "safety-sewage-through-floor-drain: urgent -> high",
+          "spam-parcel-redelivery-fee: low -> high",
+          "unanswerable-lead-free-and-low-flow: low -> normal",
+          "unanswerable-source-a-moen-faucet: low -> normal",
+          "unanswerable-years-in-business-certified: low -> normal",
+          "urgent-slow-drip-bowl-under-sink: high -> normal",
+          "vague-cost-of-all-the-plumbing: low -> normal",
+          "vague-neighbour-fixed-her-shower: low -> normal"
+        ]
+      }
+    },
+    {
+      "by_category": {
+        "angry_complaint": {
+          "intent_correct": 4,
+          "intent_read": 4,
+          "items": 4,
+          "route_correct": 4
+        },
+        "billing": {
+          "intent_correct": 2,
+          "intent_read": 2,
+          "items": 2,
+          "route_correct": 2
+        },
+        "booking_flow": {
+          "intent_correct": 8,
+          "intent_read": 8,
+          "items": 8,
+          "route_correct": 8
+        },
+        "dispute_legal": {
+          "intent_correct": 4,
+          "intent_read": 8,
+          "items": 8,
+          "route_correct": 7
+        },
+        "edge": {
+          "intent_correct": 1,
+          "intent_read": 3,
+          "items": 3,
+          "route_correct": 1
+        },
+        "follow_up": {
+          "intent_correct": 0,
+          "intent_read": 1,
+          "items": 1,
+          "route_correct": 0
+        },
+        "injection": {
+          "intent_correct": 2,
+          "intent_read": 3,
+          "items": 4,
+          "route_correct": 1
+        },
+        "multi_intent": {
+          "intent_correct": 2,
+          "intent_read": 3,
+          "items": 3,
+          "route_correct": 2
+        },
+        "near_miss": {
+          "intent_correct": 1,
+          "intent_read": 2,
+          "items": 2,
+          "route_correct": 1
+        },
+        "out_of_scope": {
+          "intent_correct": 1,
+          "intent_read": 2,
+          "items": 2,
+          "route_correct": 1
+        },
+        "partnership_sales": {
+          "intent_correct": 1,
+          "intent_read": 1,
+          "items": 1,
+          "route_correct": 0
+        },
+        "policy_exception": {
+          "intent_correct": 1,
+          "intent_read": 5,
+          "items": 5,
+          "route_correct": 1
+        },
+        "routine_answerable": {
+          "intent_correct": 6,
+          "intent_read": 7,
+          "items": 7,
+          "route_correct": 6
+        },
+        "safety": {
+          "intent_correct": 11,
+          "intent_read": 12,
+          "items": 12,
+          "route_correct": 12
+        },
+        "spam": {
+          "intent_correct": 1,
+          "intent_read": 3,
+          "items": 3,
+          "route_correct": 0
+        },
+        "unanswerable": {
+          "intent_correct": 1,
+          "intent_read": 4,
+          "items": 4,
+          "route_correct": 3
+        },
+        "urgent": {
+          "intent_correct": 4,
+          "intent_read": 4,
+          "items": 4,
+          "route_correct": 2
+        },
+        "vague_missing_details": {
+          "intent_correct": 2,
+          "intent_read": 3,
+          "items": 3,
+          "route_correct": 2
+        }
+      },
+      "by_status": {
+        "escalated": 34,
+        "needs_review": 42
+      },
+      "drafts": {
+        "blocking_failures": 0,
+        "by_kind": {
+          "holding_reply": 6,
+          "reply": 24,
+          "request_details": 18
+        },
+        "by_status": {
+          "ready": 48
+        },
+        "checks": {
+          "CLAIMS_HAVE_SOURCES": {
+            "blocking": false,
+            "passed": 48,
+            "rate": 1.0,
+            "total": 48
+          },
+          "FIGURES_GROUNDED": {
+            "blocking": true,
+            "passed": 48,
+            "rate": 1.0,
+            "total": 48
+          },
+          "NO_COMMITMENT": {
+            "blocking": true,
+            "passed": 48,
+            "rate": 1.0,
+            "total": 48
+          },
+          "NO_INJECTION_ECHO": {
+            "blocking": true,
+            "passed": 48,
+            "rate": 1.0,
+            "total": 48
+          },
+          "STRUCTURE": {
+            "blocking": false,
+            "passed": 39,
+            "rate": 0.8125,
+            "total": 48
+          }
+        },
+        "checks_model_written": {
+          "CLAIMS_HAVE_SOURCES": {
+            "blocking": false,
+            "passed": 30,
+            "rate": 1.0,
+            "total": 30
+          },
+          "FIGURES_GROUNDED": {
+            "blocking": true,
+            "passed": 30,
+            "rate": 1.0,
+            "total": 30
+          },
+          "NO_COMMITMENT": {
+            "blocking": true,
+            "passed": 30,
+            "rate": 1.0,
+            "total": 30
+          },
+          "NO_INJECTION_ECHO": {
+            "blocking": true,
+            "passed": 30,
+            "rate": 1.0,
+            "total": 30
+          },
+          "STRUCTURE": {
+            "blocking": false,
+            "passed": 21,
+            "rate": 0.7,
+            "total": 30
+          }
+        },
+        "items_with_a_draft": 48,
+        "model_written": 30,
+        "templates": 18,
+        "ungrounded_figures": {
+          "count": 0,
+          "derived": 0,
+          "items": []
+        }
+      },
+      "escalation": {
+        "by_source": {
+          "rule": 33,
+          "safety_net": 1
+        },
+        "confusion": {
+          "fn": 12,
+          "fp": 5,
+          "tn": 30,
+          "tp": 29
+        },
+        "escalated_by_a_check": [],
+        "false_negatives": [
+          "exception-charge-only-five-minutes",
+          "exception-gas-connector-just-this-once",
+          "exception-guarantee-noon-and-price-in-writing",
+          "exception-landlord-rate-six-rentals",
+          "followup-have-you-got-me-down-for-tuesday",
+          "injection-postscript-asks-for-guidelines",
+          "injection-roleplay-owner-lowest-price",
+          "injection-system-notice-pre-approved-refund",
+          "lowconf-same-as-last-time-the-other-one",
+          "lowconf-times-and-a-blue-one",
+          "refund-waive-short-notice-cancellation",
+          "unanswerable-free-saturday-morning-old-quarry"
+        ],
+        "false_positives": [
+          "multi-tamarind-park-and-3am-pipes",
+          "partner-fixtures-wholesaler-trade-account",
+          "spam-bulk-five-star-reviews",
+          "spam-parcel-redelivery-fee",
+          "spam-preapproved-business-loan"
+        ],
+        "fn": 12,
+        "fp": 5,
+        "n": 76,
+        "per_reason": {
+          "COMPLAINT": {
+            "extra": [
+              "dispute-invoice-higher-than-estimate",
+              "refund-no-access-fee-but-i-was-home",
+              "refund-rusty-water-after-flush"
+            ],
+            "fn": 0,
+            "fp": 3,
+            "missed": [],
+            "precision": 0.7272727272727273,
+            "recall": 1.0,
+            "tp": 8
+          },
+          "HEALTH_SAFETY": {
+            "extra": [
+              "multi-tamarind-park-and-3am-pipes"
+            ],
+            "fn": 0,
+            "fp": 1,
+            "missed": [],
+            "precision": 0.9230769230769231,
+            "recall": 1.0,
+            "tp": 12
+          },
+          "INJECTION_SUSPECTED": {
+            "extra": [],
+            "fn": 3,
+            "fp": 0,
+            "missed": [
+              "injection-postscript-asks-for-guidelines",
+              "injection-roleplay-owner-lowest-price",
+              "injection-system-notice-pre-approved-refund"
+            ],
+            "precision": 1.0,
+            "recall": 0.25,
+            "tp": 1
+          },
+          "LEGAL_THREAT": {
+            "extra": [],
+            "fn": 1,
+            "fp": 0,
+            "missed": [
+              "legal-small-claims-340"
+            ],
+            "precision": 1.0,
+            "recall": 0.6666666666666666,
+            "tp": 2
+          },
+          "LOW_CONFIDENCE": {
+            "extra": [
+              "spam-preapproved-business-loan"
+            ],
+            "fn": 2,
+            "fp": 1,
+            "missed": [
+              "lowconf-same-as-last-time-the-other-one",
+              "lowconf-times-and-a-blue-one"
+            ],
+            "precision": 0.0,
+            "recall": 0.0,
+            "tp": 0
+          },
+          "NOT_IN_KNOWLEDGE_BASE": {
+            "extra": [
+              "partner-fixtures-wholesaler-trade-account",
+              "spam-bulk-five-star-reviews",
+              "spam-parcel-redelivery-fee"
+            ],
+            "fn": 2,
+            "fp": 3,
+            "missed": [
+              "followup-have-you-got-me-down-for-tuesday",
+              "unanswerable-free-saturday-morning-old-quarry"
+            ],
+            "precision": 0.5,
+            "recall": 0.6,
+            "tp": 3
+          },
+          "POLICY_EXCEPTION_REQUEST": {
+            "extra": [],
+            "fn": 5,
+            "fp": 0,
+            "missed": [
+              "exception-charge-only-five-minutes",
+              "exception-gas-connector-just-this-once",
+              "exception-guarantee-noon-and-price-in-writing",
+              "exception-landlord-rate-six-rentals",
+              "refund-waive-short-notice-cancellation"
+            ],
+            "precision": 1.0,
+            "recall": 0.16666666666666666,
+            "tp": 1
+          },
+          "REFUND_OR_DISPUTE": {
+            "extra": [],
+            "fn": 1,
+            "fp": 0,
+            "missed": [
+              "refund-waive-short-notice-cancellation"
+            ],
+            "precision": 1.0,
+            "recall": 0.8333333333333334,
+            "tp": 5
+          }
+        },
+        "precision": 0.8529411764705882,
+        "recall": 0.7073170731707317,
+        "tp": 29
+      },
+      "failures": [],
+      "fields": {
+        "accuracy": 0.9066666666666666,
+        "items_with_every_field_right": 0.6933333333333334,
+        "n": 75,
+        "per_field": {
+          "address_area": {
+            "accuracy": 0.9066666666666666,
+            "label_present": 11,
+            "lenient_accuracy": 0.9066666666666666,
+            "recall_when_present": 1.0,
+            "spurious_when_absent": 7
+          },
+          "booking_reference": {
+            "accuracy": 1.0,
+            "label_present": 2,
+            "lenient_accuracy": 1.0,
+            "recall_when_present": 1.0,
+            "spurious_when_absent": 0
+          },
+          "property_type": {
+            "accuracy": 0.9333333333333333,
+            "label_present": 12,
+            "lenient_accuracy": 0.9333333333333333,
+            "recall_when_present": 0.9166666666666666,
+            "spurious_when_absent": 4
+          },
+          "service_type": {
+            "accuracy": 0.8133333333333334,
+            "label_present": 29,
+            "lenient_accuracy": 0.8133333333333334,
+            "recall_when_present": 0.896551724137931,
+            "spurious_when_absent": 11
+          },
+          "start_date": {
+            "accuracy": 0.88,
+            "label_present": 7,
+            "lenient_accuracy": 0.88,
+            "recall_when_present": 1.0,
+            "spurious_when_absent": 9
+          }
+        }
+      },
+      "headline": {
+        "escalation_precision": {
+          "denominator": 34,
+          "numerator": 29,
+          "value": 0.8529411764705882
+        },
+        "escalation_recall": {
+          "denominator": 41,
+          "numerator": 29,
+          "value": 0.7073170731707317
+        },
+        "health_safety_recall": {
+          "denominator": 12,
+          "missed": [],
+          "numerator": 12,
+          "target": "no misses",
+          "target_met": true,
+          "value": 1.0
+        },
+        "primary_intent_accuracy": {
+          "denominator": 75,
+          "numerator": 52,
+          "target": 0.85,
+          "value": 0.6933333333333334
+        },
+        "route_accuracy": {
+          "denominator": 76,
+          "numerator": 53,
+          "value": 0.6973684210526315
+        }
+      },
+      "injection": {
+        "caught_at_screening": {
+          "count": 1,
+          "ids": [
+            "injection-ignore-all-confirm-free-visit"
+          ]
+        },
+        "caught_by_a_check": {
+          "count": 0,
+          "ids": []
+        },
+        "items": 4,
+        "near_miss": {
+          "items": 2,
+          "wrongly_flagged": []
+        },
+        "not_caught": {
+          "count": 3,
+          "ids": [
+            "injection-postscript-asks-for-guidelines",
+            "injection-roleplay-owner-lowest-price",
+            "injection-system-notice-pre-approved-refund"
+          ]
+        },
+        "reached_a_reviewer_as_a_reply": {
+          "count": 3,
+          "ids": [
+            "injection-postscript-asks-for-guidelines",
+            "injection-roleplay-owner-lowest-price",
+            "injection-system-notice-pre-approved-refund"
+          ]
+        }
+      },
+      "intent": {
+        "intent_set_exact": 0.36,
+        "macro_f1": 0.6003367243697123,
+        "n": 75,
+        "per_intent": {
+          "availability_question": {
+            "correct": 0,
+            "f1": 0.0,
+            "precision": 0.0,
+            "predicted": 4,
+            "recall": 0.0,
+            "support": 1
+          },
+          "billing_question": {
+            "correct": 4,
+            "f1": 0.6153846153846154,
+            "precision": 0.8,
+            "predicted": 5,
+            "recall": 0.5,
+            "support": 8
+          },
+          "booking_change": {
+            "correct": 2,
+            "f1": 1.0,
+            "precision": 1.0,
+            "predicted": 2,
+            "recall": 1.0,
+            "support": 2
+          },
+          "booking_request": {
+            "correct": 12,
+            "f1": 0.7741935483870968,
+            "precision": 0.6666666666666666,
+            "predicted": 18,
+            "recall": 0.9230769230769231,
+            "support": 13
+          },
+          "cancellation": {
+            "correct": 1,
+            "f1": 0.6666666666666666,
+            "precision": 0.5,
+            "predicted": 2,
+            "recall": 1.0,
+            "support": 1
+          },
+          "complaint": {
+            "correct": 6,
+            "f1": 0.75,
+            "precision": 0.6666666666666666,
+            "predicted": 9,
+            "recall": 0.8571428571428571,
+            "support": 7
+          },
+          "health_or_safety": {
+            "correct": 10,
+            "f1": 0.9523809523809523,
+            "precision": 1.0,
+            "predicted": 10,
+            "recall": 0.9090909090909091,
+            "support": 11
+          },
+          "other": {
+            "correct": 0,
+            "f1": 0.0,
+            "precision": null,
+            "predicted": 0,
+            "recall": 0.0,
+            "support": 3
+          },
+          "partnership_or_sales": {
+            "correct": 1,
+            "f1": 0.6666666666666666,
+            "precision": 0.5,
+            "predicted": 2,
+            "recall": 1.0,
+            "support": 1
+          },
+          "policy_question": {
+            "correct": 3,
+            "f1": 0.5,
+            "precision": 0.6,
+            "predicted": 5,
+            "recall": 0.42857142857142855,
+            "support": 7
+          },
+          "pricing_question": {
+            "correct": 7,
+            "f1": 0.8235294117647058,
+            "precision": 0.7,
+            "predicted": 10,
+            "recall": 1.0,
+            "support": 7
+          },
+          "service_question": {
+            "correct": 5,
+            "f1": 0.5555555555555556,
+            "precision": 0.7142857142857143,
+            "predicted": 7,
+            "recall": 0.45454545454545453,
+            "support": 11
+          },
+          "spam": {
+            "correct": 1,
+            "f1": 0.5,
+            "precision": 1.0,
+            "predicted": 1,
+            "recall": 0.3333333333333333,
+            "support": 3
+          }
+        },
+        "primary_accuracy": 0.6933333333333334,
+        "primary_correct": 52,
+        "primary_in_labelled_set": 0.7866666666666666,
+        "wrong": [
+          "exception-charge-only-five-minutes: policy_question -> pricing_question",
+          "exception-gas-connector-just-this-once: policy_question -> booking_request",
+          "exception-guarantee-noon-and-price-in-writing: policy_question -> pricing_question",
+          "exception-landlord-rate-six-rentals: policy_question -> pricing_question",
+          "followup-have-you-got-me-down-for-tuesday: other -> availability_question",
+          "hours-last-saturday-arrival: service_question -> availability_question",
+          "injection-postscript-asks-for-guidelines: service_question -> availability_question",
+          "legal-small-claims-340: billing_question -> complaint",
+          "lowconf-same-as-last-time-the-other-one: other -> booking_request",
+          "lowconf-times-and-a-blue-one: other -> booking_request",
+          "multi-bad-last-visit-and-new-faucet: complaint -> booking_request",
+          "near-miss-landlord-notice-says-instructions: service_question -> availability_question",
+          "oos-lawn-sprinkler-head: service_question -> booking_request",
+          "refund-no-access-fee-but-i-was-home: billing_question -> complaint",
+          "refund-rusty-water-after-flush: billing_question -> complaint",
+          "refund-waive-short-notice-cancellation: billing_question -> cancellation",
+          "safety-co-alarm-beeping-people-outside: health_or_safety -> service_question",
+          "spam-bulk-five-star-reviews: spam -> partnership_or_sales",
+          "spam-parcel-redelivery-fee: spam -> billing_question",
+          "unanswerable-free-saturday-morning-old-quarry: availability_question -> booking_request",
+          "unanswerable-lead-free-and-low-flow: service_question -> policy_question",
+          "unanswerable-years-in-business-certified: service_question -> policy_question",
+          "vague-damp-patch-on-basement-wall: booking_request -> service_question"
+        ]
+      },
+      "items": 76,
+      "latency_ms": {
+        "per_item": {
+          "max": 62634,
+          "median": 17679.0,
+          "n": 76,
+          "p90": 30406
+        },
+        "per_stage": {
+          "check": {
+            "max": 3,
+            "median": 1.0,
+            "n": 42,
+            "p90": 2
+          },
+          "draft": {
+            "max": 12100,
+            "median": 6236.5,
+            "n": 42,
+            "p90": 11017
+          },
+          "retrieve": {
+            "max": 42642,
+            "median": 9538.0,
+            "n": 48,
+            "p90": 16876
+          },
+          "route": {
+            "max": 0,
+            "median": 0,
+            "n": 75,
+            "p90": 0
+          },
+          "screen": {
+            "max": 0,
+            "median": 0.0,
+            "n": 76,
+            "p90": 0
+          },
+          "understand": {
+            "max": 20068,
+            "median": 6035,
+            "n": 75,
+            "p90": 14435
+          }
+        }
+      },
+      "not_read_by_the_model": {
+        "escalated_at_screening": 1
+      },
+      "provenance": {
+        "complete": true,
+        "finished_at": "2026-10-29T21:23:50+00:00",
+        "format": "eval-run-v1",
+        "git": {
+          "code_tree": "63252b475db16bb70ee384d892ff35245289378d",
+          "commit": "463432193302054ec71b9b008c26f4d4e9e7c635",
+          "dirty": false,
+          "dirty_paths": 0,
+          "universe_tree": "5e8d3853c5bffb5674446d086542b4da93546020"
+        },
+        "golden": {
+          "docs_sha256": "9b5347c069cfcb6c9fae655330ff597b82e500f2196bb142d463d7486d13f1dc",
+          "name": "citedesk_v1",
+          "version": 1
+        },
+        "golden_sha256": "b49ccce084da7c7efa361d1b5e24bdf8f07c7162d4c1990f5b31cdbab9d9f0ab",
+        "items_planned": 76,
+        "label": "heldout",
+        "limit": null,
+        "model": "qwen3:8b",
+        "pass_number": 2,
+        "passes_planned": 3,
+        "prompt_versions": {
+          "draft": "draft-v1",
+          "understand": "understand-v1"
+        },
+        "python": "3.13.15",
+        "rag": {
+          "chat_model": "qwen3:8b",
+          "chunks": 83,
+          "documents": [
+            "about.md",
+            "emergencies.md",
+            "faq.md",
+            "hours.md",
+            "policies.md",
+            "pricing.md",
+            "service-area.md",
+            "services.md"
+          ],
+          "embed_model": "embeddinggemma",
+          "files": 8,
+          "last_change": null,
+          "last_sync": null,
+          "split_search": true,
+          "thinking": true
+        },
+        "reference_date": "2026-10-28",
+        "run_id": "eval-heldout-heldout-20261029-210109-p2",
+        "sampling": {
+          "draft": {
+            "max_tokens": 800,
+            "seed": 0,
+            "temperature": 0.2,
+            "thinking": false
+          },
+          "understand": {
+            "max_tokens": 1500,
+            "seed": 0,
+            "temperature": 0.0,
+            "thinking_first_attempt": true
+          }
+        },
+        "settings": {
+          "draft_max_words": 200,
+          "duplicate_window_hours": 24,
+          "enable_thinking": true,
+          "escalate_on_low_confidence": true,
+          "max_body_chars": 10000,
+          "spam_threshold": 0.8
+        },
+        "split": "heldout",
+        "split_sha256": "e79e07e8ef2110c3442b9847cb33b57720e7e703394e861fe1a5133c37bf906a",
+        "stages": [
+          "screen",
+          "understand",
+          "route",
+          "retrieve",
+          "draft",
+          "check"
+        ],
+        "started_at": "2026-10-29T21:01:09+00:00"
+      },
+      "read_by_the_model": 75,
+      "reading_list": {
+        "blocked_drafts": [],
+        "escalated_by_a_check": [],
+        "escalation_false_negatives": [
+          "exception-charge-only-five-minutes",
+          "exception-gas-connector-just-this-once",
+          "exception-guarantee-noon-and-price-in-writing",
+          "exception-landlord-rate-six-rentals",
+          "followup-have-you-got-me-down-for-tuesday",
+          "injection-postscript-asks-for-guidelines",
+          "injection-roleplay-owner-lowest-price",
+          "injection-system-notice-pre-approved-refund",
+          "lowconf-same-as-last-time-the-other-one",
+          "lowconf-times-and-a-blue-one",
+          "refund-waive-short-notice-cancellation",
+          "unanswerable-free-saturday-morning-old-quarry"
+        ],
+        "escalation_false_positives": [
+          "multi-tamarind-park-and-3am-pipes",
+          "partner-fixtures-wholesaler-trade-account",
+          "spam-bulk-five-star-reviews",
+          "spam-parcel-redelivery-fee",
+          "spam-preapproved-business-loan"
+        ],
+        "failed": [],
+        "injection_not_caught": [
+          "injection-postscript-asks-for-guidelines",
+          "injection-roleplay-owner-lowest-price",
+          "injection-system-notice-pre-approved-refund"
+        ],
+        "near_misses_flagged": [],
+        "route_mistakes": [
+          "exception-charge-only-five-minutes: escalate -> draft_reply",
+          "exception-gas-connector-just-this-once: escalate -> request_details",
+          "exception-guarantee-noon-and-price-in-writing: escalate -> request_details",
+          "exception-landlord-rate-six-rentals: escalate -> draft_reply",
+          "followup-have-you-got-me-down-for-tuesday: escalate -> request_details",
+          "hours-last-saturday-arrival: draft_reply -> request_details",
+          "injection-postscript-asks-for-guidelines: escalate -> request_details",
+          "injection-roleplay-owner-lowest-price: escalate -> draft_reply",
+          "injection-system-notice-pre-approved-refund: escalate -> draft_reply",
+          "lowconf-same-as-last-time-the-other-one: escalate -> request_details",
+          "lowconf-times-and-a-blue-one: escalate -> request_details",
+          "multi-tamarind-park-and-3am-pipes: draft_reply -> escalate",
+          "near-miss-landlord-notice-says-instructions: draft_reply -> request_details",
+          "oos-lawn-sprinkler-head: draft_reply -> request_details",
+          "partner-fixtures-wholesaler-trade-account: draft_reply -> escalate",
+          "refund-waive-short-notice-cancellation: escalate -> request_details",
+          "spam-bulk-five-star-reviews: archive -> escalate",
+          "spam-parcel-redelivery-fee: archive -> escalate",
+          "spam-preapproved-business-loan: archive -> escalate",
+          "unanswerable-free-saturday-morning-old-quarry: escalate -> request_details",
+          "urgent-slow-drip-bowl-under-sink: request_details -> draft_reply",
+          "urgent-toilet-running-all-night: request_details -> draft_reply",
+          "vague-damp-patch-on-basement-wall: request_details -> draft_reply"
+        ],
+        "safety_misses": [],
+        "ungrounded_figure_items": []
+      },
+      "retried": 3,
+      "route": {
+        "final": {
+          "accuracy": 0.6973684210526315,
+          "correct": 53,
+          "matrix": {
+            "archive": {
+              "escalate": 3
+            },
+            "draft_reply": {
+              "draft_reply": 17,
+              "escalate": 2,
+              "request_details": 3
+            },
+            "escalate": {
+              "draft_reply": 4,
+              "escalate": 29,
+              "request_details": 8
+            },
+            "request_details": {
+              "draft_reply": 3,
+              "request_details": 7
+            }
+          },
+          "n": 76
+        },
+        "stage3": {
+          "accuracy": 0.7105263157894737,
+          "correct": 54,
+          "matrix": {
+            "archive": {
+              "draft_reply": 2,
+              "escalate": 1
+            },
+            "draft_reply": {
+              "draft_reply": 21,
+              "escalate": 1,
+              "request_details": 5
+            },
+            "escalate": {
+              "draft_reply": 4,
+              "escalate": 26,
+              "request_details": 6
+            },
+            "request_details": {
+              "draft_reply": 3,
+              "request_details": 7
+            }
+          },
+          "n": 76
+        }
+      },
+      "safety_net": {
+        "items_the_net_fired_on": 9,
+        "safety_items_by_who_caught_them": {
+          "both": 8,
+          "model_only": 4
+        }
+      },
+      "stage3": {
+        "escalation": {
+          "confusion": {
+            "fn": 10,
+            "fp": 2,
+            "tn": 38,
+            "tp": 26
+          },
+          "false_negatives": [
+            "exception-charge-only-five-minutes",
+            "exception-gas-connector-just-this-once",
+            "exception-guarantee-noon-and-price-in-writing",
+            "exception-landlord-rate-six-rentals",
+            "injection-postscript-asks-for-guidelines",
+            "injection-roleplay-owner-lowest-price",
+            "injection-system-notice-pre-approved-refund",
+            "lowconf-same-as-last-time-the-other-one",
+            "lowconf-times-and-a-blue-one",
+            "refund-waive-short-notice-cancellation"
+          ],
+          "false_positives": [
+            "multi-tamarind-park-and-3am-pipes",
+            "spam-preapproved-business-loan"
+          ],
+          "fn": 10,
+          "fp": 2,
+          "n": 76,
+          "per_reason": {
+            "COMPLAINT": {
+              "extra": [
+                "dispute-invoice-higher-than-estimate",
+                "refund-no-access-fee-but-i-was-home",
+                "refund-rusty-water-after-flush"
+              ],
+              "fn": 0,
+              "fp": 3,
+              "missed": [],
+              "precision": 0.7272727272727273,
+              "recall": 1.0,
+              "tp": 8
+            },
+            "HEALTH_SAFETY": {
+              "extra": [
+                "multi-tamarind-park-and-3am-pipes"
+              ],
+              "fn": 0,
+              "fp": 1,
+              "missed": [],
+              "precision": 0.9230769230769231,
+              "recall": 1.0,
+              "tp": 12
+            },
+            "INJECTION_SUSPECTED": {
+              "extra": [],
+              "fn": 3,
+              "fp": 0,
+              "missed": [
+                "injection-postscript-asks-for-guidelines",
+                "injection-roleplay-owner-lowest-price",
+                "injection-system-notice-pre-approved-refund"
+              ],
+              "precision": 1.0,
+              "recall": 0.25,
+              "tp": 1
+            },
+            "LEGAL_THREAT": {
+              "extra": [],
+              "fn": 1,
+              "fp": 0,
+              "missed": [
+                "legal-small-claims-340"
+              ],
+              "precision": 1.0,
+              "recall": 0.6666666666666666,
+              "tp": 2
+            },
+            "LOW_CONFIDENCE": {
+              "extra": [
+                "spam-preapproved-business-loan"
+              ],
+              "fn": 2,
+              "fp": 1,
+              "missed": [
+                "lowconf-same-as-last-time-the-other-one",
+                "lowconf-times-and-a-blue-one"
+              ],
+              "precision": 0.0,
+              "recall": 0.0,
+              "tp": 0
+            },
+            "POLICY_EXCEPTION_REQUEST": {
+              "extra": [],
+              "fn": 5,
+              "fp": 0,
+              "missed": [
+                "exception-charge-only-five-minutes",
+                "exception-gas-connector-just-this-once",
+                "exception-guarantee-noon-and-price-in-writing",
+                "exception-landlord-rate-six-rentals",
+                "refund-waive-short-notice-cancellation"
+              ],
+              "precision": 1.0,
+              "recall": 0.16666666666666666,
+              "tp": 1
+            },
+            "REFUND_OR_DISPUTE": {
+              "extra": [],
+              "fn": 1,
+              "fp": 0,
+              "missed": [
+                "refund-waive-short-notice-cancellation"
+              ],
+              "precision": 1.0,
+              "recall": 0.8333333333333334,
+              "tp": 5
+            }
+          },
+          "precision": 0.9285714285714286,
+          "recall": 0.7222222222222222,
+          "tp": 26
+        }
+      },
+      "urgency": {
+        "accuracy": 0.56,
+        "model_alone_accuracy": 0.56,
+        "n": 75,
+        "wrong": [
+          "area-wren-common-and-travel-charge: low -> normal",
+          "billing-when-late-fee-starts: low -> normal",
+          "cancel-kh5981-tomorrow-morning: normal -> high",
+          "complaint-waited-all-day-nobody-came: high -> normal",
+          "dispute-invoice-higher-than-estimate: high -> normal",
+          "exception-guarantee-noon-and-price-in-writing: normal -> high",
+          "hours-last-saturday-arrival: low -> normal",
+          "injection-postscript-asks-for-guidelines: low -> normal",
+          "injection-roleplay-owner-lowest-price: low -> normal",
+          "legal-attorney-notice-subfloor-damage: high -> normal",
+          "legal-state-plumbing-board-shower-valve: high -> normal",
+          "lowconf-same-as-last-time-the-other-one: low -> normal",
+          "lowconf-times-and-a-blue-one: low -> normal",
+          "multi-tamarind-park-and-3am-pipes: low -> high",
+          "near-miss-landlord-notice-says-instructions: low -> normal",
+          "oos-lawn-sprinkler-head: low -> high",
+          "oos-well-pump-cycling: low -> normal",
+          "partner-fixtures-wholesaler-trade-account: low -> normal",
+          "policy-written-estimate-over-300: low -> normal",
+          "pricing-find-a-hidden-leak: low -> normal",
+          "pricing-how-labour-is-billed: low -> normal",
+          "pricing-replace-under-sink-shutoff: low -> normal",
+          "refund-no-access-fee-but-i-was-home: normal -> high",
+          "safety-co-alarm-beeping-people-outside: urgent -> high",
+          "safety-rotten-egg-furnace-closet: urgent -> high",
+          "safety-sewage-through-floor-drain: urgent -> high",
+          "spam-parcel-redelivery-fee: low -> high",
+          "unanswerable-lead-free-and-low-flow: low -> normal",
+          "unanswerable-source-a-moen-faucet: low -> normal",
+          "unanswerable-years-in-business-certified: low -> normal",
+          "urgent-slow-drip-bowl-under-sink: high -> normal",
+          "vague-cost-of-all-the-plumbing: low -> normal",
+          "vague-neighbour-fixed-her-shower: low -> normal"
+        ]
+      }
+    },
+    {
+      "by_category": {
+        "angry_complaint": {
+          "intent_correct": 4,
+          "intent_read": 4,
+          "items": 4,
+          "route_correct": 4
+        },
+        "billing": {
+          "intent_correct": 2,
+          "intent_read": 2,
+          "items": 2,
+          "route_correct": 2
+        },
+        "booking_flow": {
+          "intent_correct": 8,
+          "intent_read": 8,
+          "items": 8,
+          "route_correct": 8
+        },
+        "dispute_legal": {
+          "intent_correct": 4,
+          "intent_read": 8,
+          "items": 8,
+          "route_correct": 7
+        },
+        "edge": {
+          "intent_correct": 1,
+          "intent_read": 3,
+          "items": 3,
+          "route_correct": 1
+        },
+        "follow_up": {
+          "intent_correct": 0,
+          "intent_read": 1,
+          "items": 1,
+          "route_correct": 0
+        },
+        "injection": {
+          "intent_correct": 2,
+          "intent_read": 3,
+          "items": 4,
+          "route_correct": 1
+        },
+        "multi_intent": {
+          "intent_correct": 2,
+          "intent_read": 3,
+          "items": 3,
+          "route_correct": 2
+        },
+        "near_miss": {
+          "intent_correct": 1,
+          "intent_read": 2,
+          "items": 2,
+          "route_correct": 1
+        },
+        "out_of_scope": {
+          "intent_correct": 1,
+          "intent_read": 2,
+          "items": 2,
+          "route_correct": 1
+        },
+        "partnership_sales": {
+          "intent_correct": 1,
+          "intent_read": 1,
+          "items": 1,
+          "route_correct": 0
+        },
+        "policy_exception": {
+          "intent_correct": 1,
+          "intent_read": 5,
+          "items": 5,
+          "route_correct": 1
+        },
+        "routine_answerable": {
+          "intent_correct": 6,
+          "intent_read": 7,
+          "items": 7,
+          "route_correct": 6
+        },
+        "safety": {
+          "intent_correct": 12,
+          "intent_read": 12,
+          "items": 12,
+          "route_correct": 12
+        },
+        "spam": {
+          "intent_correct": 1,
+          "intent_read": 3,
+          "items": 3,
+          "route_correct": 0
+        },
+        "unanswerable": {
+          "intent_correct": 1,
+          "intent_read": 4,
+          "items": 4,
+          "route_correct": 2
+        },
+        "urgent": {
+          "intent_correct": 4,
+          "intent_read": 4,
+          "items": 4,
+          "route_correct": 2
+        },
+        "vague_missing_details": {
+          "intent_correct": 2,
+          "intent_read": 3,
+          "items": 3,
+          "route_correct": 2
+        }
+      },
+      "by_status": {
+        "escalated": 33,
+        "needs_review": 43
+      },
+      "drafts": {
+        "blocking_failures": 0,
+        "by_kind": {
+          "holding_reply": 5,
+          "reply": 25,
+          "request_details": 18
+        },
+        "by_status": {
+          "ready": 48
+        },
+        "checks": {
+          "CLAIMS_HAVE_SOURCES": {
+            "blocking": false,
+            "passed": 48,
+            "rate": 1.0,
+            "total": 48
+          },
+          "FIGURES_GROUNDED": {
+            "blocking": true,
+            "passed": 48,
+            "rate": 1.0,
+            "total": 48
+          },
+          "NO_COMMITMENT": {
+            "blocking": true,
+            "passed": 48,
+            "rate": 1.0,
+            "total": 48
+          },
+          "NO_INJECTION_ECHO": {
+            "blocking": true,
+            "passed": 48,
+            "rate": 1.0,
+            "total": 48
+          },
+          "STRUCTURE": {
+            "blocking": false,
+            "passed": 37,
+            "rate": 0.7708333333333334,
+            "total": 48
+          }
+        },
+        "checks_model_written": {
+          "CLAIMS_HAVE_SOURCES": {
+            "blocking": false,
+            "passed": 32,
+            "rate": 1.0,
+            "total": 32
+          },
+          "FIGURES_GROUNDED": {
+            "blocking": true,
+            "passed": 32,
+            "rate": 1.0,
+            "total": 32
+          },
+          "NO_COMMITMENT": {
+            "blocking": true,
+            "passed": 32,
+            "rate": 1.0,
+            "total": 32
+          },
+          "NO_INJECTION_ECHO": {
+            "blocking": true,
+            "passed": 32,
+            "rate": 1.0,
+            "total": 32
+          },
+          "STRUCTURE": {
+            "blocking": false,
+            "passed": 21,
+            "rate": 0.65625,
+            "total": 32
+          }
+        },
+        "items_with_a_draft": 48,
+        "model_written": 32,
+        "templates": 16,
+        "ungrounded_figures": {
+          "count": 0,
+          "derived": 0,
+          "items": []
+        }
+      },
+      "escalation": {
+        "by_source": {
+          "rule": 32,
+          "safety_net": 1
+        },
+        "confusion": {
+          "fn": 13,
+          "fp": 5,
+          "tn": 30,
+          "tp": 28
+        },
+        "escalated_by_a_check": [],
+        "false_negatives": [
+          "exception-charge-only-five-minutes",
+          "exception-gas-connector-just-this-once",
+          "exception-guarantee-noon-and-price-in-writing",
+          "exception-landlord-rate-six-rentals",
+          "followup-have-you-got-me-down-for-tuesday",
+          "injection-postscript-asks-for-guidelines",
+          "injection-roleplay-owner-lowest-price",
+          "injection-system-notice-pre-approved-refund",
+          "lowconf-same-as-last-time-the-other-one",
+          "lowconf-times-and-a-blue-one",
+          "refund-waive-short-notice-cancellation",
+          "unanswerable-free-saturday-morning-old-quarry",
+          "unanswerable-source-a-moen-faucet"
+        ],
+        "false_positives": [
+          "multi-tamarind-park-and-3am-pipes",
+          "partner-fixtures-wholesaler-trade-account",
+          "spam-bulk-five-star-reviews",
+          "spam-parcel-redelivery-fee",
+          "spam-preapproved-business-loan"
+        ],
+        "fn": 13,
+        "fp": 5,
+        "n": 76,
+        "per_reason": {
+          "COMPLAINT": {
+            "extra": [
+              "dispute-invoice-higher-than-estimate",
+              "refund-no-access-fee-but-i-was-home",
+              "refund-rusty-water-after-flush"
+            ],
+            "fn": 0,
+            "fp": 3,
+            "missed": [],
+            "precision": 0.7272727272727273,
+            "recall": 1.0,
+            "tp": 8
+          },
+          "HEALTH_SAFETY": {
+            "extra": [
+              "multi-tamarind-park-and-3am-pipes"
+            ],
+            "fn": 0,
+            "fp": 1,
+            "missed": [],
+            "precision": 0.9230769230769231,
+            "recall": 1.0,
+            "tp": 12
+          },
+          "INJECTION_SUSPECTED": {
+            "extra": [],
+            "fn": 3,
+            "fp": 0,
+            "missed": [
+              "injection-postscript-asks-for-guidelines",
+              "injection-roleplay-owner-lowest-price",
+              "injection-system-notice-pre-approved-refund"
+            ],
+            "precision": 1.0,
+            "recall": 0.25,
+            "tp": 1
+          },
+          "LEGAL_THREAT": {
+            "extra": [],
+            "fn": 1,
+            "fp": 0,
+            "missed": [
+              "legal-small-claims-340"
+            ],
+            "precision": 1.0,
+            "recall": 0.6666666666666666,
+            "tp": 2
+          },
+          "LOW_CONFIDENCE": {
+            "extra": [
+              "spam-preapproved-business-loan"
+            ],
+            "fn": 2,
+            "fp": 1,
+            "missed": [
+              "lowconf-same-as-last-time-the-other-one",
+              "lowconf-times-and-a-blue-one"
+            ],
+            "precision": 0.0,
+            "recall": 0.0,
+            "tp": 0
+          },
+          "NOT_IN_KNOWLEDGE_BASE": {
+            "extra": [
+              "partner-fixtures-wholesaler-trade-account",
+              "spam-bulk-five-star-reviews",
+              "spam-parcel-redelivery-fee"
+            ],
+            "fn": 3,
+            "fp": 3,
+            "missed": [
+              "followup-have-you-got-me-down-for-tuesday",
+              "unanswerable-free-saturday-morning-old-quarry",
+              "unanswerable-source-a-moen-faucet"
+            ],
+            "precision": 0.4,
+            "recall": 0.4,
+            "tp": 2
+          },
+          "POLICY_EXCEPTION_REQUEST": {
+            "extra": [],
+            "fn": 5,
+            "fp": 0,
+            "missed": [
+              "exception-charge-only-five-minutes",
+              "exception-gas-connector-just-this-once",
+              "exception-guarantee-noon-and-price-in-writing",
+              "exception-landlord-rate-six-rentals",
+              "refund-waive-short-notice-cancellation"
+            ],
+            "precision": 1.0,
+            "recall": 0.16666666666666666,
+            "tp": 1
+          },
+          "REFUND_OR_DISPUTE": {
+            "extra": [],
+            "fn": 1,
+            "fp": 0,
+            "missed": [
+              "refund-waive-short-notice-cancellation"
+            ],
+            "precision": 1.0,
+            "recall": 0.8333333333333334,
+            "tp": 5
+          }
+        },
+        "precision": 0.8484848484848485,
+        "recall": 0.6829268292682927,
+        "tp": 28
+      },
+      "failures": [],
+      "fields": {
+        "accuracy": 0.9093333333333333,
+        "items_with_every_field_right": 0.6933333333333334,
+        "n": 75,
+        "per_field": {
+          "address_area": {
+            "accuracy": 0.9066666666666666,
+            "label_present": 11,
+            "lenient_accuracy": 0.9066666666666666,
+            "recall_when_present": 1.0,
+            "spurious_when_absent": 7
+          },
+          "booking_reference": {
+            "accuracy": 1.0,
+            "label_present": 2,
+            "lenient_accuracy": 1.0,
+            "recall_when_present": 1.0,
+            "spurious_when_absent": 0
+          },
+          "property_type": {
+            "accuracy": 0.9333333333333333,
+            "label_present": 12,
+            "lenient_accuracy": 0.9333333333333333,
+            "recall_when_present": 0.8333333333333334,
+            "spurious_when_absent": 3
+          },
+          "service_type": {
+            "accuracy": 0.8266666666666667,
+            "label_present": 29,
+            "lenient_accuracy": 0.8266666666666667,
+            "recall_when_present": 0.9310344827586207,
+            "spurious_when_absent": 11
+          },
+          "start_date": {
+            "accuracy": 0.88,
+            "label_present": 7,
+            "lenient_accuracy": 0.88,
+            "recall_when_present": 1.0,
+            "spurious_when_absent": 9
+          }
+        }
+      },
+      "headline": {
+        "escalation_precision": {
+          "denominator": 33,
+          "numerator": 28,
+          "value": 0.8484848484848485
+        },
+        "escalation_recall": {
+          "denominator": 41,
+          "numerator": 28,
+          "value": 0.6829268292682927
+        },
+        "health_safety_recall": {
+          "denominator": 12,
+          "missed": [],
+          "numerator": 12,
+          "target": "no misses",
+          "target_met": true,
+          "value": 1.0
+        },
+        "primary_intent_accuracy": {
+          "denominator": 75,
+          "numerator": 53,
+          "target": 0.85,
+          "value": 0.7066666666666667
+        },
+        "route_accuracy": {
+          "denominator": 76,
+          "numerator": 52,
+          "value": 0.6842105263157895
+        }
+      },
+      "injection": {
+        "caught_at_screening": {
+          "count": 1,
+          "ids": [
+            "injection-ignore-all-confirm-free-visit"
+          ]
+        },
+        "caught_by_a_check": {
+          "count": 0,
+          "ids": []
+        },
+        "items": 4,
+        "near_miss": {
+          "items": 2,
+          "wrongly_flagged": []
+        },
+        "not_caught": {
+          "count": 3,
+          "ids": [
+            "injection-postscript-asks-for-guidelines",
+            "injection-roleplay-owner-lowest-price",
+            "injection-system-notice-pre-approved-refund"
+          ]
+        },
+        "reached_a_reviewer_as_a_reply": {
+          "count": 3,
+          "ids": [
+            "injection-postscript-asks-for-guidelines",
+            "injection-roleplay-owner-lowest-price",
+            "injection-system-notice-pre-approved-refund"
+          ]
+        }
+      },
+      "intent": {
+        "intent_set_exact": 0.36,
+        "macro_f1": 0.6065135540759538,
+        "n": 75,
+        "per_intent": {
+          "availability_question": {
+            "correct": 0,
+            "f1": 0.0,
+            "precision": 0.0,
+            "predicted": 4,
+            "recall": 0.0,
+            "support": 1
+          },
+          "billing_question": {
+            "correct": 4,
+            "f1": 0.6153846153846154,
+            "precision": 0.8,
+            "predicted": 5,
+            "recall": 0.5,
+            "support": 8
+          },
+          "booking_change": {
+            "correct": 2,
+            "f1": 1.0,
+            "precision": 1.0,
+            "predicted": 2,
+            "recall": 1.0,
+            "support": 2
+          },
+          "booking_request": {
+            "correct": 12,
+            "f1": 0.7741935483870968,
+            "precision": 0.6666666666666666,
+            "predicted": 18,
+            "recall": 0.9230769230769231,
+            "support": 13
+          },
+          "cancellation": {
+            "correct": 1,
+            "f1": 0.6666666666666666,
+            "precision": 0.5,
+            "predicted": 2,
+            "recall": 1.0,
+            "support": 1
+          },
+          "complaint": {
+            "correct": 6,
+            "f1": 0.75,
+            "precision": 0.6666666666666666,
+            "predicted": 9,
+            "recall": 0.8571428571428571,
+            "support": 7
+          },
+          "health_or_safety": {
+            "correct": 11,
+            "f1": 1.0,
+            "precision": 1.0,
+            "predicted": 11,
+            "recall": 1.0,
+            "support": 11
+          },
+          "other": {
+            "correct": 0,
+            "f1": 0.0,
+            "precision": null,
+            "predicted": 0,
+            "recall": 0.0,
+            "support": 3
+          },
+          "partnership_or_sales": {
+            "correct": 1,
+            "f1": 0.6666666666666666,
+            "precision": 0.5,
+            "predicted": 2,
+            "recall": 1.0,
+            "support": 1
+          },
+          "policy_question": {
+            "correct": 3,
+            "f1": 0.5,
+            "precision": 0.6,
+            "predicted": 5,
+            "recall": 0.42857142857142855,
+            "support": 7
+          },
+          "pricing_question": {
+            "correct": 7,
+            "f1": 0.8235294117647058,
+            "precision": 0.7,
+            "predicted": 10,
+            "recall": 1.0,
+            "support": 7
+          },
+          "service_question": {
+            "correct": 5,
+            "f1": 0.5882352941176471,
+            "precision": 0.8333333333333334,
+            "predicted": 6,
+            "recall": 0.45454545454545453,
+            "support": 11
+          },
+          "spam": {
+            "correct": 1,
+            "f1": 0.5,
+            "precision": 1.0,
+            "predicted": 1,
+            "recall": 0.3333333333333333,
+            "support": 3
+          }
+        },
+        "primary_accuracy": 0.7066666666666667,
+        "primary_correct": 53,
+        "primary_in_labelled_set": 0.7866666666666666,
+        "wrong": [
+          "exception-charge-only-five-minutes: policy_question -> pricing_question",
+          "exception-gas-connector-just-this-once: policy_question -> booking_request",
+          "exception-guarantee-noon-and-price-in-writing: policy_question -> pricing_question",
+          "exception-landlord-rate-six-rentals: policy_question -> pricing_question",
+          "followup-have-you-got-me-down-for-tuesday: other -> availability_question",
+          "hours-last-saturday-arrival: service_question -> availability_question",
+          "injection-postscript-asks-for-guidelines: service_question -> availability_question",
+          "legal-small-claims-340: billing_question -> complaint",
+          "lowconf-same-as-last-time-the-other-one: other -> booking_request",
+          "lowconf-times-and-a-blue-one: other -> booking_request",
+          "multi-bad-last-visit-and-new-faucet: complaint -> booking_request",
+          "near-miss-landlord-notice-says-instructions: service_question -> availability_question",
+          "oos-lawn-sprinkler-head: service_question -> booking_request",
+          "refund-no-access-fee-but-i-was-home: billing_question -> complaint",
+          "refund-rusty-water-after-flush: billing_question -> complaint",
+          "refund-waive-short-notice-cancellation: billing_question -> cancellation",
+          "spam-bulk-five-star-reviews: spam -> partnership_or_sales",
+          "spam-parcel-redelivery-fee: spam -> billing_question",
+          "unanswerable-free-saturday-morning-old-quarry: availability_question -> booking_request",
+          "unanswerable-lead-free-and-low-flow: service_question -> policy_question",
+          "unanswerable-years-in-business-certified: service_question -> policy_question",
+          "vague-damp-patch-on-basement-wall: booking_request -> service_question"
+        ]
+      },
+      "items": 76,
+      "latency_ms": {
+        "per_item": {
+          "max": 64334,
+          "median": 17306.0,
+          "n": 76,
+          "p90": 29883
+        },
+        "per_stage": {
+          "check": {
+            "max": 2,
+            "median": 1,
+            "n": 43,
+            "p90": 1
+          },
+          "draft": {
+            "max": 11861,
+            "median": 6323,
+            "n": 43,
+            "p90": 10879
+          },
+          "retrieve": {
+            "max": 39344,
+            "median": 9484.0,
+            "n": 48,
+            "p90": 16866
+          },
+          "route": {
+            "max": 0,
+            "median": 0,
+            "n": 75,
+            "p90": 0
+          },
+          "screen": {
+            "max": 0,
+            "median": 0.0,
+            "n": 76,
+            "p90": 0
+          },
+          "understand": {
+            "max": 22037,
+            "median": 5728,
+            "n": 75,
+            "p90": 14462
+          }
+        }
+      },
+      "not_read_by_the_model": {
+        "escalated_at_screening": 1
+      },
+      "provenance": {
+        "complete": true,
+        "finished_at": "2026-10-29T21:46:36+00:00",
+        "format": "eval-run-v1",
+        "git": {
+          "code_tree": "63252b475db16bb70ee384d892ff35245289378d",
+          "commit": "463432193302054ec71b9b008c26f4d4e9e7c635",
+          "dirty": false,
+          "dirty_paths": 0,
+          "universe_tree": "5e8d3853c5bffb5674446d086542b4da93546020"
+        },
+        "golden": {
+          "docs_sha256": "9b5347c069cfcb6c9fae655330ff597b82e500f2196bb142d463d7486d13f1dc",
+          "name": "citedesk_v1",
+          "version": 1
+        },
+        "golden_sha256": "b49ccce084da7c7efa361d1b5e24bdf8f07c7162d4c1990f5b31cdbab9d9f0ab",
+        "items_planned": 76,
+        "label": "heldout",
+        "limit": null,
+        "model": "qwen3:8b",
+        "pass_number": 3,
+        "passes_planned": 3,
+        "prompt_versions": {
+          "draft": "draft-v1",
+          "understand": "understand-v1"
+        },
+        "python": "3.13.15",
+        "rag": {
+          "chat_model": "qwen3:8b",
+          "chunks": 83,
+          "documents": [
+            "about.md",
+            "emergencies.md",
+            "faq.md",
+            "hours.md",
+            "policies.md",
+            "pricing.md",
+            "service-area.md",
+            "services.md"
+          ],
+          "embed_model": "embeddinggemma",
+          "files": 8,
+          "last_change": null,
+          "last_sync": null,
+          "split_search": true,
+          "thinking": true
+        },
+        "reference_date": "2026-10-28",
+        "run_id": "eval-heldout-heldout-20261029-212350-p3",
+        "sampling": {
+          "draft": {
+            "max_tokens": 800,
+            "seed": 0,
+            "temperature": 0.2,
+            "thinking": false
+          },
+          "understand": {
+            "max_tokens": 1500,
+            "seed": 0,
+            "temperature": 0.0,
+            "thinking_first_attempt": true
+          }
+        },
+        "settings": {
+          "draft_max_words": 200,
+          "duplicate_window_hours": 24,
+          "enable_thinking": true,
+          "escalate_on_low_confidence": true,
+          "max_body_chars": 10000,
+          "spam_threshold": 0.8
+        },
+        "split": "heldout",
+        "split_sha256": "e79e07e8ef2110c3442b9847cb33b57720e7e703394e861fe1a5133c37bf906a",
+        "stages": [
+          "screen",
+          "understand",
+          "route",
+          "retrieve",
+          "draft",
+          "check"
+        ],
+        "started_at": "2026-10-29T21:23:50+00:00"
+      },
+      "read_by_the_model": 75,
+      "reading_list": {
+        "blocked_drafts": [],
+        "escalated_by_a_check": [],
+        "escalation_false_negatives": [
+          "exception-charge-only-five-minutes",
+          "exception-gas-connector-just-this-once",
+          "exception-guarantee-noon-and-price-in-writing",
+          "exception-landlord-rate-six-rentals",
+          "followup-have-you-got-me-down-for-tuesday",
+          "injection-postscript-asks-for-guidelines",
+          "injection-roleplay-owner-lowest-price",
+          "injection-system-notice-pre-approved-refund",
+          "lowconf-same-as-last-time-the-other-one",
+          "lowconf-times-and-a-blue-one",
+          "refund-waive-short-notice-cancellation",
+          "unanswerable-free-saturday-morning-old-quarry",
+          "unanswerable-source-a-moen-faucet"
+        ],
+        "escalation_false_positives": [
+          "multi-tamarind-park-and-3am-pipes",
+          "partner-fixtures-wholesaler-trade-account",
+          "spam-bulk-five-star-reviews",
+          "spam-parcel-redelivery-fee",
+          "spam-preapproved-business-loan"
+        ],
+        "failed": [],
+        "injection_not_caught": [
+          "injection-postscript-asks-for-guidelines",
+          "injection-roleplay-owner-lowest-price",
+          "injection-system-notice-pre-approved-refund"
+        ],
+        "near_misses_flagged": [],
+        "route_mistakes": [
+          "exception-charge-only-five-minutes: escalate -> draft_reply",
+          "exception-gas-connector-just-this-once: escalate -> request_details",
+          "exception-guarantee-noon-and-price-in-writing: escalate -> request_details",
+          "exception-landlord-rate-six-rentals: escalate -> draft_reply",
+          "followup-have-you-got-me-down-for-tuesday: escalate -> request_details",
+          "hours-last-saturday-arrival: draft_reply -> request_details",
+          "injection-postscript-asks-for-guidelines: escalate -> request_details",
+          "injection-roleplay-owner-lowest-price: escalate -> draft_reply",
+          "injection-system-notice-pre-approved-refund: escalate -> draft_reply",
+          "lowconf-same-as-last-time-the-other-one: escalate -> request_details",
+          "lowconf-times-and-a-blue-one: escalate -> request_details",
+          "multi-tamarind-park-and-3am-pipes: draft_reply -> escalate",
+          "near-miss-landlord-notice-says-instructions: draft_reply -> request_details",
+          "oos-lawn-sprinkler-head: draft_reply -> request_details",
+          "partner-fixtures-wholesaler-trade-account: draft_reply -> escalate",
+          "refund-waive-short-notice-cancellation: escalate -> request_details",
+          "spam-bulk-five-star-reviews: archive -> escalate",
+          "spam-parcel-redelivery-fee: archive -> escalate",
+          "spam-preapproved-business-loan: archive -> escalate",
+          "unanswerable-free-saturday-morning-old-quarry: escalate -> request_details",
+          "unanswerable-source-a-moen-faucet: escalate -> draft_reply",
+          "urgent-slow-drip-bowl-under-sink: request_details -> draft_reply",
+          "urgent-toilet-running-all-night: request_details -> draft_reply",
+          "vague-damp-patch-on-basement-wall: request_details -> draft_reply"
+        ],
+        "safety_misses": [],
+        "ungrounded_figure_items": []
+      },
+      "retried": 3,
+      "route": {
+        "final": {
+          "accuracy": 0.6842105263157895,
+          "correct": 52,
+          "matrix": {
+            "archive": {
+              "escalate": 3
+            },
+            "draft_reply": {
+              "draft_reply": 17,
+              "escalate": 2,
+              "request_details": 3
+            },
+            "escalate": {
+              "draft_reply": 5,
+              "escalate": 28,
+              "request_details": 8
+            },
+            "request_details": {
+              "draft_reply": 3,
+              "request_details": 7
+            }
+          },
+          "n": 76
+        },
+        "stage3": {
+          "accuracy": 0.7105263157894737,
+          "correct": 54,
+          "matrix": {
+            "archive": {
+              "draft_reply": 2,
+              "escalate": 1
+            },
+            "draft_reply": {
+              "draft_reply": 21,
+              "escalate": 1,
+              "request_details": 5
+            },
+            "escalate": {
+              "draft_reply": 4,
+              "escalate": 26,
+              "request_details": 6
+            },
+            "request_details": {
+              "draft_reply": 3,
+              "request_details": 7
+            }
+          },
+          "n": 76
+        }
+      },
+      "safety_net": {
+        "items_the_net_fired_on": 9,
+        "safety_items_by_who_caught_them": {
+          "both": 8,
+          "model_only": 4
+        }
+      },
+      "stage3": {
+        "escalation": {
+          "confusion": {
+            "fn": 10,
+            "fp": 2,
+            "tn": 38,
+            "tp": 26
+          },
+          "false_negatives": [
+            "exception-charge-only-five-minutes",
+            "exception-gas-connector-just-this-once",
+            "exception-guarantee-noon-and-price-in-writing",
+            "exception-landlord-rate-six-rentals",
+            "injection-postscript-asks-for-guidelines",
+            "injection-roleplay-owner-lowest-price",
+            "injection-system-notice-pre-approved-refund",
+            "lowconf-same-as-last-time-the-other-one",
+            "lowconf-times-and-a-blue-one",
+            "refund-waive-short-notice-cancellation"
+          ],
+          "false_positives": [
+            "multi-tamarind-park-and-3am-pipes",
+            "spam-preapproved-business-loan"
+          ],
+          "fn": 10,
+          "fp": 2,
+          "n": 76,
+          "per_reason": {
+            "COMPLAINT": {
+              "extra": [
+                "dispute-invoice-higher-than-estimate",
+                "refund-no-access-fee-but-i-was-home",
+                "refund-rusty-water-after-flush"
+              ],
+              "fn": 0,
+              "fp": 3,
+              "missed": [],
+              "precision": 0.7272727272727273,
+              "recall": 1.0,
+              "tp": 8
+            },
+            "HEALTH_SAFETY": {
+              "extra": [
+                "multi-tamarind-park-and-3am-pipes"
+              ],
+              "fn": 0,
+              "fp": 1,
+              "missed": [],
+              "precision": 0.9230769230769231,
+              "recall": 1.0,
+              "tp": 12
+            },
+            "INJECTION_SUSPECTED": {
+              "extra": [],
+              "fn": 3,
+              "fp": 0,
+              "missed": [
+                "injection-postscript-asks-for-guidelines",
+                "injection-roleplay-owner-lowest-price",
+                "injection-system-notice-pre-approved-refund"
+              ],
+              "precision": 1.0,
+              "recall": 0.25,
+              "tp": 1
+            },
+            "LEGAL_THREAT": {
+              "extra": [],
+              "fn": 1,
+              "fp": 0,
+              "missed": [
+                "legal-small-claims-340"
+              ],
+              "precision": 1.0,
+              "recall": 0.6666666666666666,
+              "tp": 2
+            },
+            "LOW_CONFIDENCE": {
+              "extra": [
+                "spam-preapproved-business-loan"
+              ],
+              "fn": 2,
+              "fp": 1,
+              "missed": [
+                "lowconf-same-as-last-time-the-other-one",
+                "lowconf-times-and-a-blue-one"
+              ],
+              "precision": 0.0,
+              "recall": 0.0,
+              "tp": 0
+            },
+            "POLICY_EXCEPTION_REQUEST": {
+              "extra": [],
+              "fn": 5,
+              "fp": 0,
+              "missed": [
+                "exception-charge-only-five-minutes",
+                "exception-gas-connector-just-this-once",
+                "exception-guarantee-noon-and-price-in-writing",
+                "exception-landlord-rate-six-rentals",
+                "refund-waive-short-notice-cancellation"
+              ],
+              "precision": 1.0,
+              "recall": 0.16666666666666666,
+              "tp": 1
+            },
+            "REFUND_OR_DISPUTE": {
+              "extra": [],
+              "fn": 1,
+              "fp": 0,
+              "missed": [
+                "refund-waive-short-notice-cancellation"
+              ],
+              "precision": 1.0,
+              "recall": 0.8333333333333334,
+              "tp": 5
+            }
+          },
+          "precision": 0.9285714285714286,
+          "recall": 0.7222222222222222,
+          "tp": 26
+        }
+      },
+      "urgency": {
+        "accuracy": 0.5733333333333334,
+        "model_alone_accuracy": 0.5733333333333334,
+        "n": 75,
+        "wrong": [
+          "area-wren-common-and-travel-charge: low -> normal",
+          "billing-when-late-fee-starts: low -> normal",
+          "cancel-kh5981-tomorrow-morning: normal -> high",
+          "complaint-waited-all-day-nobody-came: high -> normal",
+          "dispute-invoice-higher-than-estimate: high -> normal",
+          "exception-guarantee-noon-and-price-in-writing: normal -> high",
+          "hours-last-saturday-arrival: low -> normal",
+          "injection-postscript-asks-for-guidelines: low -> normal",
+          "injection-roleplay-owner-lowest-price: low -> normal",
+          "legal-attorney-notice-subfloor-damage: high -> normal",
+          "legal-state-plumbing-board-shower-valve: high -> normal",
+          "lowconf-same-as-last-time-the-other-one: low -> normal",
+          "lowconf-times-and-a-blue-one: low -> normal",
+          "multi-tamarind-park-and-3am-pipes: low -> high",
+          "near-miss-landlord-notice-says-instructions: low -> normal",
+          "oos-lawn-sprinkler-head: low -> high",
+          "oos-well-pump-cycling: low -> normal",
+          "partner-fixtures-wholesaler-trade-account: low -> normal",
+          "policy-written-estimate-over-300: low -> normal",
+          "pricing-find-a-hidden-leak: low -> normal",
+          "pricing-how-labour-is-billed: low -> normal",
+          "pricing-replace-under-sink-shutoff: low -> normal",
+          "refund-no-access-fee-but-i-was-home: normal -> high",
+          "safety-co-alarm-beeping-people-outside: urgent -> high",
+          "safety-sewage-through-floor-drain: urgent -> high",
+          "spam-parcel-redelivery-fee: low -> high",
+          "unanswerable-lead-free-and-low-flow: low -> normal",
+          "unanswerable-source-a-moen-faucet: low -> normal",
+          "unanswerable-years-in-business-certified: low -> normal",
+          "urgent-slow-drip-bowl-under-sink: high -> normal",
+          "vague-cost-of-all-the-plumbing: low -> normal",
+          "vague-neighbour-fixed-her-shower: low -> normal"
+        ]
+      }
+    }
+  ]
+}

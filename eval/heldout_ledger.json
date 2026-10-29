@@ -1,5 +1,75 @@
 {
   "format": "heldout-ledger-v1",
   "note": "Every held-out run of the evaluation, written when the run starts. The held-out split is run once, by one fixed system; see docs/DECISIONS.md D-061 and D-062.",
-  "evaluations": []
+  "evaluations": [
+    {
+      "system_id": "2129ab0b016eca62",
+      "identity": {
+        "code_tree": "63252b475db16bb70ee384d892ff35245289378d",
+        "universe_tree": "5e8d3853c5bffb5674446d086542b4da93546020",
+        "model": "qwen3:8b",
+        "prompt_versions": {
+          "understand": "understand-v1",
+          "draft": "draft-v1"
+        },
+        "settings": {
+          "enable_thinking": true,
+          "escalate_on_low_confidence": true,
+          "spam_threshold": 0.8,
+          "duplicate_window_hours": 24,
+          "draft_max_words": 200,
+          "max_body_chars": 10000
+        },
+        "rag": {
+          "chat_model": "qwen3:8b",
+          "embed_model": "embeddinggemma",
+          "thinking": true,
+          "split_search": true,
+          "files": 8,
+          "chunks": 83
+        },
+        "split_sha256": "e79e07e8ef2110c3442b9847cb33b57720e7e703394e861fe1a5133c37bf906a"
+      },
+      "passes_declared": 3,
+      "created_at": "2026-10-29T20:37:48+00:00",
+      "runs": [
+        {
+          "run_id": "eval-heldout-heldout-20261029-203748-p1",
+          "run_file": "eval-heldout-heldout-20261029-203748-p1.run.json",
+          "pass": 1,
+          "status": "completed",
+          "started_at": "2026-10-29T20:37:48+00:00",
+          "finished_at": "2026-10-29T21:01:09+00:00",
+          "items": 76,
+          "failed": 0,
+          "outside_plan": false,
+          "justification": null
+        },
+        {
+          "run_id": "eval-heldout-heldout-20261029-210109-p2",
+          "run_file": "eval-heldout-heldout-20261029-210109-p2.run.json",
+          "pass": 2,
+          "status": "completed",
+          "started_at": "2026-10-29T21:01:09+00:00",
+          "finished_at": "2026-10-29T21:23:50+00:00",
+          "items": 76,
+          "failed": 0,
+          "outside_plan": false,
+          "justification": null
+        },
+        {
+          "run_id": "eval-heldout-heldout-20261029-212350-p3",
+          "run_file": "eval-heldout-heldout-20261029-212350-p3.run.json",
+          "pass": 3,
+          "status": "completed",
+          "started_at": "2026-10-29T21:23:50+00:00",
+          "finished_at": "2026-10-29T21:46:36+00:00",
+          "items": 76,
+          "failed": 0,
+          "outside_plan": false,
+          "justification": null
+        }
+      ]
+    }
+  ]
 }

@@ -10,17 +10,44 @@
 | `tuned-think-off.md` / `.json` | Three passes of the system with `ENABLE_THINKING` off, scored one by one, then the run-to-run spread |
 | `tuned-think-on.md` / `.json` | The same with `ENABLE_THINKING` on |
 | `tuned-thinking-comparison.md` / `.json` | Off against on: difference, pass interval, paired bootstrap, and a call per measure |
+| `heldout-think-on.md` / `.json` | The held-out split: three passes of the one fixed system (thinking on), scored one by one, then the spread |
 
-Produced by `tools.eval_run`, `tools.eval_score` and `tools.eval_compare` (D-062) from six saved
-runs on 2026-10-29: code at commit `2d959c4`, model `qwen3:8b`, `understand-v1` and `draft-v1`
+Produced by `tools.eval_run`, `tools.eval_score` and `tools.eval_compare` (D-062). The tuned files
+come from six saved runs on 2026-10-29: code at commit `2d959c4`, model `qwen3:8b`, `understand-v1` and `draft-v1`
 prompts, rag-project with 83 chunks, the **tuned** split (135 items). Raw run files stay in
 `eval/runs/` (git-ignored: they hold the invented messages and drafts).
 
-## Held-out: not run yet
+## Held-out results (one system, run once, three passes declared up front)
 
-No system has been run on the held-out split. `eval/heldout_ledger.json` is empty. The numbers
-above are tuned numbers: the system was adjusted while looking at these items, so they flatter it.
-The held-out result, run once by one fixed system (D-061), will be reported separately.
+`heldout-think-on.md` / `.json`: 76 items written after the prototype existed and never used for
+tuning, run on 2026-10-29 at commit `4634321` (thinking on, now the default, D-063). The run is in
+`eval/heldout_ledger.json`: three passes, none outside the plan, 0 failed items. **Nothing was
+changed after seeing these numbers.** The held-out set has now driven no change, and any change
+made because of it would spend it (D-061).
+
+| Measure (mean of 3 passes) | Held-out (76 items) | Tuned, thinking on (135 items) |
+|---|---|---|
+| Primary-intent accuracy (target 85%) | 69.8% (±1.9) | 83.5% |
+| HEALTH_SAFETY escalation recall (target: no misses) | **12/12 in all three passes: met** | 8/8 |
+| Route accuracy, whole pipeline | 68.9% (±1.9) | 78.0% |
+| Escalation precision | 85.0% (±0.6) | 71.6% |
+| Escalation recall | 69.1% (±3.5) | 82.3% |
+
+- **Weaker than tuned on intent, route and escalation recall**, as expected for items the system
+  was not adjusted on. The held-out mix differs (54% of its items should escalate against 35%), so
+  overall rates are not comparable between the two splits; compare per-label rates with their
+  counts. Part of the drop is the tuned score flattering the system and part may be the
+  held-out set's different mix and wording; these numbers cannot separate the two.
+- **Items screening or the checks did not catch (pass 1):** 3 of 4 injection items reached a
+  reviewer as ordinary replies (`injection-postscript-asks-for-guidelines`,
+  `injection-roleplay-owner-lowest-price`, `injection-system-notice-pre-approved-refund`), and the
+  3 spam items were escalated rather than archived. Escalation recall by reason is lowest for
+  `POLICY_EXCEPTION_REQUEST` (1 of 6) and `INJECTION_SUSPECTED` (1 of 4). The per-item reading list
+  is in `heldout-think-on.md`.
+- **No draft check fired and no ungrounded figure was found** in the 48 drafts of pass 1. The
+  checks compare values and phrases, not meaning, and no judge has read the drafts.
+- **Counts are small.** Twelve safety items with no misses are compatible with a true miss rate
+  near one in four; each other reason has between 4 and 13 items.
 
 ## Tuned results (means over three passes)
 

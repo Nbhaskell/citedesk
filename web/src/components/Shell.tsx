@@ -1,7 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { app } from "../copy";
+import { shortcutKey } from "../hooks/shortcuts";
 import { Footer } from "./Footer";
+import { ShortcutHelp } from "./ShortcutHelp";
 import { StatusProvider, useStatus } from "./StatusProvider";
 import { TopBar } from "./TopBar";
 import styles from "./Shell.module.css";
@@ -20,6 +22,18 @@ function Frame() {
   const { pathname } = useLocation();
   const main = useRef<HTMLElement>(null);
   const shownPath = useRef(pathname);
+  const [helpOpen, setHelpOpen] = useState(false);
+
+  // ? opens the shortcut list from any screen (not while typing, not when shortcuts are off).
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (shortcutKey(event) !== "?") return;
+      event.preventDefault();
+      setHelpOpen(true);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
 
   const urgent = data?.attention.urgent_open ?? 0;
   const attention = data
@@ -48,7 +62,8 @@ function Frame() {
       <main id="main" ref={main} tabIndex={-1} className={styles.main}>
         <Outlet />
       </main>
-      <Footer />
+      <Footer onOpenShortcuts={() => setHelpOpen(true)} />
+      {helpOpen ? <ShortcutHelp onClose={() => setHelpOpen(false)} /> : null}
     </div>
   );
 }

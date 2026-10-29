@@ -7,6 +7,7 @@ import { useDebounced } from "../../hooks/useDebounced";
 import { useNow } from "../../hooks/useNow";
 import { shortcutKey } from "../../hooks/shortcuts";
 import { QueueRow, QueueRowPlaceholder } from "./QueueRow";
+import { takeViewed } from "./returnFocus";
 import { currentTab, FILTERS, parseView, viewToSearch, type Filter } from "./params";
 import { useQueue } from "./useQueue";
 import styles from "./Queue.module.css";
@@ -59,6 +60,20 @@ export function QueueScreen() {
   const clearUrgent = () => setParams(viewToSearch({ filter: view.filter, urgentOnly: false }));
   const onSearch = (event: FormEvent) => event.preventDefault();
   const now = useNow();
+  const ids = queue.items.map((item) => item.id);
+
+  // Coming back from an inquiry, focus returns to its row, once, if nothing else has focus yet
+  // (the shell has just put it on the page content) and the row is in the list.
+  const placed = useRef(false);
+  useEffect(() => {
+    if (placed.current || !queue.hasData) return;
+    placed.current = true;
+    const id = takeViewed();
+    const row = id === null ? null : list.current?.querySelector<HTMLElement>(`a[data-id="${id}"]`);
+    const resting =
+      document.activeElement === document.body || document.activeElement?.id === "main";
+    if (row && resting) row.focus();
+  }, [queue.hasData]);
 
   let body;
   if (queue.loading) {
@@ -94,7 +109,7 @@ export function QueueScreen() {
       <>
         <ul className={styles.list} ref={list} aria-label={words.listLabel}>
           {queue.items.map((item) => (
-            <QueueRow key={item.id} item={item} now={now} />
+            <QueueRow key={item.id} item={item} now={now} ids={ids} />
           ))}
         </ul>
         {queue.hasMore ? (

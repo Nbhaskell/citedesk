@@ -1,10 +1,14 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useApi } from "../../api/context";
+import { useAnnounce } from "../../components/LiveRegion";
 import { UrgencyTag } from "../../components/UrgencyTag";
 import { detail as words, errors, stateWords } from "../../copy";
-import { isTypingTarget } from "../../hooks/shortcuts";
+import { modalOpen } from "../../hooks/modal";
+import { isTypingTarget, shortcutKey } from "../../hooks/shortcuts";
 import { useResource } from "../../hooks/useResource";
+import { markViewed } from "../queue/returnFocus";
+import { neighbours, readQueueState, type QueueState } from "./neighbours";
 import { HistoryPanel, OriginalMessage, SourcesPanel, UnderstoodAs } from "./parts";
 import { ReviewPanel } from "./ReviewPanel";
 import { mergedSources } from "./sources";
@@ -72,17 +76,51 @@ export function DetailScreen() {
     );
   }, []);
 
+  // The queue row to come back to, and the list this inquiry was opened from (for j and k).
+  useEffect(() => {
+    if (valid) markViewed(id);
+  }, [valid, id]);
+  const queueIds = readQueueState(location.state);
+  const ring = valid ? neighbours(queueIds, id) : null;
+  const ringState: QueueState = { queue: queueIds };
+
   // Escape goes back to where the person came from, unless something else used the key first
-  // (an open form or a decision waiting to be undone claim it in the capture phase).
+  // (an open form, a decision waiting to be undone or the shortcut list claim it first).
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.defaultPrevented || event.key !== "Escape" || isTypingTarget(event.target)) return;
+      if (modalOpen()) return;
       if (location.key !== "default") navigate(-1);
       else navigate("/");
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [navigate, location.key]);
+
+  // j and k: the next and previous inquiry in the list this one was opened from. The move
+  // replaces this page in the history, so Escape still goes back to the queue in one step.
+  const next = ring?.next ?? null;
+  const previous = ring?.previous ?? null;
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      const key = shortcutKey(event);
+      const target = key === "j" ? next : key === "k" ? previous : null;
+      if (target === null) return;
+      event.preventDefault();
+      const state: QueueState = { queue: queueIds };
+      navigate(`/inquiries/${target}`, { replace: true, state });
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [navigate, next, previous, queueIds]);
+
+  // Say where a move landed, since the page changes under a screen reader.
+  const announce = useAnnounce();
+  const lastId = useRef(id);
+  useEffect(() => {
+    if (lastId.current !== id && ring) announce(words.ring.moved(id, ring.position, ring.total));
+    lastId.current = id;
+  }, [id, ring, announce]);
 
   if (!valid || (error?.httpStatus === 404 && !detail)) {
     return (
@@ -98,9 +136,29 @@ export function DetailScreen() {
 
   const header = (
     <>
-      <p>
+      <div className={styles.crumbs}>
         <Link to="/">{words.back}</Link>
-      </p>
+        {ring ? (
+          <nav aria-label={words.ring.label} className={styles.ring}>
+            <span>{words.ring.position(ring.position, ring.total)}</span>
+            {ring.previous !== null ? (
+              <Link
+                to={`/inquiries/${ring.previous}`}
+                state={ringState}
+                replace
+                aria-keyshortcuts="k"
+              >
+                {words.ring.previous}
+              </Link>
+            ) : null}
+            {ring.next !== null ? (
+              <Link to={`/inquiries/${ring.next}`} state={ringState} replace aria-keyshortcuts="j">
+                {words.ring.next}
+              </Link>
+            ) : null}
+          </nav>
+        ) : null}
+      </div>
       <h1 id="page-title">
         {words.title} {id}
       </h1>

@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import type { InquiryDetail, Source } from "../../api/types";
+import { useAnnounce } from "../../components/LiveRegion";
 import { actions, detail as words } from "../../copy";
+import { modalOpen } from "../../hooks/modal";
 import { shortcutKey } from "../../hooks/shortcuts";
 import { DraftEditor, forgetSaved, useDraftText } from "./draft";
 import { ErrorNote, InlineForm } from "./forms";
 import { ChecksPanel, ClaimList, Panel } from "./parts";
 import type { Decisions } from "./useDecisions";
-import { usePendingDecision } from "./usePendingDecision";
+import { UNDO_MS, usePendingDecision } from "./usePendingDecision";
 import styles from "./Detail.module.css";
 
 const MAX_SECONDS = 86_400;
@@ -61,6 +63,7 @@ function ReviewBody({
 }) {
   const { text, change, edited } = useDraftText(draft);
   const pending = usePendingDecision();
+  const announce = useAnnounce();
   const editor = useRef<HTMLTextAreaElement>(null);
   const [openedAt] = useState(() => Date.now());
   const [panel, setPanel] = useState<"reject" | "escalate" | null>(null);
@@ -72,13 +75,20 @@ function ReviewBody({
   const seconds = () => Math.min(MAX_SECONDS, Math.round((Date.now() - openedAt) / 1000));
   const approveLabel = edited ? actions.approveEdited : actions.approve;
 
+  // The visible countdown changes every second and is not a live region (a screen reader would
+  // read every tick), so the wait is announced once, here.
+  const startWaiting = (label: string, run: () => Promise<boolean>) => {
+    announce(words.actions.undoAnnounce(label, UNDO_MS / 1000));
+    pending.start(label, run);
+  };
+
   const approve = () => {
     if (locked) return;
     decisions.clearError();
     const body = edited
       ? { edited_body: text, review_seconds: seconds() }
       : { review_seconds: seconds() };
-    pending.start(approveLabel.done, async () => {
+    startWaiting(approveLabel.done, async () => {
       const saved = await decisions.approve(draft.id, body);
       if (saved) forgetSaved(draft.id);
       return saved;
@@ -93,7 +103,7 @@ function ReviewBody({
     setMissing(false);
     setPanel(null);
     const why = reason.trim();
-    pending.start(actions.reject.done, async () => {
+    startWaiting(actions.reject.done, async () => {
       const saved = await decisions.reject(draft.id, { reason: why, review_seconds: seconds() });
       if (!saved) setPanel("reject");
       return saved;
@@ -123,6 +133,7 @@ function ReviewBody({
   });
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
+      if (modalOpen()) return;
       if (event.key === "Escape" && panel && !pending.waiting) {
         setPanel(null);
         event.preventDefault();
@@ -133,7 +144,11 @@ function ReviewBody({
       else if (key === "e") editor.current?.focus();
       else if (key === "r") handlers.current.open("reject");
       else if (key === "x") handlers.current.open("escalate");
-      else return;
+      else if ((key === "j" || key === "k") && (pending.waiting || panel)) {
+        // Moving to another inquiry would drop what is waiting or half-typed: not by accident.
+        event.preventDefault();
+        return;
+      } else return;
       event.preventDefault();
     };
     // Capture phase, so Escape closes the form before the screen treats it as "go back".
@@ -159,7 +174,7 @@ function ReviewBody({
 
       <div className={styles.actions}>
         {pending.waiting ? (
-          <p role="status" className={styles.undo}>
+          <p className={styles.undo}>
             <strong>{pending.label}.</strong> {words.actions.undoIn(pending.secondsLeft ?? 0)}{" "}
             <button type="button" className={styles.linkButton} onClick={pending.undo}>
               {actions.undo}
@@ -195,6 +210,7 @@ function ReviewBody({
 
         {panel === "reject" ? (
           <InlineForm
+            focusOnOpen
             label={words.actions.reasonLabel}
             value={reason}
             onChange={setReason}
@@ -209,6 +225,7 @@ function ReviewBody({
         ) : null}
         {panel === "escalate" ? (
           <InlineForm
+            focusOnOpen
             label={words.actions.noteLabel}
             value={note}
             onChange={setNote}

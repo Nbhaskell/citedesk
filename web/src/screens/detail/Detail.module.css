@@ -38,6 +38,30 @@
   }
 }
 
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 var(--space-6);
+  margin-bottom: var(--space-3);
+}
+
+.crumbs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target);
+}
+
+.ring {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--space-4);
+  color: var(--slate);
+  font-size: var(--size-small);
+}
+
 .stateLine {
   display: flex;
   flex-wrap: wrap;
@@ -47,6 +71,9 @@
 }
 
 .jump {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target);
   font-size: var(--size-small);
 }
 

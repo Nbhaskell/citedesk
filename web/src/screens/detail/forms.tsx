@@ -5,8 +5,9 @@ import styles from "./Detail.module.css";
 
 /**
  * A short form that opens under the buttons, not a dialog (brief: destructive actions ask for a
- * reason, not a confirmation). Focus moves to the text area when it opens. The text stays in the
- * caller's state, so a failed save loses nothing.
+ * reason, not a confirmation). A form the person opened takes focus (`focusOnOpen`); one that is
+ * simply part of the page must not, or it would swallow j, k and Escape the moment the page loads.
+ * The text stays in the caller's state, so a failed save loses nothing.
  */
 export function InlineForm({
   label,
@@ -21,6 +22,7 @@ export function InlineForm({
   invalidMessage,
   busy = false,
   maxLength = 500,
+  focusOnOpen = false,
 }: {
   label: string;
   value: string;
@@ -34,14 +36,15 @@ export function InlineForm({
   invalidMessage: string;
   busy?: boolean;
   maxLength?: number;
+  focusOnOpen?: boolean;
 }) {
   const field = useRef<HTMLTextAreaElement>(null);
   const id = useId();
   const messageId = `${id}-message`;
 
   useEffect(() => {
-    field.current?.focus();
-  }, []);
+    if (focusOnOpen) field.current?.focus();
+  }, [focusOnOpen]);
 
   const submit = (event: FormEvent) => {
     event.preventDefault();

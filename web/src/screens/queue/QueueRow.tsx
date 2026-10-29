@@ -3,17 +3,34 @@ import type { InquirySummary } from "../../api/types";
 import { UrgencyTag } from "../../components/UrgencyTag";
 import { queue as words, stateWords } from "../../copy";
 import { ageText, exactText } from "../../lib/age";
+import type { QueueState } from "../detail/neighbours";
 import styles from "./Queue.module.css";
 
 /**
  * One inquiry. The whole row is the link. Everything shown here that came from a customer or the
  * model (summary, subject, name) is rendered as text by React, never as markup.
  */
-export function QueueRow({ item, now }: { item: InquirySummary; now: number }) {
+export function QueueRow({
+  item,
+  now,
+  ids,
+}: {
+  item: InquirySummary;
+  now: number;
+  /** The ids in the list this row is in, so the inquiry screen can offer next and previous. */
+  ids: number[];
+}) {
   const edge = item.urgency ?? "none";
+  const state: QueueState = { queue: ids };
   return (
     <li className={`${styles.item} ${styles[`edge_${edge}`]}`}>
-      <Link to={`/inquiries/${item.id}`} className={styles.row} data-row>
+      <Link
+        to={`/inquiries/${item.id}`}
+        state={state}
+        className={styles.row}
+        data-row
+        data-id={item.id}
+      >
         <span className={styles.urgency}>
           {item.urgency ? <UrgencyTag urgency={item.urgency} /> : null}
         </span>

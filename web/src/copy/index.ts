@@ -256,6 +256,14 @@ export const detail = {
   title: "Inquiry",
   back: "Back to the queue",
   jumpToMessage: "Jump to the original message",
+  ring: {
+    label: "Other inquiries in your list",
+    position: (place: number, total: number): string => `${place} of ${total} in your list`,
+    previous: "Previous",
+    next: "Next",
+    moved: (id: number, place: number, total: number): string =>
+      `Inquiry ${id}, ${place} of ${total} in your list`,
+  },
   loading: "Loading the inquiry",
   notFound: "No inquiry has that number.",
   sections: {
@@ -318,6 +326,8 @@ export const detail = {
   actions: {
     saving: "Saving your decision…",
     undoIn: (seconds: number): string => `Saved in ${seconds} seconds unless you undo.`,
+    undoAnnounce: (label: string, seconds: number): string =>
+      `${label}, saving in ${seconds} seconds. Press Escape or choose Undo to take it back.`,
     failed: "Your decision was not saved. Your edit is kept.",
     reasonLabel: "Why are you rejecting it?",
     reasonRequired: "Say why, so the next draft can be better.",
@@ -498,4 +508,40 @@ export const settings = {
     shortcutsHint: "Single keys such as j, k and a. Turn them off if they get in the way.",
     notSaved: "Couldn't keep this choice in this browser. It will reset when the page reloads.",
   },
+} as const;
+
+export const shortcuts = {
+  open: "Shortcuts",
+  title: "Keyboard shortcuts",
+  close: "Close",
+  intro: "Single keys work when you are not typing in a box.",
+  switchedOff: "Single-key shortcuts are switched off in this browser. Turn them on in Settings.",
+  groups: [
+    {
+      title: "Anywhere",
+      keys: [
+        { key: "?", does: "Show this list" },
+        { key: "Esc", does: "Go back, close a form, or undo a decision that is waiting" },
+      ],
+    },
+    {
+      title: "In the queue",
+      keys: [
+        { key: "j", does: "Move to the next inquiry" },
+        { key: "k", does: "Move to the previous inquiry" },
+        { key: "Enter", does: "Open the inquiry" },
+      ],
+    },
+    {
+      title: "On an inquiry",
+      keys: [
+        { key: "a", does: "Approve the reply" },
+        { key: "e", does: "Edit the reply" },
+        { key: "r", does: "Reject the draft" },
+        { key: "x", does: "Escalate to the owner" },
+        { key: "j", does: "Next inquiry in the list you came from" },
+        { key: "k", does: "Previous inquiry in the list you came from" },
+      ],
+    },
+  ],
 } as const;

@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, parsePath } from "react-router-dom";
 import { App } from "../App";
 import type { ApiClient } from "../api/client";
 import { ApiProvider } from "../api/context";
@@ -291,10 +291,11 @@ export function fakeClient(over: Partial<ApiClient> = {}): ApiClient {
   };
 }
 
-export function renderApp(client: ApiClient, path = "/") {
+/** `state` is the router state the page was opened with, as a queue row's link sends it. */
+export function renderApp(client: ApiClient, path = "/", state?: unknown) {
   return render(
     <ApiProvider client={client}>
-      <MemoryRouter initialEntries={[path]}>
+      <MemoryRouter initialEntries={[{ ...parsePath(path), state }]}>
         <App />
       </MemoryRouter>
     </ApiProvider>,

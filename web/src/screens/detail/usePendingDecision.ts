@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { modalOpen } from "../../hooks/modal";
 
 export const UNDO_MS = 5000;
 
@@ -83,7 +84,8 @@ export function usePendingDecision(delayMs: number = UNDO_MS) {
   useEffect(() => {
     if (secondsLeft === null) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
+      // With a dialog open, Escape belongs to the dialog.
+      if (event.key !== "Escape" || modalOpen()) return;
       event.preventDefault(); // undoing uses the key; it must not also leave the page
       undo();
     };

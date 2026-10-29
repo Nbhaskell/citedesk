@@ -353,7 +353,15 @@ def create_app(
     @app.middleware("http")
     async def add_request_id(request: Request, call_next: Any) -> Response:
         request.state.request_id = uuid.uuid4().hex
-        response: Response = await call_next(request)
+        try:
+            response: Response = await call_next(request)
+        except Exception as error:  # noqa: BLE001 (the last net: answer, log the type, go on)
+            # Answered here and not re-raised, because an exception that leaves the app is logged by
+            # the server with its traceback and message, and a message can carry customer text.
+            logger.error("unhandled error: %s", type(error).__name__)
+            response = error_response(
+                request, 500, "internal_error", "Something went wrong on the server."
+            )
         response.headers["X-Request-ID"] = request.state.request_id
         return response
 
@@ -433,11 +441,6 @@ def create_app(
             "screening_failed",
             "The message could not be checked, so it was not stored.",
         )
-
-    @app.exception_handler(Exception)
-    async def handle_unexpected(request: Request, error: Exception) -> JSONResponse:
-        logger.error("unhandled error: %s", type(error).__name__)
-        return error_response(request, 500, "internal_error", "Something went wrong on the server.")
 
     # --- routes ---
 

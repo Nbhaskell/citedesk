@@ -22,7 +22,8 @@ def main() -> None:
         kb=RagProjectKB(settings.rag_url),
         business=load_business(settings.business_facts_path),
     )
-    uvicorn.run(app, host=HOST, port=settings.port)
+    # No access log: its lines hold the URL, and the search box puts typed text in the URL (rule 4).
+    uvicorn.run(app, host=HOST, port=settings.port, access_log=False)
 
 
 if __name__ == "__main__":

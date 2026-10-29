@@ -503,7 +503,7 @@ def report_markdown(run: dict[str, Any], scores: dict[str, Any]) -> str:
         f"- commit `{str(git.get('commit'))[:10]}`{dirty}; model `{header.get('model')}`; "
         f"prompts understand `{versions.get('understand')}`, draft `{versions.get('draft')}`",
         f"- settings {json.dumps(settings, sort_keys=True)}; knowledge base: "
-        f"{json.dumps(rag, sort_keys=True)}",
+        f"{json.dumps(ec.rag_identity(rag), sort_keys=True)}",
         f"- started {header.get('started_at')}, finished {header.get('finished_at')}",
         "",
         "## Headline measures (fixed before any held-out result, D-061)",

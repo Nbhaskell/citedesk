@@ -498,3 +498,16 @@ def test_the_report_names_the_run_and_the_system_it_measured() -> None:
     text = report_for()
     assert "qwen3:8b" in text and "understand-v1" in text and "draft-v1" in text
     assert "abc1234" in text
+
+
+def test_the_report_shows_the_knowledge_base_configuration_not_its_clock_or_file_list() -> None:
+    text = report_for(
+        rag={
+            "chat_model": "qwen3:8b",
+            "chunks": 83,
+            "last_sync": "yesterday",
+            "documents": ["a.md"],
+        }
+    )
+    assert '"chunks": 83' in text
+    assert "last_sync" not in text and "a.md" not in text

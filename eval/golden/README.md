@@ -34,7 +34,27 @@ Written by an AI model (Claude), by hand, in one pass per category, from the sam
 ## Splits
 
 - `tuned`: items the system may be adjusted against.
-- `heldout`: written **after** the first working prototype, in new wording, and run **once** before any tuning. Not written yet. Never tune on it. Once a held-out run has driven a change, that set is spent and a new one is written.
+- `heldout`: written **after** the first working prototype, in new wording, and run **once** before any tuning. Never tune on it. Once a held-out run has driven a change, that set is spent and a new one is written. **Written on 2026-10-29: 76 items** (`src/heldout_*.json`), 36% of the 211 in the file. See "The held-out split" below. No test reads it, and the tools that run a system refuse it unless asked by the evaluation (D-061).
+
+## The held-out split
+
+Written by the same AI model that wrote the tuned set, the knowledge-base documents and the system, after the pipeline existed and had been measured on the tuned set. **Unseen by the system, not blind**:
+
+- The author had read the tuned set and the failure lists in D-044 and D-049, so the held-out set deliberately includes more of what the system is known to find hard (policy exceptions, refunds, legal threats, a gas smell buried in a routine request). That makes it harder than the tuned set on those labels, and the mix is not comparable with it (below).
+- New wording, new senders, new situations, written from the same documents and the labelling rules above. No generator. No item was written by changing a tuned item, and none was edited after seeing any system's answer.
+- **What was seen before the one-shot run.** A test run while the items were being added reported that the screening stage (pure code, no model) did not archive one tuned spam item. The cause was an authoring mistake: a held-out spam item reused a tuned spam sender's address, so screening treated that sender as known. Only the sender address of that item and one repeated name were changed; no message text was. That run also showed, in aggregate counts only, that screening archived none of the three held-out spam items and escalated one held-out item for injection (I did not look at which). Nothing in the system was changed in response, and the evaluation reports those items like all the others.
+- Seven items (booking, change, availability and vague requests) were added before any run because the first draft of the set had only 4 `request_details` items.
+
+| | tuned (135) | held-out (76) |
+|---|---|---|
+| expected route: draft_reply / request_details / escalate / archive | 59 / 23 / 47 / 6 | 22 / 10 / 41 / 3 |
+| `HEALTH_SAFETY` / `COMPLAINT` / `REFUND_OR_DISPUTE` / `LEGAL_THREAT` | 8 / 13 / 5 / 2 | 12 / 8 / 6 / 3 |
+| `POLICY_EXCEPTION_REQUEST` / `INJECTION_SUSPECTED` / `LOW_CONFIDENCE` | 8 / 6 / 1 | 6 / 4 / 2 |
+| `NOT_IN_KNOWLEDGE_BASE` | 9 | 5 |
+| channel: web form / email | 72 / 63 | 37 / 39 |
+| median words in a message | 25 | 29 |
+
+Escalations are 54% of the held-out items, against 35% of the tuned ones: the rare reasons were oversampled so that per-reason numbers rest on more than a handful of items. **Overall accuracy on the two splits is therefore not comparable.** Compare per-label numbers, and read the counts beside them.
 
 ## Labelling rules
 

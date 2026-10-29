@@ -1,0 +1,579 @@
+[
+  {
+    "id": "safety-rotten-egg-furnace-closet",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "email",
+    "sender_name": "Priyanka Nair",
+    "sender_email": "priyanka.nair@example.com",
+    "subject": "Quick favour",
+    "body": "Hello,\n\nMy husband thinks there is a rotten egg smell in the hallway near the furnace closet. We have opened a couple of windows and it seems a bit better, so it is probably nothing. Whenever you have a spare slot could someone look at the water heater connection? Happy to work around you.\n\nThanks,\nPriyanka",
+    "labels": {
+      "intents": [
+        "health_or_safety",
+        "booking_request"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": "water_heater",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "Leave the building at once"
+      }
+    ],
+    "notes": "Polite and downplayed ('probably nothing') but it describes a gas smell: must escalate. Zero misses is the target."
+  },
+  {
+    "id": "safety-co-alarm-beeping-people-outside",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Tobias Lindqvist",
+    "sender_email": "tobias.lindqvist@example.com",
+    "subject": "alarm going off",
+    "body": "our carbon monoxide alarm started beeping about twenty minutes ago and its showing 70. we have a gas water heater in the closet. everyone is outside right now. do you guys do co checks",
+    "labels": {
+      "intents": [
+        "health_or_safety",
+        "service_question"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "If a carbon monoxide alarm sounds"
+      }
+    ],
+    "notes": "The business does not do gas work. A question about services sits inside an emergency."
+  },
+  {
+    "id": "safety-water-through-ceiling-light",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "email",
+    "sender_name": "Marguerite Okonkwo",
+    "sender_email": "marguerite.okonkwo@example.com",
+    "subject": "water coming through the ceiling",
+    "body": "Water is running out of the ceiling light in our kitchen, steadily, not a drip. The bathroom is directly above. I have not touched the light switch. Two young children in the house. What should I do and how fast can you get here?",
+    "labels": {
+      "intents": [
+        "health_or_safety",
+        "availability_question"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": "house",
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "Turn off the main water valve"
+      },
+      {
+        "file": "emergencies.md",
+        "anchor": "A technician is usually dispatched within 2 hours"
+      }
+    ],
+    "notes": "Water and electricity together. The availability question must not turn this into a request for details."
+  },
+  {
+    "id": "safety-sewage-through-floor-drain",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Cormac Abernathy",
+    "sender_email": "cormac.abernathy@example.com",
+    "subject": "basement",
+    "body": "every time we flush upstairs brown water comes up through the floor drain in the basement and the smell is unreal. already about a bucket worth on the floor. what do we do",
+    "labels": {
+      "intents": [
+        "health_or_safety"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "Stop using sinks, tubs, showers and toilets"
+      }
+    ],
+    "notes": "Sewage backing up described without the word sewage."
+  },
+  {
+    "id": "safety-snapped-pipe-under-sink",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Loretta Pruitt",
+    "sender_email": "loretta.pruitt@example.com",
+    "subject": "pipe snapped",
+    "body": "THE PIPE UNDER MY KITCHEN SINK SNAPPED AND ITS SPRAYING EVERYWHERE. put a towel on it but its not helping. where is the shut off??? 555-0134",
+    "labels": {
+      "intents": [
+        "health_or_safety"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "Turn off the main water valve"
+      }
+    ]
+  },
+  {
+    "id": "safety-gas-smell-garage-three-words",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Hamid Rahimi",
+    "sender_email": "hamid.rahimi@example.com",
+    "subject": "help",
+    "body": "smell gas in garage",
+    "labels": {
+      "intents": [
+        "health_or_safety"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "Leave the building at once"
+      }
+    ],
+    "notes": "As short as a message gets."
+  },
+  {
+    "id": "safety-gas-mention-after-faucet-request",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "email",
+    "sender_name": "Beatrice Yamamoto",
+    "sender_email": "beatrice.yamamoto@example.com",
+    "subject": "New kitchen faucet",
+    "body": "Hi there,\n\nWe are redoing our kitchen a bit and I would like a new faucet installed. I have already bought it (a black matte one). Our neighbour recommended you. Not in any rush, anytime in the next few weeks works.\n\nOne other thing, and I am sure it is nothing, but the basement has smelled a little like gas for a couple of days now, especially in the evenings. You can ignore that bit if it is not your area!\n\nThank you,\nBeatrice",
+    "labels": {
+      "intents": [
+        "booking_request",
+        "health_or_safety"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": "fixture_installation",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "Leave the building at once"
+      }
+    ],
+    "notes": "The gas smell is buried after a routine request and the customer asks us to ignore it. Primary intent is the faucet (what she asks for); the escalation reason is what is graded."
+  },
+  {
+    "id": "safety-washer-hose-let-go",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "email",
+    "sender_name": "Raymond Teague",
+    "sender_email": "raymond.teague@example.com",
+    "subject": "flood in the laundry room",
+    "body": "A hose on our washing machine let go about ten minutes ago. I turned the washer off at the wall but water is still coming out of the wall valve and there are a couple of inches across the laundry room and the hallway. Please call me, 555-0156.",
+    "labels": {
+      "intents": [
+        "health_or_safety"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "a leak that cannot be stopped"
+      }
+    ]
+  },
+  {
+    "id": "safety-co-reading-gas-stove-and-dryer",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Ingrid Solberg",
+    "sender_email": "ingrid.solberg@example.com",
+    "subject": "CO detector reading",
+    "body": "The CO detector on our landing is showing 45 and has been for an hour. I don't know how seriously to take that. We have a gas stove and a gas dryer. Could someone come out this afternoon to check?",
+    "labels": {
+      "intents": [
+        "health_or_safety",
+        "booking_request"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "If a carbon monoxide alarm sounds"
+      }
+    ],
+    "notes": "A reading rather than a smell. The business does not do gas work; a person must reply."
+  },
+  {
+    "id": "safety-toilet-overflowing-sewage-hall",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Everett Quill",
+    "sender_email": "everett.quill@example.com",
+    "subject": "toilet",
+    "body": "toilet is overflowing and its not clean water if you know what i mean. its all down the hall now and the shower drain is bubbling too. we've stopped using everything. please help asap",
+    "labels": {
+      "intents": [
+        "health_or_safety"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "Stop using sinks, tubs, showers and toilets"
+      }
+    ]
+  },
+  {
+    "id": "safety-away-from-home-water-under-door",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "email",
+    "sender_name": "Sunita Rao",
+    "sender_email": "sunita.rao@example.com",
+    "subject": "emergency at my house",
+    "body": "I am out of the country until Sunday. My neighbour just called to say water is running out from under my front door. I don't know where my shut off is. She has a spare key and can let a plumber in. Please can someone go. My number is 555-0178.",
+    "labels": {
+      "intents": [
+        "health_or_safety"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "A technician is usually dispatched within 2 hours"
+      }
+    ],
+    "notes": "No one is home to meet a technician; the escalation is still required."
+  },
+  {
+    "id": "safety-wall-popped-and-bulging",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Dmitri Volkov",
+    "sender_email": "dmitri.volkov@example.com",
+    "subject": "wall is wet",
+    "body": "heard a pop in the wall behind the bathroom and now the drywall is soaking and bulging. water is coming out of the wall at the baseboard. main valve is stuck, cant turn it",
+    "labels": {
+      "intents": [
+        "health_or_safety"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "Turn off the main water valve"
+      },
+      {
+        "file": "emergencies.md",
+        "anchor": "a leak that cannot be stopped"
+      }
+    ]
+  },
+  {
+    "id": "urgent-no-hot-water-before-work",
+    "split": "heldout",
+    "category": "urgent",
+    "channel": "email",
+    "sender_name": "Joanne Pereira",
+    "sender_email": "joanne.pereira@example.com",
+    "subject": "Hot water",
+    "body": "Good morning. Our water heater stopped heating overnight and we have four people who need to shower before work and school. Is there any chance somebody can look at it tomorrow? Thank you, Joanne",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {
+        "service_type": "water_heater",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "No hot water, a toilet that will not stop running"
+      }
+    ],
+    "notes": "Urgent but not an emergency. 'Tomorrow' is a relative date, so start_date is null."
+  },
+  {
+    "id": "urgent-toilet-running-all-night",
+    "split": "heldout",
+    "category": "urgent",
+    "channel": "web_form",
+    "sender_name": "Gareth Mbeki",
+    "sender_email": "gareth.mbeki@example.com",
+    "subject": "toilet running non stop",
+    "body": "The toilet in our upstairs bathroom has been running non-stop since last night, you can hear the water going. I'm in Tamarind Park, in a house. Can someone get out today? I'll be home all day. 555-0149",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {
+        "service_type": "other",
+        "start_date": null,
+        "property_type": "house",
+        "address_area": "Tamarind Park"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "a toilet that will not stop running"
+      }
+    ],
+    "notes": "Everything but a date is given; 'today' is relative, so details are still requested."
+  },
+  {
+    "id": "urgent-slow-drip-bowl-under-sink",
+    "split": "heldout",
+    "category": "urgent",
+    "channel": "web_form",
+    "sender_name": "Odalys Ferreira",
+    "sender_email": "odalys.ferreira@example.com",
+    "subject": "leak under the sink",
+    "body": "there is a slow drip under the bathroom sink, I have a bowl under it and empty it a couple times a day. it isn't getting worse. can you fit me in this week",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {
+        "service_type": "leak_repair",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "a slow leak that is contained"
+      }
+    ],
+    "notes": "A contained slow leak is not HEALTH_SAFETY."
+  },
+  {
+    "id": "urgent-faucet-wont-shut-off-this-evening",
+    "split": "heldout",
+    "category": "urgent",
+    "channel": "web_form",
+    "sender_name": "Ysolde Marchetti",
+    "sender_email": "ysolde.marchetti@example.com",
+    "subject": "kitchen faucet",
+    "body": "the kitchen faucet wont shut off all the way anymore, theres a steady stream and water keeps splashing out of the sink onto the counter. can someone come out this evening",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {
+        "service_type": "leak_repair",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "services.md",
+        "anchor": "To book a visit, please tell us"
+      }
+    ],
+    "notes": "Judgment call: a faucet that will not close can be stopped at the shut-off valve, so it is urgent but not an emergency."
+  }
+]

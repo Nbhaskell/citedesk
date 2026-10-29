@@ -481,9 +481,11 @@ def test_importing_the_synthetic_inbox_through_the_api_ends_where_the_labels_say
     client: TestClient, api_settings: Settings
 ) -> None:
     golden = json.loads((REPO_ROOT / "eval/golden/citedesk_v1.json").read_text("utf-8"))
-    inbox = golden_to_inbox(golden, split="all")
+    # The tuned split: these counts were checked against the labels. The held-out split is not
+    # read by any test (it is run once, by the evaluation).
+    inbox = golden_to_inbox(golden, split="tuned")
     body = upload(client, jsonl(*inbox)).json()
-    assert body["created"] == len(golden["items"]) and body["rejected"] == []
+    assert body["created"] == len(inbox) and body["rejected"] == []
 
     conn = connect(api_settings.db_path)
     pipeline.run_pending(conn, api_settings)

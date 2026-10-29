@@ -22,6 +22,7 @@ from citedesk.intake import (
     submit,
 )
 from citedesk.models import InquiryStatus, ScreeningResult
+from tests.golden_data import tuned_golden
 from tools.import_inquiries import golden_to_inbox
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -491,7 +492,7 @@ def test_an_import_summary_never_repeats_message_text(
 def test_importing_the_whole_golden_set_stores_every_item_masked(
     conn: sqlite3.Connection, settings: Settings
 ) -> None:
-    golden = json.loads((REPO_ROOT / "eval/golden/citedesk_v1.json").read_text("utf-8"))
+    golden = tuned_golden()
     records = [
         intake.ParsedRecord(line=n, record=r, error=None)
         for n, r in enumerate(golden_to_inbox(golden, split="all"), 1)

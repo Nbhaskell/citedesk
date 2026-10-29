@@ -54,7 +54,35 @@ There is no pass mark. The numbers are reported as they come out, with the limit
   marked and left out of the timing figures (the app's timer keeps running).
 - Optional, afterwards: write 5 replies from the documents without drafts, timed by stopwatch.
 
+## Running the sitting
+
+The queue is already prepared (`data\trial.db`, 24 inquiries, all waiting for review, in the sitting
+order). No model or knowledge base is needed to review. From the repo root, in PowerShell:
+
+```powershell
+Copy-Item data\trial.db data\trial.pristine.db     # a spare copy, in case the sitting must restart
+$env:CITEDESK_DB_PATH = "data\trial.db"
+.\.venv\Scripts\python.exe -m citedesk             # API on 127.0.0.1:8100; leave it running
+```
+
+In a second terminal: `cd web; npm run dev`, then open <http://127.0.0.1:5174>.
+
+- Work the queue from the top, in order, without skipping. The first 4 are the warm-up.
+- Do not open `eval\trial\`, `tools\trial_plants.py`, `tools\trial_prepare.py` or
+  `tests\test_trial.py` until you have finished: they say what is planted.
+- Do not use the Insights screen or re-open a decided inquiry during the sitting.
+- If you are interrupted partway through an inquiry, finish it as usual and note its id; it is left
+  out of the timing with `--exclude`.
+- To start again, stop the API, copy `data\trial.pristine.db` over `data\trial.db`, and begin from
+  the top. Only the final attempt is scored.
+
 ## Scoring (code, after the sitting)
+
+```powershell
+.\.venv\Scripts\python.exe -m tools.trial_score --db data\trial.db `
+  --md eval\reports\review-trial.md --json eval\reports\review-trial.json
+# optional: --exclude <ids interrupted> --unaided <seconds for each hand-written reply>
+```
 
 `tools/trial_score.py` reads the decisions and `review_seconds` from the database and `plants.json`,
 and writes ids, decisions and numbers only: no message or draft text. It prints counts, medians and

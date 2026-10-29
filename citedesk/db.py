@@ -18,6 +18,7 @@ from citedesk.config import Settings
 
 MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / "db" / "migrations"
 MIGRATION_NAME = re.compile(r"^(\d{4})_([a-z0-9_]+)\.sql$")
+BUSY_TIMEOUT_SECONDS = 5.0  # how long a write waits for another connection's lock
 
 
 class MigrationError(Exception):
@@ -32,9 +33,11 @@ def utc_now() -> str:
 def connect(path: str | Path) -> sqlite3.Connection:
     """Open a database with foreign keys on, rows as mappings, and WAL for file databases.
 
-    The connection is in autocommit mode: use `transaction()` to group statements.
+    The connection is in autocommit mode: use `transaction()` to group statements. A write that
+    finds the database locked by another connection waits `BUSY_TIMEOUT_SECONDS` and then fails
+    with `sqlite3.OperationalError`; nothing is half written.
     """
-    conn = sqlite3.connect(str(path), isolation_level=None)
+    conn = sqlite3.connect(str(path), timeout=BUSY_TIMEOUT_SECONDS, isolation_level=None)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     if str(path) != ":memory:":

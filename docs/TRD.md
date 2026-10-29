@@ -168,11 +168,13 @@ Base `http://127.0.0.1:8100`. All JSON. Request and response models are Pydantic
 | `GET /api/settings` | Read-only: business details, draft word limit, model, data mode, escalation rules and who sets each (D-053) |
 | `GET /api/status` | Model, knowledge base and database health, synthetic-data flag |
 
-Errors use one shape: `{ "error": { "code": "...", "message": "...", "request_id": "..." } }`.
+Errors use one shape: `{ "error": { "code": "...", "message": "...", "request_id": "..." } }`. Every response, errors included, carries the same id in an `X-Request-ID` header.
+
+Limits on intake (Phase 8, `citedesk/guards.py`): a request body over `MAX_BODY_CHARS * 6 + 64 KB` (5 MB for the import) is refused with 413 `payload_too_large` before it is read in full, whether or not it declares its size; more than `INTAKE_RATE_LIMIT_PER_MINUTE` calls to `POST /api/inquiries` and `POST /api/inquiries/import` in any 60 seconds are refused with 429 `rate_limited` and a `Retry-After` header. Reading is never limited.
 
 ## 7. Configuration
 
-Environment variables with defaults in `.env.example`: `CITEDESK_DB_PATH`, `CITEDESK_PORT=8100`, `OLLAMA_URL`, `LLM_MODEL=qwen3:8b`, `RAG_URL`, `ESCALATE_ON_LOW_CONFIDENCE=true`, `SPAM_THRESHOLD`, `DRAFT_MAX_WORDS`, `ENABLE_THINKING=true` (v1 started with it off for speed; the tuned comparison favoured on but could not prove it, so on is the default from D-063; the understand step only, the retry never thinks), `SYNTHETIC_DATA=true`.
+Environment variables with defaults in `.env.example`: `CITEDESK_DB_PATH`, `CITEDESK_PORT=8100`, `OLLAMA_URL`, `LLM_MODEL=qwen3:8b`, `RAG_URL`, `ESCALATE_ON_LOW_CONFIDENCE=true`, `SPAM_THRESHOLD`, `INTAKE_RATE_LIMIT_PER_MINUTE=300` (0 turns it off), `DRAFT_MAX_WORDS`, `ENABLE_THINKING=true` (v1 started with it off for speed; the tuned comparison favoured on but could not prove it, so on is the default from D-063; the understand step only, the retry never thinks), `SYNTHETIC_DATA=true`.
 
 ## 8. Security and privacy
 

@@ -1,0 +1,5 @@
+{
+  "format": "heldout-ledger-v1",
+  "note": "Every held-out run of the evaluation, written when the run starts. The held-out split is run once, by one fixed system; see docs/DECISIONS.md D-061 and D-062.",
+  "evaluations": []
+}

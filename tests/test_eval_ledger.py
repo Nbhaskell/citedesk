@@ -294,3 +294,26 @@ def test_a_clean_flagged_full_request_has_no_problems() -> None:
 
 def test_the_tuned_split_needs_none_of_this() -> None:
     assert ledger_mod.heldout_problems(**request(allow_heldout=False), split="tuned") == []
+
+
+def test_the_committed_ledger_is_a_valid_ledger_of_ids_and_counts_only() -> None:
+    from tools.eval_common import LEDGER_FILE
+
+    ledger = ledger_mod.load(LEDGER_FILE)
+    assert ledger["format"] == "heldout-ledger-v1"
+    allowed = {
+        "run_id",
+        "run_file",
+        "pass",
+        "status",
+        "started_at",
+        "finished_at",
+        "items",
+        "failed",
+        "outside_plan",
+        "justification",
+        "resumed_at",
+    }
+    for evaluation in ledger["evaluations"]:
+        for run in evaluation["runs"]:
+            assert set(run) <= allowed

@@ -220,8 +220,8 @@ def markdown(scores: dict[str, Any]) -> str:
         "",
         "## Planted problems",
         "",
-        f"The reviewer did not let the problem through on **{caught['caught']} of "
-        f"{caught['reviewed']}** reviewed drafts with a planted problem ({caught['of']} planted). "
+        f"The reviewer caught the planted problem on **{caught['caught']} of "
+        f"{caught['reviewed']}** reviewed drafts with one ({caught['of']} planted). "
         f"A count this small gives a wide exact 95% interval: {caught['interval_95'][0]:.2f} to "
         f"{caught['interval_95'][1]:.2f} as a share. A draft counts as caught if it was rejected, "
         "escalated, or edited so the planted text is gone.",

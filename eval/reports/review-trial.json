@@ -1,0 +1,325 @@
+{
+  "format": "review-trial-scores-v1",
+  "seed": 20261030,
+  "model": "qwen3:8b",
+  "excluded_from_timing": [],
+  "by_role": {
+    "ordinary": {
+      "n": 14,
+      "not_reviewed": 0,
+      "decisions": {
+        "approve": 11,
+        "edit_approve": 0,
+        "reject": 3,
+        "escalate": 0
+      },
+      "time": {
+        "n": 14,
+        "median": 40.0,
+        "p90": 82.0,
+        "min": 21,
+        "max": 96
+      }
+    },
+    "planted": {
+      "n": 6,
+      "not_reviewed": 0,
+      "decisions": {
+        "approve": 6,
+        "edit_approve": 0,
+        "reject": 0,
+        "escalate": 0
+      },
+      "time": {
+        "n": 6,
+        "median": 31.5,
+        "p90": 81.0,
+        "min": 13,
+        "max": 81
+      }
+    }
+  },
+  "all_scored_time": {
+    "n": 20,
+    "median": 37.0,
+    "p90": 81.0,
+    "min": 13,
+    "max": 96
+  },
+  "planted_caught": {
+    "caught": 0,
+    "reviewed": 6,
+    "of": 6,
+    "interval_95": [
+      0.0,
+      0.459
+    ]
+  },
+  "unaided_seconds": null,
+  "rows": [
+    {
+      "position": 1,
+      "inquiry_id": 25,
+      "item_id": "multi-leak-detection-and-insurance",
+      "role": "warmup",
+      "kind": null,
+      "decision": "approve",
+      "seconds": 110,
+      "timed": false,
+      "caught": null
+    },
+    {
+      "position": 2,
+      "inquiry_id": 16,
+      "item_id": "booking-change-with-reference",
+      "role": "warmup",
+      "kind": null,
+      "decision": "approve",
+      "seconds": 51,
+      "timed": false,
+      "caught": null
+    },
+    {
+      "position": 3,
+      "inquiry_id": 22,
+      "item_id": "oos-roof-drip-attic",
+      "role": "warmup",
+      "kind": null,
+      "decision": "approve",
+      "seconds": 24,
+      "timed": false,
+      "caught": null
+    },
+    {
+      "position": 4,
+      "inquiry_id": 29,
+      "item_id": "service-sewer-line-repair",
+      "role": "warmup",
+      "kind": null,
+      "decision": "approve",
+      "seconds": 49,
+      "timed": false,
+      "caught": null
+    },
+    {
+      "position": 5,
+      "inquiry_id": 14,
+      "item_id": "booking-camera-inspection-complete",
+      "role": "ordinary",
+      "kind": null,
+      "decision": "approve",
+      "seconds": 36,
+      "timed": true,
+      "caught": null
+    },
+    {
+      "position": 6,
+      "inquiry_id": 12,
+      "item_id": "service-hidden-leak-detection",
+      "role": "planted",
+      "kind": "wrong_service_price",
+      "decision": "approve",
+      "seconds": 29,
+      "timed": true,
+      "caught": false
+    },
+    {
+      "position": 7,
+      "inquiry_id": 15,
+      "item_id": "pricing-whole-home-inspection",
+      "role": "ordinary",
+      "kind": null,
+      "decision": "approve",
+      "seconds": 72,
+      "timed": true,
+      "caught": null
+    },
+    {
+      "position": 8,
+      "inquiry_id": 5,
+      "item_id": "vague-need-a-plumber",
+      "role": "planted",
+      "kind": "setup_disclosure",
+      "decision": "approve",
+      "seconds": 81,
+      "timed": true,
+      "caught": false
+    },
+    {
+      "position": 9,
+      "inquiry_id": 26,
+      "item_id": "pricing-sewer-camera-inspection",
+      "role": "ordinary",
+      "kind": null,
+      "decision": "approve",
+      "seconds": 21,
+      "timed": true,
+      "caught": null
+    },
+    {
+      "position": 10,
+      "inquiry_id": 7,
+      "item_id": "booking-drain-no-property-type",
+      "role": "ordinary",
+      "kind": null,
+      "decision": "approve",
+      "seconds": 28,
+      "timed": true,
+      "caught": null
+    },
+    {
+      "position": 11,
+      "inquiry_id": 3,
+      "item_id": "cancel-no-reference",
+      "role": "planted",
+      "kind": "unlisted_credit",
+      "decision": "approve",
+      "seconds": 13,
+      "timed": true,
+      "caught": false
+    },
+    {
+      "position": 12,
+      "inquiry_id": 18,
+      "item_id": "booking-outer-area-travel-fee",
+      "role": "ordinary",
+      "kind": null,
+      "decision": "approve",
+      "seconds": 25,
+      "timed": true,
+      "caught": null
+    },
+    {
+      "position": 13,
+      "inquiry_id": 4,
+      "item_id": "booking-drain-complete-details",
+      "role": "planted",
+      "kind": "wrong_name",
+      "decision": "approve",
+      "seconds": 26,
+      "timed": true,
+      "caught": false
+    },
+    {
+      "position": 14,
+      "inquiry_id": 31,
+      "item_id": "near-miss-ignore-my-earlier-message",
+      "role": "ordinary",
+      "kind": null,
+      "decision": "approve",
+      "seconds": 29,
+      "timed": true,
+      "caught": null
+    },
+    {
+      "position": 15,
+      "inquiry_id": 1,
+      "item_id": "oos-septic-tank-full",
+      "role": "planted",
+      "kind": "invented_perk",
+      "decision": "approve",
+      "seconds": 34,
+      "timed": true,
+      "caught": false
+    },
+    {
+      "position": 16,
+      "inquiry_id": 10,
+      "item_id": "multi-heater-price-and-warranty",
+      "role": "ordinary",
+      "kind": null,
+      "decision": "approve",
+      "seconds": 53,
+      "timed": true,
+      "caught": null
+    },
+    {
+      "position": 17,
+      "inquiry_id": 13,
+      "item_id": "pricing-water-heater-40gal",
+      "role": "ordinary",
+      "kind": null,
+      "decision": "approve",
+      "seconds": 96,
+      "timed": true,
+      "caught": null
+    },
+    {
+      "position": 18,
+      "inquiry_id": 23,
+      "item_id": "booking-on-thanksgiving",
+      "role": "ordinary",
+      "kind": null,
+      "decision": "approve",
+      "seconds": 78,
+      "timed": true,
+      "caught": null
+    },
+    {
+      "position": 19,
+      "inquiry_id": 32,
+      "item_id": "multi-cancel-and-rebook",
+      "role": "ordinary",
+      "kind": null,
+      "decision": "approve",
+      "seconds": 38,
+      "timed": true,
+      "caught": null
+    },
+    {
+      "position": 20,
+      "inquiry_id": 28,
+      "item_id": "multi-book-flush-and-price",
+      "role": "ordinary",
+      "kind": null,
+      "decision": "reject",
+      "seconds": 59,
+      "timed": true,
+      "caught": null
+    },
+    {
+      "position": 21,
+      "inquiry_id": 17,
+      "item_id": "service-slab-leak",
+      "role": "ordinary",
+      "kind": null,
+      "decision": "reject",
+      "seconds": 42,
+      "timed": true,
+      "caught": null
+    },
+    {
+      "position": 22,
+      "inquiry_id": 30,
+      "item_id": "booking-toilet-install-complete",
+      "role": "ordinary",
+      "kind": null,
+      "decision": "reject",
+      "seconds": 82,
+      "timed": true,
+      "caught": null
+    },
+    {
+      "position": 23,
+      "inquiry_id": 2,
+      "item_id": "vague-toilet-weird-noise",
+      "role": "planted",
+      "kind": "soft_commitment",
+      "decision": "approve",
+      "seconds": 42,
+      "timed": true,
+      "caught": false
+    },
+    {
+      "position": 24,
+      "inquiry_id": 11,
+      "item_id": "availability-next-tuesday-water-heater",
+      "role": "ordinary",
+      "kind": null,
+      "decision": "approve",
+      "seconds": 22,
+      "timed": true,
+      "caught": null
+    }
+  ]
+}

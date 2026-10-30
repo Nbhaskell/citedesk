@@ -1,6 +1,9 @@
 # Reviewer trial (protocol, written before the trial)
 
-Status: draft for the owner to approve. Nothing has been run.
+Status: run on 2026-10-30, one reviewer, one sitting. Results: `eval/reports/review-trial.md` and
+`.json`; decision record D-066. Deviation from the protocol: the reviewer used "Redraft with guidance"
+on three inquiries, which calls the real model; the scorer uses the first decision on each inquiry
+and its timing, and ignores later ones.
 
 All messages, drafts and customers are invented. The trial uses the real review screen on the
 tuned inbox, locally, and nothing is sent anywhere.

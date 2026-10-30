@@ -138,6 +138,7 @@ Acceptance: a stranger can clone and run the demo with the documented commands; 
 - Gmail draft creation behind `MailExporter` (create drafts only, never send).
 - n8n workflow that posts web-form submissions to `/api/inquiries`.
 - Reranking or hybrid search added to the knowledge base, measured with the same evaluation.
+- A review screen that points at what the checks cannot see (the price's source line and service, the greeting name beside the sender, sentences no source backs), then a rerun of the reviewer trial with new plants and ideally a second reviewer (D-066, D-067). Not built: it needs the rerun to claim anything.
 - A real pilot with a willing business: consent, anonymization, and a separate evaluation.
 
 ## Risks to watch while building

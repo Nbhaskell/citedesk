@@ -7,7 +7,6 @@ item is PASS, FAIL or NOT CHECKED, with the evidence. FAILs come first.
 
 | Item | Evidence | Fix |
 |---|---|---|
-| A LICENSE file exists and matches the README | There is no LICENSE file, and GitHub shows no licence (`gh repo view` reports none). The README states no licence. Without one, others have no right to reuse the code. | The owner chooses a licence (MIT is the usual choice for a portfolio project), then add `LICENSE` and one line in the README. Not done: it is the owner's decision. |
 | A short description and topics are set on the repository | `gh repo view` shows an empty description and no topics. The repository is also still private. | Before going public: `gh repo edit --description "..." --add-topic ...`, then change the visibility. Both change the remote, so they wait for the owner. |
 
 ## PASS
@@ -17,6 +16,7 @@ item is PASS, FAIL or NOT CHECKED, with the evidence. FAILs come first.
 | Secrets in history and the working tree | gitleaks v8.30.1 (the project's pre-commit hook, no allowlist): `gitleaks git` scanned 102 commits (2.97 MB), no leaks; `gitleaks dir` scanned the working tree including ignored and untracked files (73.6 MB), no leaks. `.env` is git-ignored and not tracked; `.env.example` holds placeholders only. |
 | Screenshots hold no keys, emails or paths | Three of 66 viewed (`settings-checked`, `detail-review`, the README image): emails are `example.com`, phones are 555-01xx, no file paths or tokens on screen, and every screen carries the "Demo data" footer. All 66 come from one scripted capture of invented data. |
 | Personal data and local traces | `git grep` over tracked files for the username, home paths and personal name finds only the public GitHub username in README links. Every commit's author email is the GitHub no-reply address. Emails not at `example.com` appear only in tests that check the validators reject them (`tests/test_golden.py`, `tests/test_kb_docs.py`, `tests/test_checks.py`); phone numbers outside 555-01xx likewise (`tests/test_golden.py`). `data/`, `.venv/`, `node_modules/`, `build/`, `eval/runs/` and `CLAUDE.md` are git-ignored; no build output or egg-info is tracked. |
+| A LICENSE file exists and matches the README | `LICENSE` is the MIT licence (copyright 2026 Nathan Haskell, the name on every commit); the README's Licence section says MIT. Added after the first run of this checklist, at the owner's choice. All runtime Python dependencies are MIT, BSD, Apache-2.0 or PSF-2.0, so none conflicts. |
 | Third-party data | None. The invented business's README says no names, wording or prices were copied from a real company. |
 | Dependencies | Lock files are present. `pip-audit` on `requirements.lock` and `requirements-dev.lock`: no known vulnerabilities. `npm audit`: 0 vulnerabilities in 480 packages. Runtime Python licences (`pip-licenses` over `requirements.lock`): MIT, BSD-3-Clause, Apache-2.0 and PSF-2.0 only, none conflicting. |
 | Synthetic data is labelled | README banner; the web app's footer and Settings screen ("Demo data. All customers and messages are invented."); `universe/README.md`; the screenshots page. The eight knowledge-base documents in `universe/docs/` are **not** labelled inside the files: they are generated text that the knowledge base indexes, and a label inside them would change what is indexed and the system that was measured (D-067). The label sits in the folder's README beside them. Fictional names use 555-01xx phones and `example.com` emails. |
@@ -36,6 +36,6 @@ item is PASS, FAIL or NOT CHECKED, with the evidence. FAILs come first.
 
 ## The three most important fixes
 
-1. Add a LICENSE (the owner's choice).
-2. Set the repository description and topics, then decide on visibility.
+1. Set the repository description and topics, then decide on visibility.
+2. Check the JavaScript dependency licences.
 3. Re-run `pip-audit` and `npm audit` on the day the repository goes public: they are point-in-time results.

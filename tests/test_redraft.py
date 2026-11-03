@@ -176,7 +176,7 @@ def test_a_redraft_twice_is_refused_the_second_time(
 def test_with_no_passages_there_is_nothing_to_redraft_from(
     conn: sqlite3.Connection, settings: Settings
 ) -> None:
-    """CLAUDE.md rule 6: no draft from nowhere."""
+    """Rule 6 (docs/RULES.md): no draft from nowhere."""
     inquiry_id, first_id = rejected(conn, settings)
     conn.execute("DELETE FROM retrievals WHERE inquiry_id = ?", (inquiry_id,))
     llm = FakeLLM([])

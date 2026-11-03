@@ -19,10 +19,10 @@ export default tseslint.config(
     languageOptions: { globals: globals.browser },
     rules: {
       // Customer text, model output and source passages are rendered as text, never as HTML
-      // (CLAUDE.md rule 5). There is no exception to this rule.
+      // (rule 5, docs/RULES.md). There is no exception to this rule.
       "react/no-danger": "error",
       "react/no-danger-with-children": "error",
-      // No message or draft text in console output (CLAUDE.md rule 4).
+      // No message or draft text in console output (rule 4, docs/RULES.md).
       "no-console": "error",
       "react/prop-types": "off",
     },

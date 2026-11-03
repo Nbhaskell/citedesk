@@ -3,8 +3,8 @@ resolve, and copy the approved text (docs/APP_FLOW.md 4.7 and 4.8).
 
 Every decision is one transaction: the draft status, the inquiry status, the `reviews` row and an
 audit event succeed or fail together. The audit event holds the decision code and the draft id,
-never the reviewer's note or edit (CLAUDE.md rule 4); those live in `reviews` only. Nothing here
-sends anything: `export` records that the text was copied.
+never the reviewer's note or edit (rule 4, docs/RULES.md); those live in `reviews` only. Nothing
+here sends anything: `export` records that the text was copied.
 """
 
 import re

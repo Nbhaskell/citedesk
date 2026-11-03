@@ -947,7 +947,7 @@ def redraft_stage(
 
     Only the latest draft of a `rejected` inquiry can be redrafted. The passages are the ones
     already stored, so the knowledge base is not asked again, and with none there is nothing to
-    write from (CLAUDE.md rule 6). The model is called with no transaction open; if the inquiry
+    write from (rule 6, docs/RULES.md). The model is called with no transaction open; if the inquiry
     changed meanwhile nothing is written. A model that gives no usable draft raises `DraftFailed`
     and leaves the inquiry `rejected`, so the reviewer can try again.
     """

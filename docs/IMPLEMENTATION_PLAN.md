@@ -16,7 +16,7 @@ Skills that help, if installed: `synthetic-business-universe` (phase 1), `ai-ui-
 ## Phase 0: Repository and tooling
 
 Tasks
-1. Create the repo `citedesk` with the layout in `TRD.md` section 3. The planning documents live in `docs/`, and `CLAUDE.md` sits at the repo root.
+1. Create the repo `citedesk` with the layout in `TRD.md` section 3. The planning documents live in `docs/`, and the project rules are in `docs/RULES.md`.
 2. Python 3.13 virtual environment; `pyproject.toml`; pinned `requirements.lock` and `requirements-dev.lock`.
 3. FastAPI app skeleton with `GET /api/status`.
 4. Settings from environment with `.env.example`; `.gitignore` covering `.env`, database files, virtual environment, `node_modules`, eval run outputs except published ones.
@@ -158,7 +158,3 @@ Acceptance: a stranger can clone and run the demo with the documented commands; 
 - Held-out evaluation run once, reported with limits.
 - No automatic sending path exists anywhere in the code.
 - README, case study and checklist report are complete, and all data is labelled as invented.
-
-## First prompt to give Claude Code
-
-> Read CLAUDE.md, then read PRD.md, TRD.md, APP_FLOW.md, UI_UX_DESIGN_BRIEF.md, BACKEND_SCHEMA.md and IMPLEMENTATION_PLAN.md in docs/. Work through Phase 0 and then stop and show me what exists and how to run it. Use the names and values in BACKEND_SCHEMA.md exactly. Write tests first for anything that is plain code. Record decisions that the documents do not cover in docs/DECISIONS.md.

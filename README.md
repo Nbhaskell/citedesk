@@ -154,7 +154,7 @@ Open items, in the order I would take them:
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE). The invented data in `universe/` and `eval/golden/` is released under the same licence.
+MIT. See [LICENSE](LICENSE). The invented data in `universe/` and `eval/golden/` is released under the same licence. The web app's build bundles two fonts from `@fontsource`, Atkinson Hyperlegible and Source Serif 4, under the SIL Open Font License 1.1; neither font file is stored in this repository. Dependencies keep their own licences (the runtime Python ones are MIT, BSD, Apache-2.0 and PSF-2.0; the JavaScript ones are mostly MIT, with a few MPL-2.0, OFL-1.1 and CC-BY-4.0 packages used only for building, testing or as bundled fonts and data).
 
 ## Documentation
 

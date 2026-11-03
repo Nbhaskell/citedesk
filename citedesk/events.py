@@ -1,8 +1,8 @@
 """Audit events: the reviewer-facing history of what happened to an inquiry.
 
 An event holds ids, stage names, status names, timings and codes, never message or draft text
-(CLAUDE.md rule 4). `record_event` is the only code that writes to `audit_events`, and it refuses
-a payload that could carry text:
+(rule 4, docs/RULES.md). `record_event` is the only code that writes to `audit_events`, and it
+refuses a payload that could carry text:
 
 - keys are plain snake_case names;
 - values are numbers, booleans, null, or short code-like tokens (no spaces, at most 64

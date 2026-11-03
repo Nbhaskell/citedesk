@@ -1,6 +1,6 @@
 """Load an inbox of inquiries into the running API.
 
-Run (the API must be listening; see CLAUDE.md for how to start it):
+Run (the API must be listening; see the README for how to start it):
     python -m tools.import_inquiries                      the tuned golden set, to 127.0.0.1:8100
     python -m tools.import_inquiries --dry-run            validate and count, send nothing
     python -m tools.import_inquiries --source inbox.jsonl any JSONL inbox, one object per line

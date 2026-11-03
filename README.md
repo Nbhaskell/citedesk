@@ -25,7 +25,7 @@ Everything is stored in SQLite, with an audit trail that holds ids, stage names,
 
 ## How well it works
 
-Measured on 211 invented inquiries written by one person: 135 **tuned** (the system was adjusted while looking at them) and 76 **held-out** (written afterwards, in new wording, run once, never used for tuning). The full numbers and the evidence for each are in [eval/reports/](eval/reports/README.md).
+Measured on 211 invented inquiries written by one author, an AI model (Claude), from the same fact sheet and documents the system uses: 135 **tuned** (the system was adjusted while looking at them) and 76 **held-out** (written afterwards, in new wording, run once, never used for tuning). The full numbers and the evidence for each are in [eval/reports/](eval/reports/README.md).
 
 | Measure | Target (PRD) | Tuned, 3 passes | Held-out, 3 passes |
 |---|---|---|---|
@@ -48,7 +48,7 @@ More, from the first held-out pass ([report](eval/reports/heldout-think-on.md)):
 
 ## What the numbers do not say
 
-- **Invented data, one labeller.** The documents, prompts, labels and test messages were all written by the same author: the held-out set is unseen but not blind. Results on an invented business show the machinery works; they do not show how it behaves on a real business's messy inbox.
+- **Invented data, one labeller.** The documents, prompts, labels and test messages were all written by the same author (an AI model): the held-out set is unseen but not blind. Results on an invented business show the machinery works; they do not show how it behaves on a real business's messy inbox.
 - **The held-out set is now spent.** Any improvement needs a fresh sealed set before it can be claimed.
 - **Small counts.** Twelve safety items with no misses are compatible with a true miss rate near one in four. Each escalation reason has between 4 and 13 held-out items. The overall rates depend on the mix, which is not a real inbox (54% of held-out items should escalate, against 35% of tuned).
 - **No judge has scored the drafts.** The only look at their quality was a manual read of 30 ([D-049](docs/DECISIONS.md)).
@@ -142,7 +142,7 @@ The held-out split has been run once and the runner refuses it again without a w
 
 ## What to improve
 
-Open items, in the order I would take them:
+Open items, in priority order:
 
 1. **Make the review screen point at what the checks cannot see.** The trial showed a reviewer approving all six planted problems. Three additions are designed but not built or tested: show, beside the draft, the line each price comes from and which service that line is for (today the Sources panel highlights a price inside a passage but does not say what the line is about); show the greeting name beside the sender's; mark sentences that no claim or source backs ("Not from your documents"). All would be warnings only, so the held-out numbers would still describe the system. Building them without a second trial would claim nothing, so this needs a rerun of the reviewer trial with new plants in new wording on different items, and ideally a second reviewer.
 2. **A fresh sealed set.** Any change to understanding, routing or the checks needs a new held-out set written after the change.
@@ -158,4 +158,4 @@ MIT. See [LICENSE](LICENSE). The invented data in `universe/` and `eval/golden/`
 
 ## Documentation
 
-[docs/](docs/): [PRD](docs/PRD.md) (what and why), [TRD](docs/TRD.md) (architecture, stages, checks, API), [APP_FLOW](docs/APP_FLOW.md), [UI_UX_DESIGN_BRIEF](docs/UI_UX_DESIGN_BRIEF.md), [UI_DESIGN_PLAN](docs/UI_DESIGN_PLAN.md), [BACKEND_SCHEMA](docs/BACKEND_SCHEMA.md), [IMPLEMENTATION_PLAN](docs/IMPLEMENTATION_PLAN.md), [DECISIONS](docs/DECISIONS.md) (every decision not covered by the others, D-001 to D-066), [REVIEW_TRIAL](docs/REVIEW_TRIAL.md), and [the knowledge-base contract](docs/knowledge-base-contract.md).
+[docs/](docs/): [PRD](docs/PRD.md) (what and why), [TRD](docs/TRD.md) (architecture, stages, checks, API), [APP_FLOW](docs/APP_FLOW.md), [UI_UX_DESIGN_BRIEF](docs/UI_UX_DESIGN_BRIEF.md), [UI_DESIGN_PLAN](docs/UI_DESIGN_PLAN.md), [BACKEND_SCHEMA](docs/BACKEND_SCHEMA.md), [RULES](docs/RULES.md) (the rules that do not bend), [IMPLEMENTATION_PLAN](docs/IMPLEMENTATION_PLAN.md), [DECISIONS](docs/DECISIONS.md) (every decision not covered by the others, D-001 to D-066), [REVIEW_TRIAL](docs/REVIEW_TRIAL.md), and [the knowledge-base contract](docs/knowledge-base-contract.md).

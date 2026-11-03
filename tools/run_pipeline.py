@@ -1,6 +1,6 @@
 """Run the tuned split through the whole pipeline (screen to check) and write a reading sheet.
 
-Run (needs Ollama and rag-project; see CLAUDE.md):
+Run (needs Ollama and rag-project; see the README):
     python -m tools.run_pipeline                    run all tuned items, summarise, write the sheet
     python -m tools.run_pipeline --sheet 30         how many drafts the reading sheet holds
     python -m tools.run_pipeline --limit 10         only the first 10 items (a check, not a result)

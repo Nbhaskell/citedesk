@@ -1,4 +1,4 @@
-"""Phase 8: logs and events hold no message or draft text (CLAUDE.md rule 4, TRD section 8).
+"""Phase 8: logs and events hold no message or draft text (rule 4 in docs/RULES.md, TRD section 8).
 
 Every message here carries odd words that cannot appear by chance. After the system has read,
 drafted, failed and crashed on them, none may be found in a log record, in a traceback attached to

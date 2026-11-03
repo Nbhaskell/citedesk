@@ -1,6 +1,6 @@
 """Score stages 1 to 3 (screen, understand, route) on the tuned golden split.
 
-Run (needs Ollama with the model; see CLAUDE.md):
+Run (needs Ollama with the model; see the README):
     python -m tools.score_understanding             run the tuned split with the real model
     python -m tools.score_understanding --limit 10  only the first 10 items (a check, not a result)
     python -m tools.score_understanding --from RUN  score a saved run again; no model is called

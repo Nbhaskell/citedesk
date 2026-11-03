@@ -3,7 +3,7 @@
 .env.*
 !.env.example
 
-# Assistant-instruction and local notes files: untracked unless the owner decides otherwise
+# Assistant-instruction and local notes files: untracked (D-012)
 CLAUDE.md
 CLAUDE.local.md
 .claude/

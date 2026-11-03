@@ -2,7 +2,7 @@
 import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
-// The two lint rules that carry safety rules (CLAUDE.md rules 4 and 5) must keep failing the build.
+// The two lint rules that carry safety rules (rules 4 and 5 in docs/RULES.md) must keep failing the build.
 async function rulesBroken(code: string): Promise<string[]> {
   const eslint = new ESLint();
   const [result] = await eslint.lintText(code, { filePath: "src/example.tsx" });

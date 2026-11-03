@@ -7,7 +7,7 @@
     python -m tools.eval_run --resume RUN_ID                  carry on an interrupted run
     python -m tools.eval_run --split heldout --allow-heldout --heldout-passes 3   see below
 
-Needs Ollama with the model and rag-project indexed on Citedesk's documents (CLAUDE.md). This asks
+Needs Ollama with the model and rag-project indexed on Citedesk's documents (README). This asks
 the system and saves raw outputs; it does not score them. `python -m tools.eval_score` does that
 from the saved file, with no model.
 
@@ -443,7 +443,7 @@ def _preflight(settings: Settings) -> str | None:
         return f"the model is not available ({model.reason})"
     kb = check_knowledge_base(settings)
     if kb.status != "ok":
-        return f"the knowledge base is not ready ({kb.reason}); index it first (CLAUDE.md)"
+        return f"the knowledge base is not ready ({kb.reason}); index it first (README)"
     return None
 
 

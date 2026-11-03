@@ -1,13 +1,11 @@
 # Pre-publish checklist report
 
-Run on 2026-10-30 against branch `phase-9-documentation`, before the repository is made public. Each
+Run on 2026-10-30 against branch `phase-9-documentation`, before the repository was made public. Updated on 2026-11-03 after publication: the items that had to wait for the switch are done and recorded below (D-069). Each
 item is PASS, FAIL or NOT CHECKED, with the evidence. FAILs come first.
 
 ## FAIL
 
-| Item | Evidence | Fix |
-|---|---|---|
-| A short description and topics are set on the repository | `gh repo view` shows an empty description and no topics. The repository is also still private. | Before going public: `gh repo edit --description "..." --add-topic ...`, then change the visibility. Both change the remote, so they need a deliberate decision. |
+None open.
 
 ## PASS
 
@@ -17,6 +15,9 @@ item is PASS, FAIL or NOT CHECKED, with the evidence. FAILs come first.
 | Screenshots hold no keys, emails or paths | Three of 66 viewed (`settings-checked`, `detail-review`, the README image): emails are `example.com`, phones are 555-01xx, no file paths or tokens on screen, and every screen carries the "Demo data" footer. All 66 come from one scripted capture of invented data. |
 | Personal data and local traces | `git grep` over tracked files for the username, home paths and personal name finds only the public GitHub username in README links. Every commit's author email is the GitHub no-reply address. Emails not at `example.com` appear only in tests that check the validators reject them (`tests/test_golden.py`, `tests/test_kb_docs.py`, `tests/test_checks.py`); phone numbers outside 555-01xx likewise (`tests/test_golden.py`). `data/`, `.venv/`, `node_modules/`, `build/`, `eval/runs/` and `CLAUDE.md` are git-ignored; no build output or egg-info is tracked. |
 | A LICENSE file exists and matches the README | `LICENSE` is the MIT licence (copyright 2026 Nathan Haskell, the name on every commit); the README's Licence section says MIT. Added after the first run of this checklist, with MIT chosen. All runtime Python dependencies are MIT, BSD, Apache-2.0 or PSF-2.0, so none conflicts. |
+| Repository settings and security features | Public since 2026-11-03. The description and ten topics are set; "delete branch on merge", Dependabot alerts, secret scanning with push protection and private vulnerability reporting are on (each read back through the API). Merged branches were deleted from the remote. |
+| Final-commit checks | On the final commit (`3f1d6a6`): gitleaks over every commit on every branch and the working folder, no leaks; `pip-audit` on both lock files, clean; `npm audit` clean for production dependencies (the `minimatch` advisory above still affects the dev-only lint chain); CI on `main` passed. |
+| After the switch: a stranger's view | An anonymous clone (no credentials) worked: 118 commits, 345 files, no `CLAUDE.md` or `.env`, MIT licence present. All 26 links and images in the README resolve (checked by script, including the CI badge, which reads "passing"). The rendered README on GitHub shows the demo-data banner, both images, all nine sections and both tables. |
 | Third-party data | None. The invented business's README says no names, wording or prices were copied from a real company. |
 | Dependencies | Lock files are present. `pip-audit` on `requirements.lock` and `requirements-dev.lock`: no known vulnerabilities. `npm audit`: 0 vulnerabilities in 480 packages on 2026-10-30. **Re-run on 2026-11-03: `pip-audit` still clean; `npm audit` now reports one moderate advisory**, `minimatch` below 11.0.1 (denial of service by glob-part amplification, GHSA-g3hv-75wg-m249) in the dev-only `eslint` chain, with 0 vulnerabilities for production dependencies (`npm audit --omit=dev`). The only offered fix, `npm audit fix --force`, installs a breaking change to the lint plugins, so it was not applied; it affects the developer's lint run, not the shipped app. Revisit when the `eslint` chain updates. Runtime Python licences (`pip-licenses` over `requirements.lock`): MIT, BSD-3-Clause, Apache-2.0 and PSF-2.0 only, none conflicting. JavaScript licences (`license-checker`, 2026-11-03, 480 packages): 369 MIT, 23 Apache-2.0, 15 ISC, 9 BSD-2-Clause, 3 BSD-3-Clause and a few others permissive; 5 MPL-2.0 packages (`axe-core`, `lightningcss`: test and build tools, not modified or redistributed), 2 OFL-1.1 (the `@fontsource` fonts the build bundles; no font file is in the repo) and 1 CC-BY-4.0 (`caniuse-lite` data, build only). The only `UNLICENSED` entry was the web package itself, which now declares MIT. No conflict with the MIT licence. |
 | Synthetic data is labelled | README banner; the web app's footer and Settings screen ("Demo data. All customers and messages are invented."); `universe/README.md`; the screenshots page. The eight knowledge-base documents in `universe/docs/` are **not** labelled inside the files: they are generated text that the knowledge base indexes, and a label inside them would change what is indexed and the system that was measured (D-067). The label sits in the folder's README beside them. Fictional names use 555-01xx phones and `example.com` emails. |
@@ -30,11 +31,11 @@ item is PASS, FAIL or NOT CHECKED, with the evidence. FAILs come first.
 
 - All 66 screenshots individually: three viewed individually, then all reviewed manually and found to be app screens only. The images were also scanned for names, paths and email.
 - Running the stack on macOS or Linux (CI runs the tests on Linux only; the README says so).
-- The CI badge against `main` after this branch merges, and the public rendering of README links and images (the repository is private).
+- Whether a stranger can complete the demo from the public README: the fresh-clone run used the repository before it was public.
 - Docker Compose: not provided (D-067).
 
-## The three most important fixes
+## Open items
 
-1. Set the repository description and topics, then decide on visibility.
-2. Turn on secret scanning with push protection and Dependabot alerts, and the "delete branch on merge" setting.
-3. Re-run `pip-audit` and `npm audit` on the day the repository goes public: they are point-in-time results.
+1. Re-run `pip-audit` and `npm audit` from time to time (they are point-in-time results) and revisit the `minimatch` advisory when the `eslint` chain updates.
+2. The review-screen fix and a rerun of the reviewer trial (README, "What to improve").
+3. Run the stack on macOS or Linux, or keep saying it is untested.

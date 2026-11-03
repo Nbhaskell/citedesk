@@ -1,6 +1,7 @@
 {
   "name": "citedesk-web",
   "private": true,
+  "license": "MIT",
   "version": "0.0.0",
   "type": "module",
   "description": "Citedesk review UI (Phase 6). API types are generated; see docs/UI_DESIGN_PLAN.md.",

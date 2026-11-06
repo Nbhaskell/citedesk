@@ -109,6 +109,26 @@ export function ReadingAids({
         </ul>
       )}
 
+      {support.unanswered ? (
+        <>
+          <h4>{words.aids.unanswered}</h4>
+          <p className={styles.faint}>{words.aids.unansweredNote}</p>
+          <p className={styles.origin}>
+            <span className={styles.warn}>{words.aids.unansweredFrom}</span>{" "}
+            {support.unanswered.origin.file} › {support.unanswered.origin.section}: “
+            {support.unanswered.origin.line}”{" "}
+            <button
+              type="button"
+              className={styles.marker}
+              onClick={() => onOpenSource(support.unanswered?.origin.source_index ?? 0)}
+              aria-label={words.aids.open(support.unanswered.origin.source_index)}
+            >
+              [{support.unanswered.origin.source_index}]
+            </button>
+          </p>
+        </>
+      ) : null}
+
       {asksKnown.length > 0 ? (
         <>
           <h4>{words.aids.asksKnown}</h4>

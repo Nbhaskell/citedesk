@@ -151,10 +151,19 @@ class SentenceSupport(Strict):
     asks_for: list[str] = []
 
 
+class Unanswered(Strict):
+    """The customer asked what it costs, a passage holds a price for what they described, and the
+    draft gives no price at all (under-answering)."""
+
+    kind: Literal["price"]
+    origin: Origin
+
+
 class DraftSupport(Strict):
     greeting_name: str | None
     figures: list[FigureOrigin]
     sentences: list[SentenceSupport]
+    unanswered: Unanswered | None = None
 
 
 def _content(text: str) -> set[str]:
@@ -243,6 +252,56 @@ def _mismatch(figure: Figure, sentence_words: set[str], origins: list[Origin]) -
     return best < MISMATCH_OVERLAP
 
 
+# A message that asks what something costs (under-answering mark). Billing complaints use "charge"
+# and "rate" in other senses, so only the words that ask for a price are listed.
+_ASKS_PRICE = re.compile(
+    r"\bhow much (?:is|are|does|do|did|would|will|for|to|it|extra|more|you)\b"
+    r"|\bcosts?\b|\bprices?\b|\bpricing\b|\bquotes?\b|\bestimates?\b"
+    r"|\bhow expensive\b|\bwhat do you charge\b",
+    re.IGNORECASE,
+)
+MIN_PRICE_LINE_WORDS = 2  # shared content words that make a price line "about what was asked"
+_NUMBER = re.compile(r"\b\d+\b")
+
+
+def _topic_words(text: str) -> set[str]:
+    """Content words plus the plain numbers in the text, so a 50-gallon tank is told from a
+    40-gallon one."""
+    return _content(text) | set(_NUMBER.findall(text))
+
+
+def _unanswered_price(
+    sentences: list[str], sources: list[Source], inquiry_text: str
+) -> Unanswered | None:
+    """A price the documents hold for what the customer asked about, in a draft that names none.
+    Whether a price the draft does give is the right one is the figure check's work, not this."""
+    if not _ASKS_PRICE.search(inquiry_text):
+        return None
+    if any(f.kind == "money" for sentence in sentences for f in extract_figures(sentence)):
+        return None
+    asked = _topic_words(inquiry_text)
+    given = _keys(extract_figures(inquiry_text))
+    best: tuple[int, Origin] | None = None
+    for index, source in enumerate(sources):
+        for line, whole in _lines_of(source):
+            prices = _keys([f for f in extract_figures(line) if f.kind == "money"])
+            if not prices or prices <= given:
+                continue  # no price on the line, or the customer already quoted it
+            shared = len(asked & _topic_words(whole))
+            if shared >= MIN_PRICE_LINE_WORDS and (best is None or shared > best[0]):
+                best = (
+                    shared,
+                    Origin(
+                        source_index=index,
+                        file=source.file,
+                        section=source.section,
+                        line=line,
+                        context=whole,
+                    ),
+                )
+    return Unanswered(kind="price", origin=best[1]) if best else None
+
+
 def analyse(
     body: str,
     sources: list[Source],
@@ -327,4 +386,9 @@ def analyse(
             ):
                 status = "from_message"
         sentences.append(SentenceSupport(text=sentence, status=status, source_index=source_index))
-    return DraftSupport(greeting_name=name, figures=figures, sentences=sentences)
+    return DraftSupport(
+        greeting_name=name,
+        figures=figures,
+        sentences=sentences,
+        unanswered=_unanswered_price(_sentences(lines), sources, inquiry_text),
+    )

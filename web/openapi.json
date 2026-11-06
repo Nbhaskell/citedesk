@@ -632,6 +632,16 @@
             },
             "title": "Sentences",
             "type": "array"
+          },
+          "unanswered": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Unanswered"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -2228,6 +2238,26 @@
           "sensitive_data_masked"
         ],
         "title": "SubmitResponse",
+        "type": "object"
+      },
+      "Unanswered": {
+        "additionalProperties": false,
+        "description": "The customer asked what it costs, a passage holds a price for what they described, and the\ndraft gives no price at all (under-answering).",
+        "properties": {
+          "kind": {
+            "const": "price",
+            "title": "Kind",
+            "type": "string"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/Origin"
+          }
+        },
+        "required": [
+          "kind",
+          "origin"
+        ],
+        "title": "Unanswered",
         "type": "object"
       },
       "Urgency": {

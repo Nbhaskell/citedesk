@@ -343,6 +343,10 @@ export const detail = {
     asksKnown: "Asks for something the customer already gave",
     asksKnownFor: (details: string[]): string => `Asks for the ${details.join(" and the ")}`,
     asksKnownNote: "The message already says this. Delete the question, or reject with guidance.",
+    unanswered: "A price in your documents that the reply leaves out",
+    unansweredNote:
+      "The customer asked what it costs, and a passage lists a price for what they described, but the reply gives no price. Add it, or reject with guidance.",
+    unansweredFrom: "Listed in",
     tone: "Tone to check",
     toneMark: "Sympathy the message does not call for",
     toneNote:

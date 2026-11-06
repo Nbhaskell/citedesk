@@ -184,3 +184,40 @@ describe("ReadingAids", () => {
     expect(screen.getByText(/Asks for the area and the property type:/)).toBeTruthy();
   });
 });
+
+describe("ReadingAids: a price the reply leaves out", () => {
+  const origin = {
+    source_index: 3,
+    file: "pricing.md",
+    section: "Pricing > Water heaters",
+    line: "Water heater replacement, 50-gallon tank, installed: $1,850",
+  };
+
+  it("shows the line that holds the price and opens its passage", () => {
+    const open = show(support({ unanswered: { kind: "price", origin } }));
+    expect(screen.getByText("A price in your documents that the reply leaves out")).toBeTruthy();
+    expect(screen.getByText(/50-gallon tank, installed: \$1,850/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Open passage 3" }));
+    expect(open).toHaveBeenCalledWith(3);
+  });
+
+  it("shows nothing about it when no price was left out", () => {
+    show(support());
+    expect(screen.queryByText(/leaves out/)).toBeNull();
+  });
+
+  it("shows the line as text, never as markup", () => {
+    const { container } = render(
+      <ReadingAids
+        support={support({
+          unanswered: { kind: "price", origin: { ...origin, line: "<b>$1</b> <img src=x>" } },
+        })}
+        senderName="A"
+        senderEmail={null}
+        onOpenSource={() => {}}
+      />,
+    );
+    expect(container.querySelector("img")).toBeNull();
+    expect(container.querySelector("b")).toBeNull();
+  });
+});

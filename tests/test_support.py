@@ -333,3 +333,112 @@ def test_a_short_sentence_sharing_one_word_with_the_message_is_not_taken_for_an_
 def test_a_longer_echo_of_the_message_is_still_marked_as_theirs() -> None:
     result = run("You asked about the slow kitchen sink in Wren Common.")
     assert statuses(result) == ["from_message"]
+
+
+# --- a price the documents hold and the draft does not give (under-answering) -------------------
+
+HEATER = Source(
+    file="pricing.md",
+    section="Pricing > Water heaters",
+    page=None,
+    text="- Water heater replacement, 40-gallon tank, installed: $1,650\n"
+    "- Water heater replacement, 50-gallon tank, installed: $1,850",
+)
+HEATER_ASK = "How much to replace my 50-gallon water heater tank?"
+
+
+def unanswered(*paragraphs: str, inquiry: str = HEATER_ASK, sources: list[Source] | None = None):
+    pool = [DRAIN, LEAK, WARRANTY, HEATER] if sources is None else sources
+    return support.analyse(frame(*paragraphs), pool, inquiry).unanswered
+
+
+def test_a_price_question_whose_price_is_in_the_documents_but_not_in_the_draft_is_marked() -> None:
+    found = unanswered("A member of our team will confirm a quote for you.")
+    assert found is not None
+    assert found.kind == "price"
+    assert found.origin.file == "pricing.md"
+    assert found.origin.line.startswith("Water heater replacement, 50-gallon")
+    assert found.origin.source_index == 3
+
+
+def test_a_draft_that_gives_a_price_is_not_marked() -> None:
+    assert unanswered("Replacing a 50-gallon water heater tank is $1,850.") is None
+
+
+def test_a_draft_that_gives_any_price_is_not_marked_even_if_it_is_the_wrong_one() -> None:
+    """Whether a figure is right is the figure check's job and the figure list's; this mark is
+    only for a draft that gives none."""
+    assert unanswered("Replacing a 40-gallon water heater tank is $1,650.") is None
+
+
+def test_a_message_that_does_not_ask_about_cost_is_not_marked() -> None:
+    assert (
+        unanswered("A member of our team will confirm.", inquiry="Do you replace water heaters?")
+        is None
+    )
+
+
+def test_no_mark_when_the_documents_hold_no_price_for_what_was_asked() -> None:
+    assert (
+        unanswered("A member of our team will confirm a quote for you.", sources=[WARRANTY]) is None
+    )
+    assert (
+        unanswered(
+            "A member of our team will confirm a quote.",
+            inquiry="How much to repaint my garage door?",
+        )
+        is None
+    )
+
+
+def test_a_price_line_for_other_work_with_one_shared_word_is_not_enough() -> None:
+    other = Source(
+        file="pricing.md",
+        section="Pricing > Inspections",
+        page=None,
+        text="- Camera inspection of a drain or sewer line: $175",
+    )
+    assert (
+        unanswered(
+            "We will confirm a quote.",
+            inquiry="How much to replace my water heater and check the drain?",
+            sources=[other],
+        )
+        is None
+    )
+
+
+def test_the_line_for_what_was_asked_is_chosen_over_a_line_for_something_else() -> None:
+    found = unanswered("We will send a quote.", sources=[DRAIN, HEATER])
+    assert found is not None
+    assert found.origin.section == "Pricing > Water heaters"
+    assert "50-gallon" in found.origin.line
+
+
+def test_the_mark_is_only_for_a_draft_the_aids_were_asked_about() -> None:
+    result = run("Drain cleaning for one fixture starts at $149.")
+    assert result.unanswered is None
+
+
+def test_how_much_notice_is_not_a_question_about_price() -> None:
+    fee = Source(
+        file="policies.md",
+        section="Policies > Cancellation",
+        page=None,
+        text="- To cancel a visit with less notice than 24 hours, a fee of $45 applies.",
+    )
+    assert (
+        unanswered(
+            "A member of our team will confirm.",
+            inquiry="How much notice do I need to give to cancel a visit?",
+            sources=[fee],
+        )
+        is None
+    )
+
+
+def test_a_price_the_customer_already_quoted_is_not_a_price_left_out() -> None:
+    inquiry = "Another plumber quoted me $149 to clear my drain. Will you match their price?"
+    assert (
+        unanswered("A member of our team will follow up.", inquiry=inquiry, sources=[DRAIN]) is None
+    )

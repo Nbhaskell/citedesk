@@ -454,6 +454,7 @@ export interface components {
             greeting_name: string | null;
             /** Sentences */
             sentences: components["schemas"]["SentenceSupport"][];
+            unanswered?: components["schemas"]["Unanswered"] | null;
         };
         /** EscalateBody */
         EscalateBody: {
@@ -896,6 +897,19 @@ export interface components {
             /** Sensitive Data Masked */
             sensitive_data_masked: boolean;
             status: components["schemas"]["InquiryStatus"];
+        };
+        /**
+         * Unanswered
+         * @description The customer asked what it costs, a passage holds a price for what they described, and the
+         *     draft gives no price at all (under-answering).
+         */
+        Unanswered: {
+            /**
+             * Kind
+             * @constant
+             */
+            kind: "price";
+            origin: components["schemas"]["Origin"];
         };
         /**
          * Urgency

@@ -310,7 +310,8 @@ def test_a_model_written_reply_comes_with_its_support(
     inquiry_id, _ = waiting(api_settings)
     support = client.get(f"/api/inquiries/{inquiry_id}").json()["support"]
     assert support is not None
-    assert {"greeting_name", "figures", "sentences"} <= set(support)
+    assert {"greeting_name", "figures", "sentences", "unanswered"} <= set(support)
+    assert support["unanswered"] is None  # the draft states its price
     assert all(
         s["status"] in {"supported", "routine", "from_message", "unsupported"}
         for s in support["sentences"]

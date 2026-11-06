@@ -513,3 +513,23 @@ The protocol (`docs/REVIEW_TRIAL.md`) was approved and committed before the sitt
 - **Reworded where the first run found real cases:** the maintainer persona in the PRD, a first-person aside in the golden set README, and a mockup in the UI brief whose customer quote ran across table rows. Test strings that hold a real-looking address or number are now built from parts.
 
 **Limits.** The patterns are a list and catch what they list; a different phrasing for the same idea passes. "The owner" in the sense of the business owner and in the sense of the project owner cannot be told apart by form, so the check lists decision verbs and misses others. The commit-message hook is enabled per clone; CI covers files but not commit messages.
+
+### D-071. A sealed set, written first and unseen by the session that builds the fixes (written before the items exist)
+**Why.** The held-out set is spent in the sense of D-061 and D-064 as soon as a change is made because of it. The planned changes (intent and escalation fixes, wider phrase lists, draft greeting and sign-off, review-screen aids) all need a test that was written before them. The intent accuracy fell from the tuned split to the held-out one (83.5% to 69.8% over three passes), and the held-out misses are concentrated in `POLICY_EXCEPTION_REQUEST` and `INJECTION_SUSPECTED`, so the fixes are about wording the detectors have not met.
+
+**Method** (the pattern of citeTally D-062).
+- **Written by a separate subagent that is given the documents and the labelling rules but not any existing item or result.** The session that builds the fixes never reads the sealed items. The subagent returns counts only. This removes the limitation recorded for the held-out set, where the same session had read the failure lists before writing, and does not remove the others (one AI author, one labeller).
+- **Kept out of the repository.** The items are in `data/sealed/` (git-ignored). Only the SHA-256 of the built file is committed (`eval/golden/citedesk_sealed.sha256`), before any fix. `python -m tools.golden verify-sealed` compares them; `seal` refuses to replace an existing hash. The summary commands print counts and never an id or text. No test reads the sealed set.
+- **Rules for whoever builds the fixes:** do not open `data/sealed/`; do not run any system on it before the sealed run; do not change the sealed items or the hash after sealing; the labelling guideline is not changed to fit them.
+- **The runner lock is still to be built** (`--split sealed`, refused without a one-time confirmation flag and a matching hash, with the pass count declared up front, as for the held-out ledger in D-062). It is built test-first with scripted fakes, before the run.
+
+**Composition asked for.** About 150 items, new senders and wording, roughly half expected to escalate so that per-reason numbers rest on more than a handful: at least 12 `HEALTH_SAFETY`, 12 `REFUND_OR_DISPUTE`, 14 `POLICY_EXCEPTION_REQUEST` (3 of them commercial-property), 12 `INJECTION_SUSPECTED` with at least 8 near misses that must not be flagged, 8 `LEGAL_THREAT`, 10 `COMPLAINT`, 8 `NOT_IN_KNOWLEDGE_BASE`, 8 spam, and about 55 routine, `request_details` and multi-intent items. About a sixth are written messily (typos, lower case, two topics, a signature, a forwarded quote). Judgment calls are marked in `notes`.
+
+**Targets, fixed here before any fix or result.** Judged on the sealed run, one evaluation of one fixed system, three declared passes, reported as it comes out:
+1. Primary-intent accuracy at least 85% (the PRD target), with its 95% interval.
+2. `HEALTH_SAFETY` escalation recall: no misses, with n reported.
+3. `STRUCTURE` check (greeting, sign-off, length) passed by at least 95% of model-written drafts.
+4. `POLICY_EXCEPTION_REQUEST` and `INJECTION_SUSPECTED` recall, escalation precision and recall, and route accuracy are reported with counts and intervals beside the held-out values (16.7% of 6, 25.0% of 4). An improvement is claimed only where the two 95% intervals do not overlap. No pass mark is set for these.
+A target missed is reported as missed.
+
+**What it still cannot show.** One AI author, so the set is unseen by the fixing session and not blind to the style of the process that wrote the documents. A single labeller. The mix is built to exercise rules and is not a real inbox. Passing would show that the fixes generalise to a second set of invented messages, not that the product works on real customers.

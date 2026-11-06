@@ -21,7 +21,7 @@ from citedesk.models import (
     Route,
     ScreeningResult,
 )
-from citedesk.routing import MODEL_SIGNALS, decide_route
+from citedesk.routing import MAIN_READING_SIGNALS, decide_route
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ITEMS: list[dict[str, Any]] = json.loads(
@@ -48,7 +48,7 @@ def inputs_from_labels(item: dict[str, Any]) -> dict[str, Any]:
         if ReasonCode.LOW_CONFIDENCE in reasons
         else Confidence.high,
         "fields": labels["fields"],
-        "signals": sorted(reasons & MODEL_SIGNALS),
+        "signals": sorted(reasons & MAIN_READING_SIGNALS),
         "screening_result": screening,
     }
 

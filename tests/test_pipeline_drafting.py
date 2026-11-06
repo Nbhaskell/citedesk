@@ -296,7 +296,7 @@ def test_a_model_draft_is_stored_blocked_until_its_checks_have_run(
         DraftKind.reply,
         1,
         "tiny",
-        "draft-v1",
+        "draft-v4",
     )
     assert draft.status is DraftStatus.blocked  # D-028: not ready until checked
     assert draft.body.startswith("Hi Alex") and draft.claims[0].source_index == 0
@@ -522,10 +522,12 @@ def test_a_draft_with_several_problems_names_every_reason(
 def test_a_warning_is_recorded_but_does_not_stop_the_draft(
     conn: sqlite3.Connection, settings: Settings
 ) -> None:
-    no_sign_off = GOOD_DRAFT | {
-        "body": "Hi Alex,\n\nDrain cleaning for one fixture starts at $149."
+    # The code adds the greeting and the sign-off (D-076), so the warning is raised by wording
+    # that refers to the documents instead.
+    jargon_draft = GOOD_DRAFT | {
+        "body": "According to the documents, drain cleaning for one fixture starts at $149."
     }
-    inquiry_id = checked(conn, settings, no_sign_off)
+    inquiry_id = checked(conn, settings, jargon_draft)
     assert status_of(conn, inquiry_id) is S.needs_review
     draft = repo.latest_draft(conn, inquiry_id)
     assert draft is not None and draft.status is DraftStatus.ready
@@ -533,7 +535,7 @@ def test_a_warning_is_recorded_but_does_not_stop_the_draft(
         c for c in repo.list_draft_checks(conn, draft.id) if c.check_code is CheckCode.STRUCTURE
     )
     assert not structure.passed and not structure.blocking and structure.detail is not None
-    assert "sign_off" in structure.detail["missing"]
+    assert structure.detail["jargon"] and structure.detail["missing"] == []
 
 
 def test_the_checks_use_the_sources_the_draft_was_written_from(

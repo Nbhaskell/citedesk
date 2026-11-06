@@ -319,6 +319,40 @@ export const detail = {
     },
     forReference: "For reference, not checked for sending",
   },
+  aids: {
+    title: "Look at these before you approve",
+    intro:
+      "The checks cannot tell whether a sentence is true. These point at what to compare with the sources. Read the whole reply anyway.",
+    greeting: "Greeting",
+    greetingNone: "No name in the greeting",
+    sender: "Message from",
+    senderNone: "no name given",
+    nameDiffers: "The name in the greeting is not the sender's name.",
+    figures: "Figures and where they come from",
+    noFigures: "The reply states no figures.",
+    from: "from",
+    fromMessage: "From the customer's own message.",
+    noOrigin: "Not in your documents.",
+    otherLine:
+      "This line is about something else than the sentence it is used in. Check the service.",
+    open: (index: number): string => `Open passage ${index}`,
+    unsourced: "Sentences no source backs",
+    unsourcedMark: "Not from your documents",
+    noneMarked:
+      "No sentence is marked. That only means each one uses the wording of a passage or of the message. It does not mean the reply is right.",
+    asksKnown: "Asks for something the customer already gave",
+    asksKnownFor: (details: string[]): string => `Asks for the ${details.join(" and the ")}`,
+    asksKnownNote: "The message already says this. Delete the question, or reject with guidance.",
+    unanswered: "A price in your documents that the reply leaves out",
+    unansweredNote:
+      "The customer asked what it costs, and a passage lists a price for what they described, but the reply gives no price. Add it, or reject with guidance.",
+    unansweredFrom: "Listed in",
+    tone: "Tone to check",
+    toneMark: "Sympathy the message does not call for",
+    toneNote:
+      "The customer reported no problem or good news, so a line like this may read oddly. Edit or remove it if it does.",
+    count: (marked: number, total: number): string => `${marked} of ${total} sentences marked`,
+  },
   checks: {
     failed: "Needs attention",
     warning: "Worth a look",

@@ -6,6 +6,7 @@
     python -m tools.eval_run --limit 8                        a quick check, not a result
     python -m tools.eval_run --resume RUN_ID                  carry on an interrupted run
     python -m tools.eval_run --split heldout --allow-heldout --heldout-passes 3   see below
+    python -m tools.eval_run --split sealed --confirm-sealed-once --sealed-passes 3   see below
 
 Needs Ollama with the model and rag-project indexed on Citedesk's documents (README). This asks
 the system and saves raw outputs; it does not score them. `python -m tools.eval_score` does that
@@ -26,6 +27,12 @@ the passes are declared before the first item is read. Every held-out run is wri
 committed ledger `eval/heldout_ledger.json` before its first item. A pass beyond those declared, a
 fresh start of an unfinished run, or a run of a different system is refused unless `--justify TEXT`
 gives a reason, which the ledger keeps. Tuned runs never touch the ledger.
+
+**Sealed set** (D-071). The same rules, with its own committed ledger `eval/sealed_ledger.json`
+and two more: the run needs `--confirm-sealed-once`, and the sealed file
+(`data/sealed/citedesk_sealed_v1.json`, git-ignored) must match the hash committed in
+`eval/golden/citedesk_sealed.sha256`, or nothing is read. The first run declares its passes with
+`--sealed-passes N`. Its labels come from the sealed file, not `citedesk_v1.json`.
 """
 
 import argparse
@@ -264,6 +271,12 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         "--heldout-passes", type=int, help="passes declared by the first held-out run"
     )
     parser.add_argument(
+        "--confirm-sealed-once",
+        action="store_true",
+        help="permit --split sealed (D-071): one evaluation of one fixed system",
+    )
+    parser.add_argument("--sealed-passes", type=int, help="passes declared by the first sealed run")
+    parser.add_argument(
         "--justify", help="a written reason for anything beyond the declared passes"
     )
     args = parser.parse_args(argv)
@@ -302,6 +315,8 @@ def run_command(
     ledger_path: Path,
     preflight: Callable[[], str | None],
     progress: Progress | None = None,
+    sealed_ledger_path: Path | None = None,
+    sealed_hash_matches: Callable[[], bool] = lambda: False,
 ) -> int:
     """Everything `main` does once its inputs exist, so a test can supply scripted ones."""
     split: str = args.split
@@ -321,6 +336,16 @@ def run_command(
         git_known=git.get("commit") is not None and git.get("dirty") is not None,
         split=split,
     )
+    problems += ledger_mod.sealed_problems(
+        split=split,
+        confirmed=args.confirm_sealed_once,
+        limit=args.limit if resumed is None else resumed.get("limit"),
+        dirty=bool(git.get("dirty")),
+        git_known=git.get("commit") is not None and git.get("dirty") is not None,
+        hash_matches=sealed_hash_matches() if split == "sealed" else True,
+    )
+    if split == "sealed" and sealed_ledger_path is None:
+        problems.append("no sealed ledger is configured")
     if problems:
         for problem in problems:
             _say(f"Refused: {problem}")
@@ -339,7 +364,9 @@ def run_command(
         _say(f"the {split} split has no items")
         return 2
     reference_date = golden["header"].get("reference_date", "2026-10-28")
-    ledger = ledger_mod.load(ledger_path) if split == "heldout" else None
+    locked_path = sealed_ledger_path if split == "sealed" else ledger_path
+    ledger = ledger_mod.load(locked_path, split) if split in ec.LOCKED_SPLITS else None
+    declared_passes = args.sealed_passes if split == "sealed" else args.heldout_passes
     began = time.monotonic()
 
     def say_progress(number: int, total: int, record: dict[str, Any]) -> None:
@@ -379,7 +406,7 @@ def run_command(
                 auth = ledger_mod.authorize(
                     ledger,
                     system_identity(header),
-                    passes=args.heldout_passes,
+                    passes=declared_passes,
                     justify=args.justify,
                     resume_run_id=run_id if resumed else None,
                 )
@@ -399,7 +426,7 @@ def run_command(
                 run_file=f"{run_id}.run.json",
                 now=now.isoformat(timespec="seconds"),
             )
-            ledger_mod.save(ledger_path, ledger)
+            ledger_mod.save(locked_path, ledger)
         if justification:
             header["justification_in_ledger"] = True
         out_path = runs_dir / f"{run_id}.run.json"
@@ -429,7 +456,7 @@ def run_command(
                 items=len(run["items"]),
                 failed=sum(1 for r in run["items"] if r["status"] == "failed"),
             )
-            ledger_mod.save(ledger_path, ledger)
+            ledger_mod.save(locked_path, ledger)
         failed = sum(1 for r in run["items"] if r["status"] == "failed")
         print(f"Wrote {out_path} ({len(run['items'])} items, {failed} failed)")
         if header.get("limit"):
@@ -447,6 +474,16 @@ def _preflight(settings: Settings) -> str | None:
     return None
 
 
+def _split_to_run(args: argparse.Namespace) -> str:
+    """The split this invocation will run: a resumed run keeps the split it started with."""
+    if args.resume:
+        path = Path(args.resume)
+        path = path if path.suffix else ec.RUNS_DIR / f"{args.resume}.run.json"
+        if path.exists():
+            return str(json.loads(path.read_text("utf-8"))["header"]["split"])
+    return str(args.split)
+
+
 def main(argv: list[str]) -> int:
     args = parse_args(argv)
     early = ledger_mod.heldout_problems(
@@ -455,6 +492,13 @@ def main(argv: list[str]) -> int:
         dirty=False,
         git_known=True,
         split=args.split,
+    ) + ledger_mod.sealed_problems(
+        split=args.split,
+        confirmed=args.confirm_sealed_once,
+        limit=args.limit,
+        dirty=False,
+        git_known=True,
+        hash_matches=True,
     )
     if early:
         for problem in early:
@@ -462,22 +506,46 @@ def main(argv: list[str]) -> int:
         return 2
 
     from citedesk.providers.ollama import OllamaProvider
+    from tools.golden import SEALED_FILE, SEALED_HASH_FILE, verify_sealed
 
     settings = Settings()
-    golden = json.loads(ec.GOLDEN_FILE.read_text("utf-8"))
+    split = _split_to_run(args)
+    git = ec.git_state()
+    if split == "sealed":
+        # Refused here, before the file is opened: a request that will be turned down must not
+        # read the sealed set at all.
+        refused = ledger_mod.sealed_problems(
+            split=split,
+            confirmed=args.confirm_sealed_once,
+            limit=args.limit,
+            dirty=bool(git.get("dirty")),
+            git_known=git.get("commit") is not None and git.get("dirty") is not None,
+            hash_matches=verify_sealed(SEALED_FILE, SEALED_HASH_FILE),
+        )
+        if refused:
+            for problem in refused:
+                _say(f"Refused: {problem}")
+            return 2
+    golden_path = ec.golden_file_for(split)
+    if not golden_path.is_file():
+        _say(f"Refused: {golden_path.name} does not exist")
+        return 2
+    golden = json.loads(golden_path.read_text("utf-8"))
     return run_command(
         args,
         golden=golden,
-        golden_sha256=ec.file_sha256(),
+        golden_sha256=ec.file_sha256(golden_path),
         settings=settings,
         llm=OllamaProvider.from_settings(settings),
         kb=RagProjectKB(settings.rag_url),
         business=load_business(settings.business_facts_path),
-        git=ec.git_state(),
+        git=git,
         rag=ec.rag_status(settings.rag_url),
         runs_dir=ec.RUNS_DIR,
         ledger_path=ec.LEDGER_FILE,
         preflight=lambda: _preflight(settings),
+        sealed_ledger_path=ec.SEALED_LEDGER_FILE,
+        sealed_hash_matches=lambda: verify_sealed(SEALED_FILE, SEALED_HASH_FILE),
     )
 
 

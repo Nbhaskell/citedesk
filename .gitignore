@@ -45,3 +45,4 @@ Thumbs.db
 
 # Reviewer trial: what is planted stays unread until after the sitting (docs/REVIEW_TRIAL.md)
 eval/trial/
+.cache/

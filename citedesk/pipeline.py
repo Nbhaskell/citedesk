@@ -244,6 +244,7 @@ def understand_stage(
             summary=output.summary,
             safety_net_hit=found.safety_net_hit,
             raw_response=found.raw_response,
+            focused_signals=found.focused_signals,
             duration_ms=found.duration_ms,
             now=now,
         )
@@ -323,13 +324,17 @@ def route_stage(
             now=now,
         )
 
-        # The three flags the model may raise are kept in the reply it gave, not in a column.
+        # The main reading's flags are kept in the reply it gave (D-041); the focused call's are
+        # in their own column (D-075). Both only add reasons.
         flagged = understand.parse_output(classification.raw_response).escalation_signals
+        raised = list(
+            dict.fromkeys([ReasonCode(code) for code in flagged] + classification.focused_signals)
+        )
         decision = routing.decide_route(
             intents=classification.intents,
             primary_confidence=classification.primary_confidence,
             fields=extraction.fields,
-            signals=[ReasonCode(code) for code in flagged],
+            signals=raised,
             screening_result=screening.result,
             safety_net_hit=classification.safety_net_hit,
             escalate_on_low_confidence=settings.escalate_on_low_confidence,
@@ -597,10 +602,15 @@ class _DraftInputs:
     unanswered: list[Intent]
     asking: bool
     missing: list[str]
+    known: dict[str, str]
 
 
 def _draft_inputs(
-    conn: sqlite3.Connection, inquiry: Inquiry, settings: Settings, now: str | None
+    conn: sqlite3.Connection,
+    inquiry: Inquiry,
+    settings: Settings,
+    now: str | None,
+    business_name: str,
 ) -> _DraftInputs:
     """What the model is told when it writes a reply, from what the earlier stages stored."""
     classification = repo.latest_classification(conn, inquiry.id)
@@ -621,7 +631,18 @@ def _draft_inputs(
         if asking
         else []
     )
-    return _DraftInputs(screening, retrieval.merged_sources(rows), unanswered, asking, missing)
+    return _DraftInputs(
+        screening,
+        retrieval.merged_sources(rows),
+        unanswered,
+        asking,
+        missing,
+        drafting.known_details(
+            extraction.fields,
+            message=f"{inquiry.subject or ''}\n{inquiry.body}",
+            business_name=business_name,
+        ),
+    )
 
 
 def draft_stage(
@@ -651,7 +672,7 @@ def draft_stage(
         return inquiry.status
     if repo.latest_draft(conn, inquiry_id) is not None:
         return inquiry.status
-    inputs = _draft_inputs(conn, inquiry, settings, now)
+    inputs = _draft_inputs(conn, inquiry, settings, now, business.name)
     screening, sources, unanswered = inputs.screening, inputs.sources, inputs.unanswered
     asking, missing = inputs.asking, inputs.missing
     events.record_event(
@@ -688,6 +709,7 @@ def draft_stage(
             unanswered=unanswered,
             sensitive_data_masked=screening.sensitive_data_masked,
             max_words=settings.draft_max_words,
+            known_fields=inputs.known,
         )
         kind = DraftKind.request_details if asking else DraftKind.reply
         subject = written.output.subject or drafting.reply_subject(inquiry.subject)
@@ -965,7 +987,7 @@ def redraft_stage(
         or old.status is not DraftStatus.rejected
     ):
         raise review.WrongState("Only the latest rejected draft can be redrafted.")
-    inputs = _draft_inputs(conn, inquiry, settings, now)
+    inputs = _draft_inputs(conn, inquiry, settings, now, business.name)
     if not inputs.sources:
         raise review.WrongState("There are no passages to write a new draft from. Close this item.")
     events.record_event(
@@ -989,6 +1011,7 @@ def redraft_stage(
             sensitive_data_masked=inputs.screening.sensitive_data_masked,
             max_words=settings.draft_max_words,
             guidance=note,
+            known_fields=inputs.known,
         )
     except drafting.DraftFailed as error:
         events.record_event(

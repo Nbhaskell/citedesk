@@ -156,6 +156,7 @@ def collect(
             "sentiment": classification.sentiment.value,
             "model_urgency": model_said["urgency"],
             "model_signals": model_said["escalation_signals"],
+            "focused_signals": [code.value for code in classification.focused_signals],
             "safety_net_hit": classification.safety_net_hit,
             "fields": extraction.fields.model_dump(mode="json"),
             "missing_fields": extraction.missing_fields,

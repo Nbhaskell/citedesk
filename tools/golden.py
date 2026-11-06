@@ -5,6 +5,8 @@ Run:
     python -m tools.golden validate   check the committed file: schema, rules, docs, anchors
     python -m tools.golden report     counts per intent, category, route and reason
     python -m tools.golden schema     write eval/golden/golden.schema.json
+    python -m tools.golden build-sealed | validate-sealed | seal | verify-sealed
+                                      the sealed set in data/sealed/ (D-071); prints counts only
 
 Names and values come from citedesk/models.py, which tests keep in step with
 docs/BACKEND_SCHEMA.md and the database CHECK constraints. The required-fields table is
@@ -31,6 +33,15 @@ SRC_DIR = GOLDEN_DIR / "src"
 GOLDEN_FILE = GOLDEN_DIR / "citedesk_v1.json"
 SCHEMA_FILE = GOLDEN_DIR / "golden.schema.json"
 DOCS_DIR = REPO_ROOT / "universe/docs"
+
+# The sealed set (D-071) lives in a git-ignored folder; only the hash of its built file is
+# committed.
+SEALED_DIR = REPO_ROOT / "data/sealed"
+SEALED_SRC_DIR = SEALED_DIR / "src"
+SEALED_FILE = SEALED_DIR / "citedesk_sealed_v1.json"
+SEALED_HASH_FILE = GOLDEN_DIR / "citedesk_sealed.sha256"
+SEALED_NAME = "citedesk_sealed_v1"
+MAIN_SPLITS = ("tuned", "heldout")
 
 NAME = "citedesk_v1"
 VERSION = 1
@@ -91,7 +102,7 @@ Channel = Literal[schema_enum("channel")]  # type: ignore[valid-type]
 ServiceType = Literal[schema_enum("service_type")]  # type: ignore[valid-type]
 PropertyType = Literal[schema_enum("property_type")]  # type: ignore[valid-type]
 Category = Literal[CATEGORIES]  # type: ignore[valid-type]
-Split = Literal["tuned", "heldout"]
+Split = Literal["tuned", "heldout", "sealed"]
 
 
 class Strict(BaseModel):
@@ -281,7 +292,9 @@ def validate_item(raw: dict[str, Any], docs: dict[str, str]) -> list[str]:
     return [f"{item_id}: {p}" for p in found]
 
 
-def validate_data(data: dict[str, Any], docs: dict[str, str]) -> list[str]:
+def validate_data(
+    data: dict[str, Any], docs: dict[str, str], allowed_splits: tuple[str, ...] = MAIN_SPLITS
+) -> list[str]:
     found: list[str] = []
     if not isinstance(data, dict) or "header" not in data or "items" not in data:
         return ["file must have 'header' and 'items'"]
@@ -304,6 +317,11 @@ def validate_data(data: dict[str, Any], docs: dict[str, str]) -> list[str]:
     seen: Counter[str] = Counter(str(i.get("id")) for i in data["items"] if isinstance(i, dict))
     found += [f"duplicate id {i!r}" for i, n in sorted(seen.items()) if n > 1]
     for raw in data["items"]:
+        if isinstance(raw, dict) and raw.get("split") not in allowed_splits:
+            found.append(
+                f"{raw.get('id', '?')}: split {raw.get('split')!r} is not allowed in this file "
+                f"(it takes only: {', '.join(allowed_splits)})"
+            )
         found += validate_item(raw, docs)
     return found
 
@@ -374,6 +392,62 @@ def report(data: dict[str, Any]) -> str:
     return "\n\n".join(parts)
 
 
+# --- the sealed set (D-071) ------------------------------------------------------------------
+
+
+def build_sealed(src_dir: Path, docs: dict[str, str]) -> tuple[dict[str, Any], list[str]]:
+    """Merge the sealed items and validate them. Only items with split 'sealed' are accepted."""
+    data = build_golden(src_dir, docs, name=SEALED_NAME, version=VERSION, written_by=WRITTEN_BY)
+    return data, validate_data(data, docs, allowed_splits=("sealed",))
+
+
+def file_hash(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def seal(sealed_file: Path, hash_file: Path) -> str:
+    """Record the file's SHA-256 in the committed hash file. Refuses to overwrite a hash."""
+    if hash_file.exists():
+        raise FileExistsError(f"{hash_file.name} already exists; a sealed hash is never replaced")
+    digest = file_hash(sealed_file)
+    hash_file.write_text(digest + "\n", encoding="utf-8")
+    return digest
+
+
+def verify_sealed(sealed_file: Path, hash_file: Path) -> bool:
+    """True when the file exists and its hash equals the committed one."""
+    if not sealed_file.is_file() or not hash_file.is_file():
+        return False
+    return file_hash(sealed_file) == hash_file.read_text(encoding="utf-8").strip()
+
+
+def sealed_summary(data: dict[str, Any]) -> str:
+    """Counts only: no ids, no text, so nothing about any item is shown."""
+    items = data["items"]
+    labels = [i["labels"] for i in items]
+    return "\n\n".join(
+        [
+            f"{len(items)} items",
+            table("Category", Counter(i["category"] for i in items), CATEGORIES),
+            table(
+                "Primary intent",
+                Counter(lab["primary_intent"] for lab in labels),
+                schema_enum("intent"),
+            ),
+            table(
+                "Expected route",
+                Counter(lab["expected_route"] for lab in labels),
+                schema_enum("route"),
+            ),
+            table(
+                "Escalation reason",
+                Counter(r for lab in labels for r in lab["expected_reason_codes"]),
+                schema_enum("reason_code"),
+            ),
+        ]
+    )
+
+
 # --- command line ----------------------------------------------------------------------------
 
 
@@ -409,8 +483,45 @@ def cmd_validate() -> int:
     return 0
 
 
+def cmd_build_sealed() -> int:
+    data, problems = build_sealed(SEALED_SRC_DIR, load_docs())
+    if problems:
+        print(f"Not writing: {len(problems)} problem(s):")
+        for p in problems:
+            print(f"  - {p}")
+        return 1
+    write_json(SEALED_FILE, data)
+    print(f"Wrote {SEALED_FILE.relative_to(REPO_ROOT)}\n")
+    print(sealed_summary(data))
+    return 0
+
+
+def cmd_validate_sealed() -> int:
+    data = json.loads(SEALED_FILE.read_text("utf-8"))
+    problems = validate_data(data, load_docs(), allowed_splits=("sealed",))
+    if problems:
+        print(f"{len(problems)} problem(s):")
+        for p in problems:
+            print(f"  - {p}")
+        return 1
+    print("OK\n")
+    print(sealed_summary(data))
+    return 0
+
+
 def main(argv: list[str]) -> int:
     command = argv[1] if len(argv) > 1 else ""
+    if command == "build-sealed":
+        return cmd_build_sealed()
+    if command == "validate-sealed":
+        return cmd_validate_sealed()
+    if command == "seal":
+        print(f"Sealed: {seal(SEALED_FILE, SEALED_HASH_FILE)}")
+        return 0
+    if command == "verify-sealed":
+        ok = verify_sealed(SEALED_FILE, SEALED_HASH_FILE)
+        print("The sealed file matches the committed hash." if ok else "MISMATCH or missing file.")
+        return 0 if ok else 1
     if command == "build":
         return cmd_build()
     if command == "validate":

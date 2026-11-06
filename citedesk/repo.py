@@ -367,6 +367,7 @@ def insert_classification(
     summary: str | None,
     safety_net_hit: bool,
     raw_response: str,
+    focused_signals: Sequence[ReasonCode | str] = (),
     duration_ms: int | None = None,
     now: str | None = None,
 ) -> int:
@@ -378,8 +379,8 @@ def insert_classification(
         cursor = conn.execute(
             "INSERT INTO classifications (inquiry_id, attempt, model, prompt_version, intents, "
             "primary_intent, primary_confidence, urgency, sentiment, summary, safety_net_hit, "
-            "raw_response, duration_ms, created_at) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "raw_response, focused_signals, duration_ms, created_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 inquiry_id,
                 attempt,
@@ -393,6 +394,7 @@ def insert_classification(
                 summary,
                 int(safety_net_hit),
                 raw_response,
+                _json([ReasonCode(code).value for code in focused_signals]),
                 duration_ms,
                 _now(now),
             ),

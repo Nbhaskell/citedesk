@@ -18,6 +18,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from citedesk import understand
 from citedesk.business import load_business
 from citedesk.config import Settings
 from citedesk.knowledge import RagProjectKB
@@ -179,7 +180,9 @@ def main(argv: list[str]) -> int:
         with_drafts=True,
     )
     run["header"]["stages"] = ["screen", "understand", "route", "retrieve", "draft", "check"]
-    run["header"]["run_id"] = run["header"]["run_id"].replace("understand-v1", "pipeline-v1")
+    run["header"]["run_id"] = run["header"]["run_id"].replace(
+        understand.PROMPT_VERSION, "pipeline-v1"
+    )
     base = RUNS_DIR / run["header"]["run_id"]
     write_json(base.with_suffix(".drafts.json"), run)
     by_id = {i["id"]: i for i in golden["items"]}

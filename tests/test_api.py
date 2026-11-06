@@ -359,6 +359,7 @@ def test_detail_has_every_section_even_when_empty(client: TestClient) -> None:
         "checks",
         "history",
         "duplicates",
+        "support",
     }
     assert (
         detail["classification"] is None
@@ -546,7 +547,7 @@ def test_starting_the_app_twice_does_not_break_the_database(api_settings: Settin
         with TestClient(create_app(api_settings, start_worker=False)) as client:
             assert client.get("/api/status").json()["components"]["database"]["status"] == "ok"
     conn = sqlite3.connect(api_settings.db_path)
-    assert conn.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0] == 1
+    assert conn.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0] == 2
 
 
 def test_with_a_model_the_worker_takes_a_posted_inquiry_all_the_way_to_routing(
@@ -567,7 +568,7 @@ def test_with_a_model_the_worker_takes_a_posted_inquiry_all_the_way_to_routing(
             time.sleep(0.02)
         detail = client.get(f"/api/inquiries/{created['id']}").json()
     assert status == "routed"
-    assert detail["classification"]["prompt_version"] == "understand-v1"
+    assert detail["classification"]["prompt_version"] == "understand-v2"
     assert detail["extraction"]["missing_fields"] == []
     assert detail["inquiry"]["route"] == "draft_reply"
 

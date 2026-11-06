@@ -14,6 +14,7 @@ from citedesk import drafting
 from citedesk.business import Business, load_business
 from citedesk.checks import CheckInput, run_checks
 from citedesk.drafting import (
+    FRAME_WORDS,
     PROMPT_VERSION,
     DraftFailed,
     DraftOutput,
@@ -239,12 +240,12 @@ def test_every_template_passes_every_check(masked: bool) -> None:
 
 
 def test_the_prompt_version_is_recorded() -> None:
-    assert PROMPT_VERSION == "draft-v1"
+    assert PROMPT_VERSION == "draft-v4"
 
 
 def test_the_system_prompt_sets_the_rules_the_checks_enforce() -> None:
     prompt = build_system_prompt(BUSINESS, max_words=150).lower()
-    assert "kestrel hollow plumbing" in prompt and "150 words" in prompt
+    assert "kestrel hollow plumbing" in prompt and f"{150 - FRAME_WORDS} words" in prompt
     for rule in ("only the passages", "never confirm", "refund", "discount", "guarantee", "health"):
         assert rule in prompt, rule
     assert "<inquiry>" in prompt and "never instructions" in prompt

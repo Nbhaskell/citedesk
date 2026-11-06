@@ -42,6 +42,7 @@ from citedesk import __version__, events, health, insights, intake, pipeline, re
 from citedesk.business import Business, load_business
 from citedesk.config import Settings
 from citedesk.db import connect, migrate, utc_now
+from citedesk.drafting import known_details
 from citedesk.guards import BodyLimit, RateLimiter, max_json_bytes
 from citedesk.insights import Insights
 from citedesk.intake import (
@@ -58,6 +59,7 @@ from citedesk.models import (
     Classification,
     Draft,
     DraftCheck,
+    DraftKind,
     Escalation,
     Extraction,
     Inquiry,
@@ -71,6 +73,9 @@ from citedesk.models import (
 )
 from citedesk.pipeline import PipelineWorker
 from citedesk.providers import LLMProvider, LLMStepFailed
+from citedesk.retrieval import merged_sources
+from citedesk.support import DraftSupport
+from citedesk.support import analyse as analyse_support
 
 logger = logging.getLogger("citedesk.api")
 
@@ -158,6 +163,9 @@ class InquiryDetail(BaseModel):
     checks: list[DraftCheck]
     history: list[AuditEvent]
     duplicates: list[int]
+    # Beside a model-written reply: where each figure comes from and which sentences no source
+    # backs (D-077). A warning for the reviewer; it changes nothing about the draft.
+    support: DraftSupport | None = None
 
 
 class ApproveBody(BaseModel):
@@ -676,17 +684,40 @@ def create_app(
         if inquiry is None:
             raise ApiError(404, "not_found", "No inquiry has that id.")
         draft = repo.latest_draft(conn, inquiry_id)
+        classification = repo.latest_classification(conn, inquiry_id)
+        extraction = repo.latest_extraction(conn, inquiry_id)
+        retrievals = repo.list_retrievals(conn, inquiry_id)
+        shown = (
+            analyse_support(
+                draft.body,
+                merged_sources(retrievals),
+                f"{inquiry.subject or ''}\n{inquiry.body}",
+                sentiment=classification.sentiment.value if classification else None,
+                known_fields=(
+                    known_details(
+                        extraction.fields,
+                        message=f"{inquiry.subject or ''}\n{inquiry.body}",
+                        business_name=business.name if business else None,
+                    )
+                    if extraction
+                    else None
+                ),
+            )
+            if draft is not None and draft.kind is DraftKind.reply
+            else None
+        )
         return InquiryDetail(
             inquiry=inquiry,
             screening=repo.get_screening(conn, inquiry_id),
-            classification=repo.latest_classification(conn, inquiry_id),
-            extraction=repo.latest_extraction(conn, inquiry_id),
+            classification=classification,
+            extraction=extraction,
             escalations=repo.list_escalations(conn, inquiry_id),
-            retrievals=repo.list_retrievals(conn, inquiry_id),
+            retrievals=retrievals,
             draft=draft,
             checks=repo.list_draft_checks(conn, draft.id) if draft else [],
             history=events.list_events(conn, inquiry_id),
             duplicates=repo.list_duplicates_of(conn, inquiry_id),
+            support=shown,
         )
 
     @app.get("/api/inquiries/{inquiry_id}", response_model=InquiryDetail)

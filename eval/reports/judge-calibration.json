@@ -1,0 +1,14 @@
+{
+ "n": 36,
+ "exact": 18,
+ "same_side": 20,
+ "kappa": 0.021148036253776422,
+ "matrix": {
+  "partly_supported -> unsupported": 2,
+  "supported -> partly_supported": 11,
+  "supported -> supported": 18,
+  "supported -> unsupported": 5
+ },
+ "judge_flags_what_hand_calls_supported": 16,
+ "judge_passes_what_hand_flags": 0
+}

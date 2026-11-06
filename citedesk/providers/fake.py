@@ -40,8 +40,17 @@ class FakeLLM:
         replies: Iterable[Reply] | Callable[[LLMCall], Reply] = (),
         *,
         model: str = "fake-model",
+        asks_exception: bool | Callable[[LLMCall], Reply] = False,
+        addresses_assistant: bool = False,
     ) -> None:
+        """`asks_exception` and `addresses_assistant` answer the focused questions (a call whose
+        schema has an `asks_for_exception` field). `asks_exception` may instead be a function of the
+        call that returns the whole reply. Those calls are kept in `focused_calls` and never use the
+        scripted replies, so a test that scripts the main reading is not disturbed by them."""
         self.model = model
+        self._asks_exception = asks_exception
+        self._addresses_assistant = addresses_assistant
+        self.focused_calls: list[LLMCall] = []
         self.calls: list[LLMCall] = []
         self._function = replies if callable(replies) else None
         self._queue: list[Reply] = [] if callable(replies) else list(replies)
@@ -59,6 +68,22 @@ class FakeLLM:
         think: bool = False,
     ) -> LLMResult:
         call = LLMCall(system, user, schema, temperature, max_tokens, timeout_s, seed, think)
+        if "asks_for_exception" in schema.get("properties", {}):
+            self.focused_calls.append(call)
+            reply = (
+                self._asks_exception(call)
+                if callable(self._asks_exception)
+                else {
+                    "asks_for_exception": self._asks_exception,
+                    "addresses_the_assistant": self._addresses_assistant,
+                }
+            )
+            if isinstance(reply, Exception):
+                raise reply
+            if isinstance(reply, LLMResult):
+                return reply
+            text = reply if isinstance(reply, str) else json.dumps(reply)
+            return LLMResult(text=text, model=self.model, duration_ms=1)
         self.calls.append(call)
         if self._function is not None:
             reply = self._function(call)

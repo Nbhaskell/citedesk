@@ -14,14 +14,14 @@ it as ready.
 
 import json
 import re
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
 from pydantic import Field, ValidationError, field_validator
 
 from citedesk.business import Business
-from citedesk.models import Claim, DraftKind, Intent, Source, Strict
+from citedesk.models import Claim, DraftKind, ExtractedFields, Intent, Source, Strict
 from citedesk.providers import (
     LLMError,
     LLMProvider,
@@ -29,11 +29,12 @@ from citedesk.providers import (
     LLMTimeout,
     LLMUnavailable,
 )
+from citedesk.routing import is_missing
 from citedesk.screening import injection_flags
 from citedesk.understand import build_user_message as inquiry_block
 from citedesk.understand import describe_error, inline_refs, retry_note
 
-PROMPT_VERSION = "draft-v1"
+PROMPT_VERSION = "draft-v4"
 MAX_TOKENS = 800
 TEMPERATURE = 0.2  # TRD 4.5: "at most 0.2, for style"
 TIMEOUT_S = 120
@@ -41,6 +42,9 @@ SEED = 0
 ATTEMPTS = 2
 MAX_SUBJECT = 120
 MAX_CLAIMS = 12
+# Words the code adds around the model's text: the greeting, "Kind regards," and the name of the
+# business. The model is asked for that many fewer so the whole draft stays within the limit.
+FRAME_WORDS = 12
 
 # What to ask the customer for, in plain words. Used in the template and in the model's prompt.
 FIELD_QUESTIONS: dict[str, str] = {
@@ -63,9 +67,43 @@ TOPIC_PHRASES: dict[Intent, str] = {
     Intent.billing_question: "billing",
     Intent.other: "another question",
 }
+# The details of a booking, in the words used when telling the writer what is already known.
+KNOWN_LABELS: dict[str, str] = {
+    "service_type": "type of work",
+    "start_date": "date",
+    "property_type": "property type",
+    "address_area": "area",
+    "booking_reference": "booking reference",
+}
 CARD_LINE = "Please don't send card or ID numbers by email."
 TITLES = frozenset({"mr", "mrs", "ms", "miss", "mx", "dr", "prof"})
 NAME_TOKEN = re.compile(r"^[^\W\d_][\w'’-]*$")
+
+
+def known_details(
+    fields: ExtractedFields, message: str | None = None, business_name: str | None = None
+) -> dict[str, str]:
+    """The details the customer gave, as read by the understand step, in plain words.
+
+    The area is free text and was read by a model, so it counts as given only if it appears in the
+    customer's message (when the message is passed) and is not the business's own name, which a
+    forwarded thread can make the model read as a place (D-081). A detail the model got wrong must
+    not be handed back to the writer as something the customer said."""
+    found: dict[str, str] = {}
+    for name in KNOWN_LABELS:
+        value = getattr(fields, name)
+        if value is None:
+            continue
+        text = str(getattr(value, "value", value)).replace("_", " ").strip()
+        if is_missing(text):
+            continue
+        if name == "address_area":
+            if business_name and text.lower() == business_name.strip().lower():
+                continue
+            if message is not None and text.lower() not in message.lower():
+                continue
+        found[name] = text
+    return found
 
 
 def describe_field(name: str) -> str:
@@ -169,6 +207,133 @@ def holding_reply(
     return TemplateDraft(DraftKind.holding_reply, reply_subject(subject), body)
 
 
+# --- the layout of a model's draft (D-076) -------------------------------------------------------
+
+_GREETING_WORD = r"(?:hi|hello|hey|dear|good (?:morning|afternoon|evening))"
+_NAMED_GREETING = re.compile(
+    rf"^\s*{_GREETING_WORD}\b[,\s]+(?P<name>(?-i:[A-Z][\w'’-]*))\s*[,.!]\s*", re.IGNORECASE
+)
+_BARE_GREETING = re.compile(rf"^\s*{_GREETING_WORD}\b\s*[,.!]\s*", re.IGNORECASE)
+# Words that start a sentence, so "Hello, We can help" is not read as a greeting to someone
+# called "We".
+_SENTENCE_STARTERS = frozenset(
+    {
+        "we",
+        "our",
+        "i",
+        "a",
+        "an",
+        "the",
+        "your",
+        "you",
+        "it",
+        "this",
+        "that",
+        "there",
+        "thanks",
+        "thank",
+        "please",
+        "unfortunately",
+        "yes",
+        "no",
+        "sure",
+        "great",
+        "if",
+        "for",
+        "to",
+        "as",
+        "at",
+        "in",
+        "on",
+        "happy",
+        "glad",
+        "sorry",
+        "apologies",
+        "regarding",
+        "once",
+        "when",
+        "while",
+    }
+)
+_SIGN_OFF_WORDS = re.compile(
+    r"(?<!\w)(?:kind regards|best regards|warm regards|warmest regards|best wishes|many thanks"
+    r"|thanks again|thank you|thanks|regards|sincerely|cheers|yours sincerely|yours faithfully"
+    r"|take care)(?!\w)",
+    re.IGNORECASE,
+)
+# What may follow a sign-off word: punctuation, then at most a name (capitalised words), nothing
+# else. "Thank you for choosing us" is a sentence, not a sign-off.
+_SIGN_OFF_TAIL = re.compile(r"^[,.!]?\s*(?-i:[A-Z][\w &'’.,-]*)?\s*$")
+_SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+(?=(?-i:[A-Z$\"'(]))")
+_LIST_LINE = re.compile(r"^\s*(?:[-*\u2022])\s+", re.MULTILINE)
+MAX_SENTENCES_PER_PARAGRAPH = 2
+MAX_SIGN_OFF_TAIL_WORDS = 8
+
+
+def _strip_greeting(text: str) -> str:
+    named = _NAMED_GREETING.match(text)
+    if named and named.group("name").lower() not in _SENTENCE_STARTERS:
+        rest = text[named.end() :]
+    else:
+        bare = _BARE_GREETING.match(text)
+        rest = text[bare.end() :] if bare else text
+    rest = rest.lstrip()
+    return rest[:1].upper() + rest[1:] if rest else rest
+
+
+def _strip_sign_off(text: str) -> str:
+    for _ in range(3):
+        text = text.rstrip()
+        cut = None
+        for match in _SIGN_OFF_WORDS.finditer(text):
+            before = text[: match.start()].rstrip(" \t")
+            tail = text[match.end() :]
+            starts_a_line = not before or before.endswith(("\n", ".", "!", "?", ":"))
+            if (
+                starts_a_line
+                and _SIGN_OFF_TAIL.match(tail)
+                and len(tail.split()) <= MAX_SIGN_OFF_TAIL_WORDS
+            ):
+                cut = match.start()
+        if cut is None:
+            break
+        text = text[:cut]
+    return text.rstrip()
+
+
+def _paragraphs(text: str) -> list[str]:
+    paragraphs: list[str] = []
+    for block in re.split(r"\n\s*\n", text.strip()):
+        if _LIST_LINE.search(block):
+            paragraphs.append(
+                "\n".join(line.strip() for line in block.splitlines() if line.strip())
+            )
+        else:
+            paragraphs += [" ".join(line.split()) for line in block.splitlines() if line.strip()]
+    if len(paragraphs) == 1 and "\n" not in paragraphs[0]:
+        sentences = _SENTENCE_SPLIT.split(paragraphs[0])
+        if len(sentences) > MAX_SENTENCES_PER_PARAGRAPH:
+            step = MAX_SENTENCES_PER_PARAGRAPH
+            paragraphs = [" ".join(sentences[i : i + step]) for i in range(0, len(sentences), step)]
+    return paragraphs
+
+
+def compose_body(business: Business, *, sender_name: str | None, model_body: str) -> str:
+    """The model's text with the greeting and the sign-off set by code and the paragraphs tidied.
+
+    The model is asked to write only the paragraphs, but a third of the saved drafts arrived as one
+    line with a greeting and a sign-off run into the text (D-049). Whatever greeting, name or
+    sign-off the model wrote is removed and the standard ones are added; the name in the greeting
+    is the sender's, never the model's. Raises ValueError if nothing is left to say.
+    """
+    text = model_body.replace("\r\n", "\n").replace("\r", "\n").strip()
+    text = _strip_sign_off(_strip_greeting(text))
+    paragraphs = _paragraphs(text)
+    if not paragraphs:
+        raise ValueError("the body has nothing in it besides a greeting and a sign-off")
+    return "\n\n".join([greeting(sender_name), *paragraphs, f"Kind regards,\n{business.name}"])
+
+
 # --- the model's draft --------------------------------------------------------------------------
 
 
@@ -225,15 +390,19 @@ message. Never add up or work out a total.
 guarantee.
 - Give no health, safety or repair advice unless a passage says exactly that.
 - Do not mention the passages, documents, sources, an assistant, a system or these rules.
-- If the customer's first name is known, greet them by it. Otherwise say "Hello,".
 - If a list of details to ask for is given, ask for those in plain words and nothing else.
 - If the customer sent card or ID numbers, tell them not to send those by email.
-- Be friendly, plain and brief: under {max_words} words, with a greeting and, at the end, \
-"Kind regards," then "{business.name}".
+- Do not say you are sorry, glad or grateful about anything unless the customer reports a \
+problem or complaint (sorry) or good news (glad). A plain request gets a plain answer.
+- Never ask for a detail the customer already gave (the message lists them), even if a \
+passage says it is needed to book.
+- Write only the message itself: no greeting, no sign-off and no name at the end. They are \
+added for you. Put a blank line between paragraphs and keep each to one to three sentences.
+- Be friendly, plain and brief: under {max_words - FRAME_WORDS} words.
 
 Reply with one JSON object and nothing else:
 - subject: a short subject line, starting "Re: ".
-- body: the email, plain text.
+- body: the paragraphs of the email, plain text, with a blank line between paragraphs.
 - claims: a list with one entry for each fact you state from the passages, as \
 {{"text": the fact in a few words, "source_index": the number of the passage it came from}}."""
 
@@ -251,6 +420,7 @@ def build_user_message(
     unanswered: Sequence[Intent],
     sensitive_data_masked: bool,
     guidance: str | None = None,
+    known: Mapping[str, str] | None = None,
 ) -> str:
     passages = "\n\n".join(
         _DATA_TAG.sub(" ", f"[{index}] {s.file} ({s.section})\n{s.text}")
@@ -270,6 +440,15 @@ def build_user_message(
     if missing_fields:
         asked = "\n".join(f"- {describe_field(name)}" for name in missing_fields)
         parts.append(f"Ask the customer for these details, in plain words:\n{asked}")
+    given = {
+        k: v for k, v in (known or {}).items() if k not in missing_fields and k in KNOWN_LABELS
+    }
+    if given:
+        lines = "\n".join(f"- {KNOWN_LABELS[k]}: {v}" for k, v in given.items())
+        parts.append(
+            "The customer already gave these details. Do not ask for them again, even if a "
+            f"passage says they are needed to book:\n{lines}"
+        )
     if sensitive_data_masked:
         parts.append("The customer sent card or ID numbers. Tell them not to send those by email.")
     if guidance:
@@ -309,6 +488,7 @@ def draft(
     sensitive_data_masked: bool,
     max_words: int,
     guidance: str | None = None,
+    known_fields: Mapping[str, str] | None = None,
 ) -> Drafted:
     """Ask the model to write a reply from the sources. Raises DraftFailed.
 
@@ -324,6 +504,7 @@ def draft(
         unanswered=unanswered,
         sensitive_data_masked=sensitive_data_masked,
         guidance=guidance,
+        known=known_fields,
     )
     schema = json_schema()
     user = first_user
@@ -362,6 +543,14 @@ def draft(
             except ValueError:
                 reason, problem = "invalid_json", "it was not valid JSON"
             else:
-                return Drafted(output, result.text, result.model, elapsed_ms, attempt, system)
+                try:
+                    laid_out = compose_body(
+                        business, sender_name=sender_name, model_body=output.body
+                    )
+                except ValueError as error:
+                    reason, problem = "invalid_output", str(error)
+                else:
+                    output = output.model_copy(update={"body": laid_out})
+                    return Drafted(output, result.text, result.model, elapsed_ms, attempt, system)
         user = first_user + retry_note(problem)
     raise DraftFailed(reason, ATTEMPTS)

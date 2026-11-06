@@ -49,7 +49,7 @@ def run(llm: FakeLLM, **over: Any) -> understand.Understanding:
 
 
 def test_the_prompt_version_is_recorded() -> None:
-    assert PROMPT_VERSION == "understand-v1"
+    assert PROMPT_VERSION == "understand-v2"
 
 
 def test_the_system_prompt_lists_every_value_the_model_may_use() -> None:
@@ -487,6 +487,7 @@ def test_a_recorded_ollama_reply_goes_through_provider_and_step() -> None:
         body="Can I book a leak repair for Nov 12th at my house in Fernhill?",
         received_at="2026-10-28T12:00:00Z",
         enable_thinking=False,
+        focused_checks=False,  # the recording holds the main reading only
     )
     assert result.output.primary_intent is Intent.booking_request
     assert result.fields.service_type is ServiceType.leak_repair

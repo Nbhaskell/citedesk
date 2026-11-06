@@ -17,15 +17,22 @@ from typing import Any
 from urllib.parse import urlparse
 
 from citedesk.providers.ollama import LOOPBACK_HOSTS
-from tools.golden import GOLDEN_FILE, REPO_ROOT
+from tools.golden import GOLDEN_FILE, REPO_ROOT, SEALED_FILE
 
 RUNS_DIR = REPO_ROOT / "eval/runs"
 REPORTS_DIR = REPO_ROOT / "eval/reports"
 LEDGER_FILE = REPO_ROOT / "eval/heldout_ledger.json"
-SPLITS = ("tuned", "heldout")
+SEALED_LEDGER_FILE = REPO_ROOT / "eval/sealed_ledger.json"
+SPLITS = ("tuned", "heldout", "sealed")
+LOCKED_SPLITS = ("heldout", "sealed")
 
 # What changes while an evaluation is running without changing the system under test.
-IGNORED_FOR_DIRTY = ("eval/heldout_ledger.json", "eval/runs/", "eval/reports/")
+IGNORED_FOR_DIRTY = (
+    "eval/heldout_ledger.json",
+    "eval/sealed_ledger.json",
+    "eval/runs/",
+    "eval/reports/",
+)
 
 # The parts of rag-project's status that describe its configuration, not its clock.
 RAG_IDENTITY_KEYS = ("chat_model", "embed_model", "thinking", "split_search", "files", "chunks")
@@ -40,6 +47,11 @@ def select_split(golden: dict[str, Any], split: str) -> list[dict[str, Any]]:
     if split not in SPLITS:
         raise ValueError(f"unknown split {split!r}; the splits are {', '.join(SPLITS)}")
     return [item for item in golden["items"] if item["split"] == split]
+
+
+def golden_file_for(split: str) -> Path:
+    """The file the labels of a split are in: the sealed set is kept apart (D-071)."""
+    return SEALED_FILE if split == "sealed" else GOLDEN_FILE
 
 
 def split_sha256(items: Iterable[dict[str, Any]]) -> str:

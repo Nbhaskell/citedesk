@@ -60,10 +60,10 @@ def problems(a: list[dict[str, Any]], b: list[dict[str, Any]]) -> list[str]:
             found.append(f"the {name} group has no runs")
     if found:
         return found
-    if any(_header(one).get("split") == "heldout" for one in [*a, *b]):
+    if any(_header(one).get("split") in ec.LOCKED_SPLITS for one in [*a, *b]):
         found.append(
-            "held-out runs cannot be compared: the held-out result is not used to choose "
-            "between settings (D-061); make the choice on the tuned split"
+            "held-out and sealed runs cannot be compared: their results are not used to choose "
+            "between settings (D-061, D-071); make the choice on the tuned split"
         )
     for name, group in (("first", a), ("second", b)):
         why = _within(group)
@@ -186,7 +186,7 @@ def main(argv: list[str]) -> int:
 
     # Read only the splits the runs were made on; refuse before reading labels if held-out.
     headers = [json.loads(p.read_text("utf-8"))["header"] for p in [*args.a, *args.b]]
-    if any(h.get("split") == "heldout" for h in headers):
+    if any(h.get("split") in ec.LOCKED_SPLITS for h in headers):
         print("Refused: " + problems_for_heldout(), file=sys.stderr)
         return 2
     golden = json.loads(ec.GOLDEN_FILE.read_text("utf-8"))
@@ -210,8 +210,8 @@ def main(argv: list[str]) -> int:
 
 def problems_for_heldout() -> str:
     return (
-        "held-out runs cannot be compared: the held-out result is not used to choose between "
-        "settings (D-061); make the choice on the tuned split"
+        "held-out and sealed runs cannot be compared: their results are not used to choose "
+        "between settings (D-061, D-071); make the choice on the tuned split"
     )
 
 

@@ -335,6 +335,8 @@ export interface components {
             created_at: string;
             /** Duration Ms */
             duration_ms: number | null;
+            /** Focused Signals */
+            focused_signals: components["schemas"]["ReasonCode"][];
             /** Id */
             id: number;
             /** Inquiry Id */
@@ -444,6 +446,16 @@ export interface components {
          * @enum {string}
          */
         DraftStatus: "ready" | "blocked" | "approved" | "rejected" | "superseded";
+        /** DraftSupport */
+        DraftSupport: {
+            /** Figures */
+            figures: components["schemas"]["FigureOrigin"][];
+            /** Greeting Name */
+            greeting_name: string | null;
+            /** Sentences */
+            sentences: components["schemas"]["SentenceSupport"][];
+            unanswered?: components["schemas"]["Unanswered"] | null;
+        };
         /** EscalateBody */
         EscalateBody: {
             /** Note */
@@ -513,6 +525,19 @@ export interface components {
             inquiry_id: number;
             /** Missing Fields */
             missing_fields: string[];
+        };
+        /** FigureOrigin */
+        FigureOrigin: {
+            /** Figure */
+            figure: string;
+            /** From Message */
+            from_message: boolean;
+            /** Mismatch */
+            mismatch: boolean;
+            /** Origins */
+            origins: components["schemas"]["Origin"][];
+            /** Sentence */
+            sentence: string;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -584,6 +609,7 @@ export interface components {
             /** Retrievals */
             retrievals: components["schemas"]["Retrieval"][];
             screening: components["schemas"]["Screening"] | null;
+            support?: components["schemas"]["DraftSupport"] | null;
         };
         /** InquiryList */
         InquiryList: {
@@ -679,6 +705,17 @@ export interface components {
             /** Thread Id */
             thread_id?: string | null;
         };
+        /** Origin */
+        Origin: {
+            /** File */
+            file: string;
+            /** Line */
+            line: string;
+            /** Section */
+            section: string;
+            /** Source Index */
+            source_index: number;
+        };
         /**
          * PropertyType
          * @enum {string}
@@ -769,6 +806,23 @@ export interface components {
          * @enum {string}
          */
         ScreeningResult: "clean" | "spam" | "injection_suspected";
+        /** SentenceSupport */
+        SentenceSupport: {
+            /**
+             * Asks For
+             * @default []
+             */
+            asks_for: string[];
+            /** Source Index */
+            source_index: number | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "supported" | "routine" | "from_message" | "unsupported" | "tone" | "asks_known";
+            /** Text */
+            text: string;
+        };
         /**
          * Sentiment
          * @enum {string}
@@ -843,6 +897,19 @@ export interface components {
             /** Sensitive Data Masked */
             sensitive_data_masked: boolean;
             status: components["schemas"]["InquiryStatus"];
+        };
+        /**
+         * Unanswered
+         * @description The customer asked what it costs, a passage holds a price for what they described, and the
+         *     draft gives no price at all (under-answering).
+         */
+        Unanswered: {
+            /**
+             * Kind
+             * @constant
+             */
+            kind: "price";
+            origin: components["schemas"]["Origin"];
         };
         /**
          * Urgency

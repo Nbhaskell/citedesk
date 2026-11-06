@@ -91,13 +91,13 @@ def test_utc_now_is_iso_8601_utc() -> None:
 
 
 def test_all_migrations_apply_to_an_empty_database(conn: sqlite3.Connection) -> None:
-    assert migrate(conn, REAL_MIGRATIONS) == [1]
+    assert migrate(conn, REAL_MIGRATIONS) == [1, 2]
     assert tables(conn) == EXPECTED_TABLES
 
 
 def test_the_applied_migration_is_recorded(conn: sqlite3.Connection) -> None:
     migrate(conn, REAL_MIGRATIONS)
-    row = conn.execute("SELECT * FROM schema_migrations").fetchone()
+    row = conn.execute("SELECT * FROM schema_migrations ORDER BY version").fetchone()
     assert (row["version"], row["name"]) == (1, "init")
     assert re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", row["applied_at"])
 
@@ -105,7 +105,7 @@ def test_the_applied_migration_is_recorded(conn: sqlite3.Connection) -> None:
 def test_migrating_twice_applies_nothing_the_second_time(conn: sqlite3.Connection) -> None:
     migrate(conn, REAL_MIGRATIONS)
     assert migrate(conn, REAL_MIGRATIONS) == []
-    assert conn.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0] == 1
+    assert conn.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0] == 2
 
 
 def test_migration_file_is_exactly_the_sql_in_the_schema_document() -> None:

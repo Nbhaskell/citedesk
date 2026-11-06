@@ -73,7 +73,7 @@ Targets are starting hypotheses. Replace them with the measured baseline after t
 4. As staff, I edit the draft and approve it, or reject it with a reason, so the record shows what happened.
 5. As an owner, I see urgent and sensitive messages flagged with the reason, so nothing serious waits in the queue.
 6. As an owner, I see counts of handled, approved unchanged, edited, rejected and escalated, so I can judge whether it helps.
-7. As the author, I run an evaluation and get a report of scores with limits, so I can publish honest results.
+7. As a maintainer, I run an evaluation and get a report of scores with limits, so I can publish honest results.
 
 ## 9. Functional requirements
 

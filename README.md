@@ -46,7 +46,7 @@ More, from the first held-out pass ([report](eval/reports/heldout-think-on.md)):
 - **Checks in code, not a model** ([TRD](docs/TRD.md)): a model never decides that a draft is safe. The cost is that the checks are phrase lists (see below).
 - **One held-out run** ([D-061 to D-064](docs/DECISIONS.md)): enforced by a committed ledger ([eval/heldout_ledger.json](eval/heldout_ledger.json)) and tests, so the weak held-out number could not be quietly retried.
 
-**The reviewer trial** ([report](eval/reports/review-trial.md), [D-066](docs/DECISIONS.md)): one reviewer, who also built the system, reviewed 24 inquiries. Median review time was **37 seconds** (p90 81 s), so "check a ready draft in under a minute" held. Six drafts each had one planted problem that passed every automated check (a made-up perk, a soft promise, a credit nobody offered, a wrong name, a price from the wrong service, a sentence describing how the desk works). **All six were approved unchanged: 0 of 6 caught** (exact 95% interval 0 to 46%). The same reviewer rejected 3 of 14 ordinary drafts for real flaws. The setting favoured the reviewer (they knew some drafts had problems and 6 of 20 were bad), so the catch count is probably an upper bound.
+**The reviewer trial** ([report](eval/reports/review-trial.md), [D-066](docs/DECISIONS.md)): one reviewer, who also built the system, reviewed 24 inquiries. Median review time was **37 seconds** (p90 81 s), so "check a ready draft in under a minute" held. Six drafts each had one planted problem that passed every automated check (a made-up perk, a soft promise, a credit nobody offered, a wrong name, a price from the wrong service, a sentence describing how the desk works). **All six were approved unchanged: 0 of 6 caught** (exact 95% interval 0 to 46%). Reading the stored drafts afterwards (D-077), one of the six, the swapped price, shows a price that agrees with the sources, so it was not a defect: the count is better read as 0 of 5 real problems. The same reviewer rejected 3 of 14 ordinary drafts for real flaws. The setting favoured the reviewer (they knew some drafts had problems and 6 of 20 were bad), so the catch count is probably an upper bound.
 
 ## What the numbers do not say
 
@@ -60,7 +60,7 @@ More, from the first held-out pass ([report](eval/reports/heldout-think-on.md)):
 
 What follows is what the tests and the measured runs show, with the file that shows it.
 
-**The person who reviews did not catch what the checks missed.** See the trial above. Do not read "a person approves everything" as a safety guarantee: it is only as good as the review, and the review screen does not yet point at the things the checks cannot see.
+**The person who reviews did not catch what the checks missed.** See the trial above. Do not read "a person approves everything" as a safety guarantee: it is only as good as the review, and the review screen did not point at the things the checks cannot see. Since the trial it does (D-077, see "What to improve"), but that has not been tried on a reviewer.
 
 **Prompt injection is only partly stopped.** There are three lines of defence: screening patterns (plain code), the draft checks (plain code), and a person who reads every draft (see the trial). Nothing is sent automatically.
 - Screening flagged all 6 injection items in the tuned set, which its patterns were written with in view. On the held-out set it flagged 1 of 4; the other 3 reached a reviewer as ordinary replies.
@@ -147,7 +147,7 @@ The held-out split has been run once and the runner refuses it again without a w
 
 Open items, in priority order:
 
-1. **Make the review screen point at what the checks cannot see.** The trial showed a reviewer approving all six planted problems. Three additions are designed but not built or tested: show, beside the draft, the line each price comes from and which service that line is for (today the Sources panel highlights a price inside a passage but does not say what the line is about); show the greeting name beside the sender's; mark sentences that no claim or source backs ("Not from your documents"). All would be warnings only, so the held-out numbers would still describe the system. Building them without a second trial would claim nothing, so this needs a rerun of the reviewer trial with new plants in new wording on different items, and ideally a second reviewer.
+1. **Try the review aids on a reviewer.** The review screen now shows, beside the draft, the line each figure comes from, the greeting name next to the sender, and the sentences no passage backs (D-077). Against the six drafts of the first trial the sentence marks and the name warning point at all five real problems, and about one ordinary sentence in ten is marked; those are development numbers from code written with the problem kinds in view. Whether a person catches more with them is not known: it needs a rerun of the reviewer trial with new plants in new wording on different items, and ideally a second reviewer.
 2. **A fresh sealed set.** Any change to understanding, routing or the checks needs a new held-out set written after the change.
 3. **Understanding accuracy** (69.8% against 85%): policy exceptions, refunds and the injection wordings that got through.
 4. **The phrase-list checks** (commitments, injection echo): they miss paraphrases.

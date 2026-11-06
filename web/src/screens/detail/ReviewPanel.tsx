@@ -4,6 +4,7 @@ import { useAnnounce } from "../../components/LiveRegion";
 import { actions, detail as words } from "../../copy";
 import { modalOpen } from "../../hooks/modal";
 import { shortcutKey } from "../../hooks/shortcuts";
+import { ReadingAids } from "./aids";
 import { DraftEditor, forgetSaved, useDraftText } from "./draft";
 import { ErrorNote, InlineForm } from "./forms";
 import { ChecksPanel, ClaimList, Panel } from "./parts";
@@ -168,6 +169,14 @@ function ReviewBody({
           disabled={locked}
         />
         <ClaimList claims={draft.claims} sourceCount={sources.length} onOpen={onOpenSource} />
+        {detail.support ? (
+          <ReadingAids
+            support={detail.support}
+            senderName={detail.inquiry.sender_name}
+            senderEmail={detail.inquiry.sender_email}
+            onOpenSource={onOpenSource}
+          />
+        ) : null}
       </Panel>
 
       <ChecksPanel checks={detail.checks} />

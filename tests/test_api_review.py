@@ -299,3 +299,42 @@ def test_reprocess_puts_a_failed_inquiry_back(client: TestClient, api_settings: 
     assert response.json()["inquiry"]["failure_stage"] is None
     assert_error(client.post(f"/api/inquiries/{inquiry_id}/reprocess"), 409, "wrong_state")
     assert_error(client.post("/api/inquiries/99/reprocess"), 404, "not_found")
+
+
+# --- the aids beside a draft (D-077) -------------------------------------------------------
+
+
+def test_a_model_written_reply_comes_with_its_support(
+    client: TestClient, api_settings: Settings
+) -> None:
+    inquiry_id, _ = waiting(api_settings)
+    support = client.get(f"/api/inquiries/{inquiry_id}").json()["support"]
+    assert support is not None
+    assert {"greeting_name", "figures", "sentences"} <= set(support)
+    assert all(
+        s["status"] in {"supported", "routine", "from_message", "unsupported"}
+        for s in support["sentences"]
+    )
+    assert any(f["figure"] == "$175" for f in support["figures"])
+
+
+def test_support_is_computed_from_the_draft_and_changes_nothing_stored(
+    client: TestClient, api_settings: Settings
+) -> None:
+    inquiry_id, draft_id = waiting(api_settings)
+    first = client.get(f"/api/inquiries/{inquiry_id}").json()
+    second = client.get(f"/api/inquiries/{inquiry_id}").json()
+    assert first["support"] == second["support"]
+    assert first["draft"] == second["draft"] and first["draft"]["id"] == draft_id
+
+
+def test_an_inquiry_without_a_draft_has_no_support(
+    client: TestClient, api_settings: Settings
+) -> None:
+    created = client.post(
+        "/api/inquiries",
+        json={"channel": "web_form", "body": "How much is a drain?", "sender_name": "A"},
+    )
+    assert created.status_code in (200, 201), created.text
+    inquiry_id = created.json()["id"] if "id" in created.json() else created.json()["inquiry"]["id"]
+    assert client.get(f"/api/inquiries/{inquiry_id}").json()["support"] is None

@@ -9,7 +9,9 @@ async function rulesBroken(code: string): Promise<string[]> {
   return (result?.messages ?? []).filter((m) => m.severity === 2).map((m) => m.ruleId ?? "");
 }
 
-describe("lint rules that protect the safety rules", () => {
+// ESLint loads the whole project config on its first run, which can pass the default 5 seconds when
+// the machine is busy, so the file gets a longer limit.
+describe("lint rules that protect the safety rules", { timeout: 30_000 }, () => {
   it("refuses to put text into the page as HTML", async () => {
     const code =
       "export const A = ({ x }: { x: string }) => <div dangerouslySetInnerHTML={{ __html: x }} />;\n";

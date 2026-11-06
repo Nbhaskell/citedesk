@@ -359,6 +359,7 @@ def test_detail_has_every_section_even_when_empty(client: TestClient) -> None:
         "checks",
         "history",
         "duplicates",
+        "support",
     }
     assert (
         detail["classification"] is None

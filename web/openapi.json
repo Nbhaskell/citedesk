@@ -605,6 +605,43 @@
         "title": "DraftStatus",
         "type": "string"
       },
+      "DraftSupport": {
+        "additionalProperties": false,
+        "properties": {
+          "figures": {
+            "items": {
+              "$ref": "#/components/schemas/FigureOrigin"
+            },
+            "title": "Figures",
+            "type": "array"
+          },
+          "greeting_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Greeting Name"
+          },
+          "sentences": {
+            "items": {
+              "$ref": "#/components/schemas/SentenceSupport"
+            },
+            "title": "Sentences",
+            "type": "array"
+          }
+        },
+        "required": [
+          "greeting_name",
+          "figures",
+          "sentences"
+        ],
+        "title": "DraftSupport",
+        "type": "object"
+      },
       "EscalateBody": {
         "additionalProperties": false,
         "properties": {
@@ -856,6 +893,43 @@
           "created_at"
         ],
         "title": "Extraction",
+        "type": "object"
+      },
+      "FigureOrigin": {
+        "additionalProperties": false,
+        "properties": {
+          "figure": {
+            "title": "Figure",
+            "type": "string"
+          },
+          "from_message": {
+            "title": "From Message",
+            "type": "boolean"
+          },
+          "mismatch": {
+            "title": "Mismatch",
+            "type": "boolean"
+          },
+          "origins": {
+            "items": {
+              "$ref": "#/components/schemas/Origin"
+            },
+            "title": "Origins",
+            "type": "array"
+          },
+          "sentence": {
+            "title": "Sentence",
+            "type": "string"
+          }
+        },
+        "required": [
+          "figure",
+          "sentence",
+          "origins",
+          "from_message",
+          "mismatch"
+        ],
+        "title": "FigureOrigin",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -1159,6 +1233,16 @@
             "anyOf": [
               {
                 "$ref": "#/components/schemas/Screening"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "support": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DraftSupport"
               },
               {
                 "type": "null"
@@ -1594,6 +1678,35 @@
         "title": "NewInquiry",
         "type": "object"
       },
+      "Origin": {
+        "additionalProperties": false,
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "line": {
+            "title": "Line",
+            "type": "string"
+          },
+          "section": {
+            "title": "Section",
+            "type": "string"
+          },
+          "source_index": {
+            "title": "Source Index",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "source_index",
+          "file",
+          "section",
+          "line"
+        ],
+        "title": "Origin",
+        "type": "object"
+      },
       "PropertyType": {
         "enum": [
           "house",
@@ -1852,6 +1965,43 @@
         ],
         "title": "ScreeningResult",
         "type": "string"
+      },
+      "SentenceSupport": {
+        "additionalProperties": false,
+        "properties": {
+          "source_index": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Index"
+          },
+          "status": {
+            "enum": [
+              "supported",
+              "routine",
+              "from_message",
+              "unsupported"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "status",
+          "source_index"
+        ],
+        "title": "SentenceSupport",
+        "type": "object"
       },
       "Sentiment": {
         "enum": [

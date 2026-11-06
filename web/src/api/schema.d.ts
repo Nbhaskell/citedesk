@@ -446,6 +446,15 @@ export interface components {
          * @enum {string}
          */
         DraftStatus: "ready" | "blocked" | "approved" | "rejected" | "superseded";
+        /** DraftSupport */
+        DraftSupport: {
+            /** Figures */
+            figures: components["schemas"]["FigureOrigin"][];
+            /** Greeting Name */
+            greeting_name: string | null;
+            /** Sentences */
+            sentences: components["schemas"]["SentenceSupport"][];
+        };
         /** EscalateBody */
         EscalateBody: {
             /** Note */
@@ -515,6 +524,19 @@ export interface components {
             inquiry_id: number;
             /** Missing Fields */
             missing_fields: string[];
+        };
+        /** FigureOrigin */
+        FigureOrigin: {
+            /** Figure */
+            figure: string;
+            /** From Message */
+            from_message: boolean;
+            /** Mismatch */
+            mismatch: boolean;
+            /** Origins */
+            origins: components["schemas"]["Origin"][];
+            /** Sentence */
+            sentence: string;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -586,6 +608,7 @@ export interface components {
             /** Retrievals */
             retrievals: components["schemas"]["Retrieval"][];
             screening: components["schemas"]["Screening"] | null;
+            support?: components["schemas"]["DraftSupport"] | null;
         };
         /** InquiryList */
         InquiryList: {
@@ -681,6 +704,17 @@ export interface components {
             /** Thread Id */
             thread_id?: string | null;
         };
+        /** Origin */
+        Origin: {
+            /** File */
+            file: string;
+            /** Line */
+            line: string;
+            /** Section */
+            section: string;
+            /** Source Index */
+            source_index: number;
+        };
         /**
          * PropertyType
          * @enum {string}
@@ -771,6 +805,18 @@ export interface components {
          * @enum {string}
          */
         ScreeningResult: "clean" | "spam" | "injection_suspected";
+        /** SentenceSupport */
+        SentenceSupport: {
+            /** Source Index */
+            source_index: number | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "supported" | "routine" | "from_message" | "unsupported";
+            /** Text */
+            text: string;
+        };
         /**
          * Sentiment
          * @enum {string}

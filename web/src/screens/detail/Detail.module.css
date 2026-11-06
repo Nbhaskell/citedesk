@@ -429,3 +429,29 @@ mark {
     flex: 1 1 100%;
   }
 }
+
+.aids {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--rule);
+}
+
+.aids h4 {
+  margin: var(--space-3) 0 var(--space-1);
+}
+
+.aidList {
+  margin: 0;
+  padding-left: var(--space-4);
+}
+
+.origin {
+  display: inline;
+}
+
+.warn {
+  padding: 0 var(--space-1);
+  background: var(--amber-tint);
+  color: var(--amber-ink);
+  font-weight: 600;
+}

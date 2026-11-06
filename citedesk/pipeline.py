@@ -244,6 +244,7 @@ def understand_stage(
             summary=output.summary,
             safety_net_hit=found.safety_net_hit,
             raw_response=found.raw_response,
+            focused_signals=found.focused_signals,
             duration_ms=found.duration_ms,
             now=now,
         )
@@ -323,13 +324,17 @@ def route_stage(
             now=now,
         )
 
-        # The three flags the model may raise are kept in the reply it gave, not in a column.
+        # The main reading's flags are kept in the reply it gave (D-041); the focused call's are
+        # in their own column (D-075). Both only add reasons.
         flagged = understand.parse_output(classification.raw_response).escalation_signals
+        raised = list(
+            dict.fromkeys([ReasonCode(code) for code in flagged] + classification.focused_signals)
+        )
         decision = routing.decide_route(
             intents=classification.intents,
             primary_confidence=classification.primary_confidence,
             fields=extraction.fields,
-            signals=[ReasonCode(code) for code in flagged],
+            signals=raised,
             screening_result=screening.result,
             safety_net_hit=classification.safety_net_hit,
             escalate_on_low_confidence=settings.escalate_on_low_confidence,

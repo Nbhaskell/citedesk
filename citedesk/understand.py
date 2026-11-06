@@ -286,13 +286,14 @@ class Understanding:
     urgency: Urgency  # the model's, raised by the emergency net if need be
     primary_confidence: Confidence
     safety_net_hit: bool
-    signals: list[ReasonCode]
+    signals: list[ReasonCode]  # the main reading's and the focused call's, without repeats
     missing_fields: list[str]
     raw_response: str
     model: str
     duration_ms: int
     attempts: int
     notes: list[str] = field(default_factory=list)
+    focused_signals: list[ReasonCode] = field(default_factory=list)  # added by the focused call
 
 
 _LLM_REASONS: dict[type[LLMError], str] = {
@@ -480,13 +481,22 @@ def understand(
                 answers, extra_ms = ask_focused(
                     llm, subject=subject, body=body, enable_thinking=enable_thinking
                 )
-                signals = list(found.signals)
-                if answers.asks_for_exception:
-                    signals.append(ReasonCode.POLICY_EXCEPTION_REQUEST)
-                if answers.addresses_the_assistant:
-                    signals.append(ReasonCode.INJECTION_SUSPECTED)
-                signals = list(dict.fromkeys(signals))
-                return replace(found, signals=signals, duration_ms=found.duration_ms + extra_ms)
+                raised = [
+                    code
+                    for code, on in (
+                        (ReasonCode.POLICY_EXCEPTION_REQUEST, answers.asks_for_exception),
+                        (ReasonCode.INJECTION_SUSPECTED, answers.addresses_the_assistant),
+                    )
+                    if on
+                ]
+                added = [code for code in raised if code not in found.signals]
+                signals = list(found.signals) + added
+                return replace(
+                    found,
+                    signals=signals,
+                    focused_signals=added,
+                    duration_ms=found.duration_ms + extra_ms,
+                )
         user = first_user + retry_note(problem)
 
     raise UnderstandFailed(reason, ATTEMPTS)

@@ -270,6 +270,7 @@ def test_json_columns_are_parsed_from_text() -> None:
         "summary": None,
         "safety_net_hit": 0,
         "raw_response": "{}",
+        "focused_signals": '["INJECTION_SUSPECTED"]',
         "duration_ms": None,
         "created_at": "x",
     }

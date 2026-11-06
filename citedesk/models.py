@@ -293,6 +293,7 @@ class Classification(Row):
     summary: str | None
     safety_net_hit: bool
     raw_response: str
+    focused_signals: Annotated[list[ReasonCode], BeforeValidator(parse_json)]
     duration_ms: int | None
     created_at: str
 

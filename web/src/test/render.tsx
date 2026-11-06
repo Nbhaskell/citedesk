@@ -106,6 +106,7 @@ export function detailFixture(over: Partial<InquiryDetail> = {}): InquiryDetail 
       summary: "Asks how much a kitchen drain costs and if someone can come this week.",
       safety_net_hit: false,
       raw_response: "{}",
+      focused_signals: [],
       duration_ms: 1,
       created_at: T,
     },

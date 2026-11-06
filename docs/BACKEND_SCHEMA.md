@@ -212,6 +212,14 @@ CREATE TABLE settings (
 );
 ```
 
+**Migration 0002** (`db/migrations/0002_focused_signals.sql`, D-075) adds one column to `classifications`:
+
+```sql
+-- The signals raised by the focused call that follows the main reading (D-075).
+-- A JSON array of reason codes. The main reading's own signals stay in raw_response.
+ALTER TABLE classifications ADD COLUMN focused_signals TEXT NOT NULL DEFAULT '[]';
+```
+
 ## 4. JSON shapes
 
 **`classifications.intents`**
@@ -219,7 +227,7 @@ CREATE TABLE settings (
 [{"intent": "booking_request", "confidence": "high"}, {"intent": "pricing_question", "confidence": "medium"}]
 ```
 
-**`classifications.raw_response`** is the model's accepted reply exactly as it came (a JSON object). Besides the values copied into the columns above it holds `summary`, `sentiment`, `escalation_signals` (the codes the model flagged: `REFUND_OR_DISPUTE`, `LEGAL_THREAT`, `POLICY_EXCEPTION_REQUEST`) and the model's own `urgency` before the emergency net. The route stage reads `escalation_signals` from here (D-041).
+**`classifications.raw_response`** is the model's accepted reply exactly as it came (a JSON object). Besides the values copied into the columns above it holds `summary`, `sentiment`, `escalation_signals` (the codes the model flagged: `REFUND_OR_DISPUTE`, `LEGAL_THREAT`, `POLICY_EXCEPTION_REQUEST`) and the model's own `urgency` before the emergency net. The route stage reads `escalation_signals` from here (D-041) and adds `classifications.focused_signals` (D-075): a JSON array of the reason codes the focused call raised (`POLICY_EXCEPTION_REQUEST`, `INJECTION_SUSPECTED`), kept apart so that `raw_response` stays exactly what the main reading said.
 
 **`extractions.fields`** (every key present; unknown values are `null` or `"unknown"`)
 ```json

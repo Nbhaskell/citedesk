@@ -335,6 +335,8 @@ export interface components {
             created_at: string;
             /** Duration Ms */
             duration_ms: number | null;
+            /** Focused Signals */
+            focused_signals: components["schemas"]["ReasonCode"][];
             /** Id */
             id: number;
             /** Inquiry Id */

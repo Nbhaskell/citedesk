@@ -262,6 +262,13 @@
             ],
             "title": "Duration Ms"
           },
+          "focused_signals": {
+            "items": {
+              "$ref": "#/components/schemas/ReasonCode"
+            },
+            "title": "Focused Signals",
+            "type": "array"
+          },
           "id": {
             "title": "Id",
             "type": "integer"
@@ -331,6 +338,7 @@
           "summary",
           "safety_net_hit",
           "raw_response",
+          "focused_signals",
           "duration_ms",
           "created_at"
         ],

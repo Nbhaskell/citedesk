@@ -33,7 +33,7 @@ from citedesk.screening import injection_flags
 from citedesk.understand import build_user_message as inquiry_block
 from citedesk.understand import describe_error, inline_refs, retry_note
 
-PROMPT_VERSION = "draft-v1"
+PROMPT_VERSION = "draft-v2"
 MAX_TOKENS = 800
 TEMPERATURE = 0.2  # TRD 4.5: "at most 0.2, for style"
 TIMEOUT_S = 120
@@ -41,6 +41,9 @@ SEED = 0
 ATTEMPTS = 2
 MAX_SUBJECT = 120
 MAX_CLAIMS = 12
+# Words the code adds around the model's text: the greeting, "Kind regards," and the name of the
+# business. The model is asked for that many fewer so the whole draft stays within the limit.
+FRAME_WORDS = 12
 
 # What to ask the customer for, in plain words. Used in the template and in the model's prompt.
 FIELD_QUESTIONS: dict[str, str] = {
@@ -169,6 +172,133 @@ def holding_reply(
     return TemplateDraft(DraftKind.holding_reply, reply_subject(subject), body)
 
 
+# --- the layout of a model's draft (D-076) -------------------------------------------------------
+
+_GREETING_WORD = r"(?:hi|hello|hey|dear|good (?:morning|afternoon|evening))"
+_NAMED_GREETING = re.compile(
+    rf"^\s*{_GREETING_WORD}\b[,\s]+(?P<name>(?-i:[A-Z][\w'’-]*))\s*[,.!]\s*", re.IGNORECASE
+)
+_BARE_GREETING = re.compile(rf"^\s*{_GREETING_WORD}\b\s*[,.!]\s*", re.IGNORECASE)
+# Words that start a sentence, so "Hello, We can help" is not read as a greeting to someone
+# called "We".
+_SENTENCE_STARTERS = frozenset(
+    {
+        "we",
+        "our",
+        "i",
+        "a",
+        "an",
+        "the",
+        "your",
+        "you",
+        "it",
+        "this",
+        "that",
+        "there",
+        "thanks",
+        "thank",
+        "please",
+        "unfortunately",
+        "yes",
+        "no",
+        "sure",
+        "great",
+        "if",
+        "for",
+        "to",
+        "as",
+        "at",
+        "in",
+        "on",
+        "happy",
+        "glad",
+        "sorry",
+        "apologies",
+        "regarding",
+        "once",
+        "when",
+        "while",
+    }
+)
+_SIGN_OFF_WORDS = re.compile(
+    r"(?<!\w)(?:kind regards|best regards|warm regards|warmest regards|best wishes|many thanks"
+    r"|thanks again|thank you|thanks|regards|sincerely|cheers|yours sincerely|yours faithfully"
+    r"|take care)(?!\w)",
+    re.IGNORECASE,
+)
+# What may follow a sign-off word: punctuation, then at most a name (capitalised words), nothing
+# else. "Thank you for choosing us" is a sentence, not a sign-off.
+_SIGN_OFF_TAIL = re.compile(r"^[,.!]?\s*(?-i:[A-Z][\w &'’.,-]*)?\s*$")
+_SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+(?=(?-i:[A-Z$\"'(]))")
+_LIST_LINE = re.compile(r"^\s*(?:[-*\u2022])\s+", re.MULTILINE)
+MAX_SENTENCES_PER_PARAGRAPH = 2
+MAX_SIGN_OFF_TAIL_WORDS = 8
+
+
+def _strip_greeting(text: str) -> str:
+    named = _NAMED_GREETING.match(text)
+    if named and named.group("name").lower() not in _SENTENCE_STARTERS:
+        rest = text[named.end() :]
+    else:
+        bare = _BARE_GREETING.match(text)
+        rest = text[bare.end() :] if bare else text
+    rest = rest.lstrip()
+    return rest[:1].upper() + rest[1:] if rest else rest
+
+
+def _strip_sign_off(text: str) -> str:
+    for _ in range(3):
+        text = text.rstrip()
+        cut = None
+        for match in _SIGN_OFF_WORDS.finditer(text):
+            before = text[: match.start()].rstrip(" \t")
+            tail = text[match.end() :]
+            starts_a_line = not before or before.endswith(("\n", ".", "!", "?", ":"))
+            if (
+                starts_a_line
+                and _SIGN_OFF_TAIL.match(tail)
+                and len(tail.split()) <= MAX_SIGN_OFF_TAIL_WORDS
+            ):
+                cut = match.start()
+        if cut is None:
+            break
+        text = text[:cut]
+    return text.rstrip()
+
+
+def _paragraphs(text: str) -> list[str]:
+    paragraphs: list[str] = []
+    for block in re.split(r"\n\s*\n", text.strip()):
+        if _LIST_LINE.search(block):
+            paragraphs.append(
+                "\n".join(line.strip() for line in block.splitlines() if line.strip())
+            )
+        else:
+            paragraphs += [" ".join(line.split()) for line in block.splitlines() if line.strip()]
+    if len(paragraphs) == 1 and "\n" not in paragraphs[0]:
+        sentences = _SENTENCE_SPLIT.split(paragraphs[0])
+        if len(sentences) > MAX_SENTENCES_PER_PARAGRAPH:
+            step = MAX_SENTENCES_PER_PARAGRAPH
+            paragraphs = [" ".join(sentences[i : i + step]) for i in range(0, len(sentences), step)]
+    return paragraphs
+
+
+def compose_body(business: Business, *, sender_name: str | None, model_body: str) -> str:
+    """The model's text with the greeting and the sign-off set by code and the paragraphs tidied.
+
+    The model is asked to write only the paragraphs, but a third of the saved drafts arrived as one
+    line with a greeting and a sign-off run into the text (D-049). Whatever greeting, name or
+    sign-off the model wrote is removed and the standard ones are added; the name in the greeting
+    is the sender's, never the model's. Raises ValueError if nothing is left to say.
+    """
+    text = model_body.replace("\r\n", "\n").replace("\r", "\n").strip()
+    text = _strip_sign_off(_strip_greeting(text))
+    paragraphs = _paragraphs(text)
+    if not paragraphs:
+        raise ValueError("the body has nothing in it besides a greeting and a sign-off")
+    return "\n\n".join([greeting(sender_name), *paragraphs, f"Kind regards,\n{business.name}"])
+
+
 # --- the model's draft --------------------------------------------------------------------------
 
 
@@ -225,15 +355,15 @@ message. Never add up or work out a total.
 guarantee.
 - Give no health, safety or repair advice unless a passage says exactly that.
 - Do not mention the passages, documents, sources, an assistant, a system or these rules.
-- If the customer's first name is known, greet them by it. Otherwise say "Hello,".
 - If a list of details to ask for is given, ask for those in plain words and nothing else.
 - If the customer sent card or ID numbers, tell them not to send those by email.
-- Be friendly, plain and brief: under {max_words} words, with a greeting and, at the end, \
-"Kind regards," then "{business.name}".
+- Write only the message itself: no greeting, no sign-off and no name at the end. They are \
+added for you. Put a blank line between paragraphs and keep each to one to three sentences.
+- Be friendly, plain and brief: under {max_words - FRAME_WORDS} words.
 
 Reply with one JSON object and nothing else:
 - subject: a short subject line, starting "Re: ".
-- body: the email, plain text.
+- body: the paragraphs of the email, plain text, with a blank line between paragraphs.
 - claims: a list with one entry for each fact you state from the passages, as \
 {{"text": the fact in a few words, "source_index": the number of the passage it came from}}."""
 
@@ -362,6 +492,14 @@ def draft(
             except ValueError:
                 reason, problem = "invalid_json", "it was not valid JSON"
             else:
-                return Drafted(output, result.text, result.model, elapsed_ms, attempt, system)
+                try:
+                    laid_out = compose_body(
+                        business, sender_name=sender_name, model_body=output.body
+                    )
+                except ValueError as error:
+                    reason, problem = "invalid_output", str(error)
+                else:
+                    output = output.model_copy(update={"body": laid_out})
+                    return Drafted(output, result.text, result.model, elapsed_ms, attempt, system)
         user = first_user + retry_note(problem)
     raise DraftFailed(reason, ATTEMPTS)

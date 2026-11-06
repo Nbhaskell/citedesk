@@ -606,7 +606,11 @@ class _DraftInputs:
 
 
 def _draft_inputs(
-    conn: sqlite3.Connection, inquiry: Inquiry, settings: Settings, now: str | None
+    conn: sqlite3.Connection,
+    inquiry: Inquiry,
+    settings: Settings,
+    now: str | None,
+    business_name: str,
 ) -> _DraftInputs:
     """What the model is told when it writes a reply, from what the earlier stages stored."""
     classification = repo.latest_classification(conn, inquiry.id)
@@ -633,7 +637,11 @@ def _draft_inputs(
         unanswered,
         asking,
         missing,
-        drafting.known_details(extraction.fields),
+        drafting.known_details(
+            extraction.fields,
+            message=f"{inquiry.subject or ''}\n{inquiry.body}",
+            business_name=business_name,
+        ),
     )
 
 
@@ -664,7 +672,7 @@ def draft_stage(
         return inquiry.status
     if repo.latest_draft(conn, inquiry_id) is not None:
         return inquiry.status
-    inputs = _draft_inputs(conn, inquiry, settings, now)
+    inputs = _draft_inputs(conn, inquiry, settings, now, business.name)
     screening, sources, unanswered = inputs.screening, inputs.sources, inputs.unanswered
     asking, missing = inputs.asking, inputs.missing
     events.record_event(
@@ -979,7 +987,7 @@ def redraft_stage(
         or old.status is not DraftStatus.rejected
     ):
         raise review.WrongState("Only the latest rejected draft can be redrafted.")
-    inputs = _draft_inputs(conn, inquiry, settings, now)
+    inputs = _draft_inputs(conn, inquiry, settings, now, business.name)
     if not inputs.sources:
         raise review.WrongState("There are no passages to write a new draft from. Close this item.")
     events.record_event(

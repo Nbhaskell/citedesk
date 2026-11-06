@@ -80,16 +80,29 @@ TITLES = frozenset({"mr", "mrs", "ms", "miss", "mx", "dr", "prof"})
 NAME_TOKEN = re.compile(r"^[^\W\d_][\w'’-]*$")
 
 
-def known_details(fields: ExtractedFields) -> dict[str, str]:
-    """The details the customer gave, as read by the understand step, in plain words."""
+def known_details(
+    fields: ExtractedFields, message: str | None = None, business_name: str | None = None
+) -> dict[str, str]:
+    """The details the customer gave, as read by the understand step, in plain words.
+
+    The area is free text and was read by a model, so it counts as given only if it appears in the
+    customer's message (when the message is passed) and is not the business's own name, which a
+    forwarded thread can make the model read as a place (D-081). A detail the model got wrong must
+    not be handed back to the writer as something the customer said."""
     found: dict[str, str] = {}
     for name in KNOWN_LABELS:
         value = getattr(fields, name)
         if value is None:
             continue
         text = str(getattr(value, "value", value)).replace("_", " ").strip()
-        if not is_missing(text):
-            found[name] = text
+        if is_missing(text):
+            continue
+        if name == "address_area":
+            if business_name and text.lower() == business_name.strip().lower():
+                continue
+            if message is not None and text.lower() not in message.lower():
+                continue
+        found[name] = text
     return found
 
 

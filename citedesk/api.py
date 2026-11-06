@@ -693,7 +693,15 @@ def create_app(
                 merged_sources(retrievals),
                 f"{inquiry.subject or ''}\n{inquiry.body}",
                 sentiment=classification.sentiment.value if classification else None,
-                known_fields=known_details(extraction.fields) if extraction else None,
+                known_fields=(
+                    known_details(
+                        extraction.fields,
+                        message=f"{inquiry.subject or ''}\n{inquiry.body}",
+                        business_name=business.name if business else None,
+                    )
+                    if extraction
+                    else None
+                ),
             )
             if draft is not None and draft.kind is DraftKind.reply
             else None

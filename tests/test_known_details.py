@@ -107,11 +107,29 @@ def test_the_pipeline_tells_the_writer_the_area_the_customer_gave(
     reply = model_reply(
         fields=model_reply()["fields"] | {"address_area": "Wren Common", "property_type": "house"}
     )
-    inquiry_id = retrieved(conn, settings, answering(), reply)
+    inquiry_id = retrieved(
+        conn, settings, answering(), reply, body="How much to clear a drain in Wren Common?"
+    )
     llm = FakeLLM([GOOD_DRAFT])
     pipeline.draft_stage(conn, inquiry_id, settings, llm, BUSINESS, now=NOW)
     sent = llm.calls[0].user
     assert "already gave" in sent and "- area: Wren Common" in sent
+
+
+def test_an_area_the_model_read_that_the_message_does_not_contain_is_not_passed_on(
+    conn: sqlite3.Connection, settings: Settings
+) -> None:
+    reply = model_reply(
+        fields=model_reply()["fields"] | {"address_area": "Kestrel Hollow Plumbing"}
+    )
+    inquiry_id = retrieved(conn, settings, answering(), reply)
+    llm = FakeLLM([GOOD_DRAFT])
+    pipeline.draft_stage(conn, inquiry_id, settings, llm, BUSINESS, now=NOW)
+    assert (
+        "Kestrel Hollow Plumbing"
+        not in llm.calls[0].user.split("<sources>")[0].split("</inquiry>")[-1]
+    )
+    assert "- area:" not in llm.calls[0].user
 
 
 # --- the review aids mark a question for something known -----------------------------------------
@@ -155,3 +173,31 @@ def test_a_statement_that_mentions_the_area_is_not_a_request() -> None:
 
 def test_nothing_is_marked_when_the_known_details_are_not_passed() -> None:
     assert marked("Please provide the neighbourhood or address area.").status != "asks_known"
+
+
+# --- a detail the model read wrongly must not be handed back as known ----------------------------
+
+
+def test_an_area_that_is_not_in_the_message_is_not_known() -> None:
+    fields = FIELDS.model_copy(update={"address_area": "Millrace"})
+    assert "address_area" not in drafting.known_details(fields, message="my sink in Wren Common")
+
+
+def test_an_area_in_the_message_is_known_whatever_the_case() -> None:
+    known = drafting.known_details(FIELDS, message="my sink in WREN COMMON is slow")
+    assert known["address_area"] == "Wren Common"
+
+
+def test_the_business_name_is_never_the_customers_area() -> None:
+    fields = FIELDS.model_copy(update={"address_area": "Kestrel Hollow Plumbing"})
+    known = drafting.known_details(
+        fields,
+        message="forwarded from Kestrel Hollow Plumbing",
+        business_name="Kestrel Hollow Plumbing",
+    )
+    assert "address_area" not in known
+
+
+def test_the_other_details_are_kept_when_only_the_area_fails_the_check() -> None:
+    known = drafting.known_details(FIELDS, message="a slow sink", business_name="X")
+    assert set(known) == {"service_type", "property_type"}

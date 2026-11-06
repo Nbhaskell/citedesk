@@ -3,3 +3,17 @@ repos:
     rev: v8.30.1
     hooks:
       - id: gitleaks
+  - repo: local
+    hooks:
+      - id: personal-info
+        name: personal information and wording check
+        entry: python tools/check_personal_info.py --staged
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+      - id: commit-message-wording
+        name: commit message wording check
+        entry: python tools/check_personal_info.py --message
+        language: system
+        stages: [commit-msg]

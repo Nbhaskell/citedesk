@@ -31,6 +31,8 @@ jobs:
         run: python -m pytest
       - name: OpenAPI file is current
         run: python -m tools.export_openapi --check
+      - name: Personal information and wording check
+        run: python tools/check_personal_info.py --all
 
   web:
     runs-on: ubuntu-latest

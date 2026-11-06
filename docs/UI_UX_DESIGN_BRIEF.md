@@ -67,7 +67,7 @@ Purpose: verify and decide.
 | From Priya S., web form| Wants: availability + price    | Subject: ...      |
 | 2 h ago                | Urgency: normal  Tone: neutral | Hi Priya, ...     |
 | "Hi, can someone look  | Service: drain cleaning        | (editable)        |
-| at my slow kitchen     | Property: house                |                   |
+| at the slow kitchen    | Property: house                |                   |
 | sink this week? ..."   | Dates: "this week"             | CHECKS            |
 |                        | Missing: preferred date, area  | Figures match: yes|
 | Thread (1 earlier)     |                                | No promises: yes  |

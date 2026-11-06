@@ -364,3 +364,27 @@ def test_the_two_agreement_figures_are_computed_on_the_same_drafts() -> None:
     after = [{"id": "a", "verdict": "supported"}, {"id": "b", "verdict": "supported"}]
     result = jd.compare_agreement(labels, before, after)
     assert result["whole_draft"]["exact"] == 1 and result["claims_only"]["exact"] == 2
+
+
+# --- the damage check with the claims-only rule and real good drafts (D-082) -------------------
+
+
+def test_the_good_drafts_are_the_ones_a_person_called_supported() -> None:
+    cases = [{"id": "a"}, {"id": "b"}, {"id": "c"}]
+    labels = {"a": "supported", "b": "partly_supported", "c": ""}
+    assert [c["id"] for c in jd.good_by_label(cases, labels)] == ["a"]
+
+
+def test_claims_only_cases_keep_their_other_fields_and_drop_conversation() -> None:
+    cases = [
+        {
+            "id": "a",
+            "question": "q",
+            "answer": "Thanks for your message. Drain cleaning starts at $149.",
+            "passages": PASSAGES,
+            "damage": "x",
+        }
+    ]
+    out = jd.as_claims_only(cases)
+    assert out[0]["answer"] == "Drain cleaning starts at $149." and out[0]["damage"] == "x"
+    assert cases[0]["answer"].startswith("Thanks")  # the input is not changed

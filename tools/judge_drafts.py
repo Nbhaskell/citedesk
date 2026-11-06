@@ -242,13 +242,18 @@ def known_bad_summary(
     return {"control": flagged(controls), "kinds": kinds}
 
 
-def render_known_bad(summary: dict[str, Any]) -> str:
+def render_known_bad(summary: dict[str, Any], labelled_controls: bool = False) -> str:
     c = summary["control"]
+    note = (
+        "The controls are drafts a person labelled supported, shown unchanged."
+        if labelled_controls
+        else "The controls are drafts the judge called supported and the review aids did not "
+        "mark, but no person has labelled them: they are a proxy for good drafts."
+    )
     lines = [
-        "# Does the judge notice damage? (D-079)",
+        "# Does the judge notice damage? (D-079, D-082)",
         "",
-        "> SYNTHETIC DATA. The controls are drafts the judge called supported and the review aids "
-        "did not mark, but no person has labelled them: they are a proxy for good drafts.",
+        f"> SYNTHETIC DATA. {note}",
         "",
         f"- control (unchanged good drafts) flagged: {c[0]} of {c[1]}",
     ]
@@ -377,6 +382,16 @@ def claims_only(answer: str, passages: Sequence[str], question: str) -> str:
         if s.status not in NOT_CLAIMS
     ]
     return " ".join(kept)
+
+
+def good_by_label(cases: Sequence[Case], labels: dict[str, str]) -> list[Case]:
+    """The drafts a person called supported: a real pool of good drafts for the damage check."""
+    return [c for c in cases if labels.get(c["id"]) == "supported"]
+
+
+def as_claims_only(cases: Sequence[Case]) -> list[Case]:
+    """Copies of the cases whose answer holds only the sentences that make claims."""
+    return [{**c, "answer": claims_only(c["answer"], c["passages"], c["question"])} for c in cases]
 
 
 def rejudge_claims(
@@ -508,6 +523,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--per-kind", type=int, default=15)
     parser.add_argument("--n", type=int, default=36, help="drafts on the labelling sheet")
     parser.add_argument(
+        "--claims-only",
+        action="store_true",
+        help="known-bad: use the hand-labelled good drafts and judge only claim sentences",
+    )
+    parser.add_argument(
         "--labels", type=Path, default=LABELS_DIR / "draft_faithfulness.labels.json"
     )
     parser.add_argument("--md", type=Path)
@@ -553,17 +573,26 @@ def main(argv: list[str] | None = None) -> int:
                 f.mismatch for f in marked.figures
             ):
                 good.append(case)
-        damaged = damaged_cases(good, load_plants(), args.per_kind)
         judge = make_judge(src)
+        if args.claims_only:
+            labels = json.loads(args.labels.read_text("utf-8"))["labels"]
+            good = good_by_label(cases, labels)
+            damaged = as_claims_only(damaged_cases(good, load_plants(), args.per_kind))
+            controls = [
+                {**r, "note": "unchanged good draft"}
+                for r in rejudge_claims(judge, good, {c["id"] for c in good})
+            ]
+        else:
+            damaged = damaged_cases(good, load_plants(), args.per_kind)
+            controls = [{"id": c["id"], "verdict": "supported"} for c in good]
         verdicts = judge_all(judge, damaged, _progress("known-bad"))
         rows = [{**v, "damage": d["damage"]} for v, d in zip(verdicts, damaged, strict=True)]
-        controls = [{"id": c["id"], "verdict": "supported"} for c in good]
         summary = known_bad_summary(controls, rows)
         out = RUNS_DIR / f"judge-known-bad-{_stamp()}.json"
         _write(
             out, {"config": judge.config(), "summary": summary, "cases": damaged, "results": rows}
         )
-        text = render_known_bad(summary)
+        text = render_known_bad(summary, labelled_controls=args.claims_only)
         if args.md:
             args.md.write_text(text, encoding="utf-8")
         print(text + f"Wrote {out}")

@@ -125,6 +125,56 @@ STRONG: dict[str, re.Pattern[str]] = {
     "decode_and_follow": re.compile(
         r"\bdecode\b.{0,40}\b(?:and|then)\b.{0,15}\b(?:do|follow|execute|obey|run|act)\b"
     ),
+    # Wider wordings for the same four ideas (D-074): asking the assistant for what it was told,
+    # to play the owner, notices written to the system, and new orders that replace its rules.
+    # Each needs words a customer writing to a plumber does not use ("your hidden rules",
+    # "notice to the assistant"), so ordinary mentions of rules, owners and systems pass.
+    "reveal_instructions": re.compile(
+        r"\b(?:paste|print|copy|repeat|quote|reveal|share|send|show|list|output|display|recite)\b"
+        r".{0,30}\b(?:guidelines|instructions|rules|prompt)\b.{0,15}"
+        r"\b(?:you were given|you were told|you have been given|you use to (?:write|reply|"
+        r"respond|decide|draft)|you follow when you (?:write|reply|respond|draft))\b"
+        r"|\b(?:paste|print|copy|repeat|quote|reveal|share|send|show|list|output|display|recite)\b"
+        r".{0,30}\byour (?:(?:own|internal|hidden|secret|system|initial|original|private) )+"
+        r"(?:guidelines|instructions|rules|prompt|configuration|notes)\b"
+        r"|\b(?:quote|recite|repeat|paste|print)\b.{0,20}\byour (?:instructions|guidelines|rules)\b"
+        r"\W+(?:exactly|verbatim|word for word|in full|here|below)\b"
+        r"|\b(?:send|share|show|paste|print|repeat|reveal)\b.{0,15}\byour "
+        r"(?:configuration|prompt)\b"
+        r"|\b(?:print|repeat|paste|copy|show|output|display)\b.{0,40}"
+        r"\b(?:text|everything|content|instructions)\b.{0,30}"
+        r"\b(?:above|before) (?:this|my) message\b"
+    ),
+    "role_play_owner": re.compile(
+        r"\b(?:pretend|imagine|role-?play|roleplay|play (?:a|the) (?:game|role))\b.{0,60}"
+        r"\b(?:owner|boss|manager|ceo|director)\b"
+        r"|\b(?:act|respond|reply|speak|answer|write) (?:as|like) (?:if )?(?:you (?:are|were) )?"
+        r"(?:the |our )?(?:business |company )?(?:owner|boss|manager|ceo|director)\b"
+    ),
+    "system_notice": re.compile(
+        r"\b(?:system|admin(?:istrator)?|automated|internal) (?:notice|message|override|directive"
+        r"|alert)\b.{0,100}\b(?:approved|pre-approved|authori[sz]ed|pre-authori[sz]ed|override"
+        r"|skip|bypass|disabled|waive|refund|confirm)"
+        r"|\[\s*(?:system|admin|assistant)\b[^\]]{0,20}\]"
+        r"|(?:^|[.!?] )(?:system|admin|assistant)\s*:"
+        r"|\b(?:notice|message|note|instruction|memo)s? (?:to|for) (?:the )?(?:ai|assistant|chatbot"
+        r"|bot|model|(?:reply|response|email) (?:writer|drafter|bot)"
+        r"|automated (?:system|assistant))"
+        r"|\bto whoever (?:is |will be )?(?:reading|drafting|writing|answering|handling)\b"
+    ),
+    "override_rules": re.compile(
+        r"\b(?:ignore|disregard|forget|override|bypass)\b.{0,25}\b(?:your|these)\b.{0,15}"
+        r"\b(?:rules|guidelines|instructions|guidance|policies|restrictions|programming)\b"
+        r"|\b(?:ignore|disregard|forget|override)\b\W+(?:what|whatever)\b.{0,20}"
+        r"\byour (?:rules|guidelines|instructions|policies)\b"
+        r"|\byour (?:(?:previous|earlier|current|old|usual|normal) )?"
+        r"(?:rules|instructions|guidelines|restrictions)\b.{0,20}"
+        r"\b(?:no longer apply|do not apply|don't apply|are void|are cancelled|are suspended)\b"
+        r"|\b(?:you have|here are|these are)\b.{0,10}"
+        r"\bnew (?:instructions|rules|orders|directives)\b"
+        r"|\bnew (?:instruction|rule|order|directive)s? (?:for|to) (?:the |you|this )?"
+        r"(?:assistant|ai|bot|model|you)\b"
+    ),
 }
 
 WEAK: dict[str, re.Pattern[str]] = {
@@ -142,6 +192,22 @@ WEAK: dict[str, re.Pattern[str]] = {
     "force_confirm": re.compile(
         r"\b(?:reply|respond|say|answer)\b.{0,10}\b(?:that|with)\b.{0,60}"
         r"\b(?:confirmed|approved|no charge|free of charge|full refund)\b"
+    ),
+    # Added in D-074. Each is ordinary on its own; two together are flagged.
+    "ai_addressed": re.compile(
+        r"\b(?:dear|hello|hi|hey|attention) (?:ai|assistant|chatbot|bot)\b"
+        r"|\btest of the (?:assistant|ai|chatbot|bot)\b"
+    ),
+    "approval_claim": re.compile(
+        r"\b(?:pre-?approved|pre-?authori[sz]ed|already approved|has been approved|was approved"
+        r"|have approved|has approved)\b"
+    ),
+    "reply_steering": re.compile(
+        r"\b(?:in|within) your (?:reply|response|answer|email|draft)\b.{0,30}"
+        r"\b(?:state|say|write|include|mention|confirm|add)\b"
+        r"|\bmake sure (?:that )?(?:your|the) (?:reply|response|answer|email) "
+        r"(?:says|states|includes|mentions|contains)\b"
+        r"|\btell them\b.{0,30}\b(?:approved|authori[sz]ed|free|waived)\b"
     ),
 }
 

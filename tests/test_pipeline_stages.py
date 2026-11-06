@@ -118,7 +118,7 @@ def test_understanding_stores_the_classification_and_the_extraction(
     classification = repo.latest_classification(conn, inquiry_id)
     assert classification is not None
     assert classification.model == "tiny-model"
-    assert classification.prompt_version == "understand-v1"
+    assert classification.prompt_version == "understand-v2"
     assert classification.primary_intent.value == "pricing_question"
     assert classification.primary_confidence.value == "high"
     assert (classification.urgency.value, classification.sentiment.value) == ("low", "positive")

@@ -567,7 +567,7 @@ def test_with_a_model_the_worker_takes_a_posted_inquiry_all_the_way_to_routing(
             time.sleep(0.02)
         detail = client.get(f"/api/inquiries/{created['id']}").json()
     assert status == "routed"
-    assert detail["classification"]["prompt_version"] == "understand-v1"
+    assert detail["classification"]["prompt_version"] == "understand-v2"
     assert detail["extraction"]["missing_fields"] == []
     assert detail["inquiry"]["route"] == "draft_reply"
 

@@ -269,3 +269,53 @@ def test_a_passage_with_the_same_words_but_no_figure_does_not_hide_the_one_that_
     result = run("A camera inspection of a drain or sewer line is $175.", sources=[about, price])
     assert statuses(result) == ["supported"]
     assert result.sentences[0].source_index == 1
+
+
+# --- sympathy the message does not call for (D-080) ---------------------------------------------
+
+CANCEL = "Please cancel booking KH-4471. Sorry for the trouble, I got the part and did it myself."
+
+
+def tone(*paragraphs: str, sentiment: str | None, inquiry: str = ASK) -> list[str]:
+    result = support.analyse(frame(*paragraphs), SOURCES, inquiry, sentiment=sentiment)
+    return statuses(result)
+
+
+def test_sympathy_the_message_does_not_call_for_is_marked_as_tone() -> None:
+    assert tone(
+        "We're sorry to hear you managed to do the work yourself.", sentiment="neutral"
+    ) == ["tone"]
+
+
+def test_the_same_sentence_is_routine_when_the_customer_is_unhappy() -> None:
+    sentence = "We're sorry to hear about the charge on your invoice."
+    assert tone(sentence, sentiment="negative") == ["routine"]
+    assert tone(sentence, sentiment="angry") == ["routine"]
+
+
+def test_an_apology_that_softens_a_refusal_is_not_marked() -> None:
+    assert "tone" not in tone("We're sorry, but we don't offer discounts.", sentiment="neutral")
+    assert "tone" not in tone("Sorry, we cannot confirm that today.", sentiment="neutral")
+
+
+def test_gladness_and_thanks_are_marked_unless_the_customer_is_pleased() -> None:
+    glad = "We're glad to hear our technician was helpful."
+    assert tone(glad, sentiment="neutral") == ["tone"]
+    assert tone(glad, sentiment="positive") == ["routine"]
+    assert tone("We appreciate your prompt payment.", sentiment="neutral") == ["tone"]
+
+
+def test_with_no_sentiment_known_nothing_is_marked_as_tone() -> None:
+    assert tone("We're sorry to hear that.", sentiment=None) == ["routine"]
+
+
+def test_a_sympathy_sentence_that_promises_something_is_still_unsupported() -> None:
+    assert tone("We're sorry, and we will refund the charge.", sentiment="neutral") == [
+        "unsupported"
+    ]
+
+
+def test_an_ordinary_sentence_is_never_marked_as_tone() -> None:
+    assert tone("Drain cleaning for one fixture starts at $149.", sentiment="neutral") == [
+        "supported"
+    ]

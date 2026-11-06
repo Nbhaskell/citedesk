@@ -1985,7 +1985,8 @@
               "supported",
               "routine",
               "from_message",
-              "unsupported"
+              "unsupported",
+              "tone"
             ],
             "title": "Status",
             "type": "string"

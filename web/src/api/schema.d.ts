@@ -813,7 +813,7 @@ export interface components {
              * Status
              * @enum {string}
              */
-            status: "supported" | "routine" | "from_message" | "unsupported";
+            status: "supported" | "routine" | "from_message" | "unsupported" | "tone";
             /** Text */
             text: string;
         };

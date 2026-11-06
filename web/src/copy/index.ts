@@ -340,6 +340,10 @@ export const detail = {
     unsourcedMark: "Not from your documents",
     noneMarked:
       "No sentence is marked. That only means each one uses the wording of a passage or of the message. It does not mean the reply is right.",
+    tone: "Tone to check",
+    toneMark: "Sympathy the message does not call for",
+    toneNote:
+      "The customer reported no problem or good news, so a line like this may read oddly. Edit or remove it if it does.",
     count: (marked: number, total: number): string => `${marked} of ${total} sentences marked`,
   },
   checks: {

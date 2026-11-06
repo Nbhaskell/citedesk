@@ -19,7 +19,7 @@ from pydantic import Field
 from citedesk.checks import GREETING, MAX_GREETING_WORDS, SIGN_OFF, Figure, extract_figures
 from citedesk.models import Source, Strict
 
-Status = Literal["supported", "routine", "from_message", "unsupported"]
+Status = Literal["supported", "routine", "from_message", "unsupported", "tone"]
 
 SUPPORT_OVERLAP = 0.6  # share of a sentence's content words that one source passage must hold
 MESSAGE_OVERLAP = 0.75  # share that the customer's own message must hold
@@ -65,6 +65,32 @@ _SYMPATHY = re.compile(
 )
 _PROMISE = re.compile(r"\b(?:refund|credit|discount|free|waive|guarantee|promise)", re.IGNORECASE)
 MAX_SYMPATHY_WORDS = 14
+# Sympathy the message may not call for (D-080). "Sorry to hear" answers a problem; "glad to hear"
+# answers good news. A sentence is marked as tone when the sentiment the model read does not fit.
+_SORRY = re.compile(
+    r"^(?:we(?:'re| are)? (?:so )?sorry|sorry|we apologi[sz]e|apologies)\b", re.IGNORECASE
+)
+_GLAD = re.compile(
+    r"^(?:we(?:'re| are)? (?:glad|happy|pleased|delighted) to hear|we appreciate"
+    r"|we are grateful)\b",
+    re.IGNORECASE,
+)
+_REFUSAL = re.compile(
+    r"\b(?:but|unfortunately|unable|cannot|can't|don't|do not|not able)\b", re.IGNORECASE
+)
+UNHAPPY = frozenset({"negative", "angry"})
+
+
+def _misplaced_sympathy(plain: str, sentiment: str | None) -> bool:
+    """A sympathy sentence the message does not call for. Nothing is judged when the sentiment
+    is unknown, and an apology that softens a refusal is always in place."""
+    if sentiment is None:
+        return False
+    if _SORRY.match(plain):
+        return sentiment not in UNHAPPY and not _REFUSAL.search(plain)
+    if _GLAD.match(plain):
+        return sentiment != "positive"
+    return False
 
 
 class Origin(Strict):
@@ -181,7 +207,9 @@ def _mismatch(figure: Figure, sentence_words: set[str], origins: list[Origin]) -
     return best < MISMATCH_OVERLAP
 
 
-def analyse(body: str, sources: list[Source], inquiry_text: str) -> DraftSupport:
+def analyse(
+    body: str, sources: list[Source], inquiry_text: str, sentiment: str | None = None
+) -> DraftSupport:
     """Judge each sentence of a draft against its sources and the customer's message, and find the
     line each figure comes from. Deterministic; changes nothing."""
     name, lines = _frame_free(body)
@@ -229,7 +257,7 @@ def analyse(body: str, sources: list[Source], inquiry_text: str) -> DraftSupport
                 and not _PROMISE.search(plain)
             )
         ):
-            status = "routine"
+            status = "tone" if _misplaced_sympathy(plain, sentiment) else "routine"
         elif not words and not found:
             status = "routine"  # nothing in it to assert
         else:

@@ -28,6 +28,7 @@ export function ReadingAids({
   onOpenSource: (index: number) => void;
 }) {
   const marked = support.sentences.filter((s) => s.status === "unsupported");
+  const tone = support.sentences.filter((s) => s.status === "tone");
   const sender = firstName(senderName);
   const differs =
     support.greeting_name !== null &&
@@ -106,6 +107,20 @@ export function ReadingAids({
           ))}
         </ul>
       )}
+
+      {tone.length > 0 ? (
+        <>
+          <h4>{words.aids.tone}</h4>
+          <p className={styles.faint}>{words.aids.toneNote}</p>
+          <ul className={styles.aidList}>
+            {tone.map((sentence) => (
+              <li key={sentence.text}>
+                <span className={styles.warn}>{words.aids.toneMark}:</span> {sentence.text}
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
     </section>
   );
 }

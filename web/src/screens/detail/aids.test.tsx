@@ -125,4 +125,20 @@ describe("ReadingAids", () => {
     expect(container.querySelector("img")).toBeNull();
     expect(container.textContent).toContain("<img src=x onerror=alert(1)>");
   });
+
+  it("lists a sympathy line the message does not call for, apart from the unsourced ones", () => {
+    const s = support();
+    s.sentences = [
+      { text: "We're sorry to hear you did it yourself.", status: "tone", source_index: null },
+    ];
+    show(s);
+    expect(screen.getByText("Tone to check")).toBeTruthy();
+    expect(screen.getByText(/We're sorry to hear you did it yourself\./)).toBeTruthy();
+    expect(screen.getByText(/0 of 1 sentences marked/)).toBeTruthy();
+  });
+
+  it("shows no tone section when no line is marked for tone", () => {
+    show(support());
+    expect(screen.queryByText("Tone to check")).toBeNull();
+  });
 });

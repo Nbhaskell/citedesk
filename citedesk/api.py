@@ -683,12 +683,14 @@ def create_app(
         if inquiry is None:
             raise ApiError(404, "not_found", "No inquiry has that id.")
         draft = repo.latest_draft(conn, inquiry_id)
+        classification = repo.latest_classification(conn, inquiry_id)
         retrievals = repo.list_retrievals(conn, inquiry_id)
         shown = (
             analyse_support(
                 draft.body,
                 merged_sources(retrievals),
                 f"{inquiry.subject or ''}\n{inquiry.body}",
+                sentiment=classification.sentiment.value if classification else None,
             )
             if draft is not None and draft.kind is DraftKind.reply
             else None
@@ -696,7 +698,7 @@ def create_app(
         return InquiryDetail(
             inquiry=inquiry,
             screening=repo.get_screening(conn, inquiry_id),
-            classification=repo.latest_classification(conn, inquiry_id),
+            classification=classification,
             extraction=repo.latest_extraction(conn, inquiry_id),
             escalations=repo.list_escalations(conn, inquiry_id),
             retrievals=retrievals,

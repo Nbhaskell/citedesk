@@ -296,7 +296,7 @@ def test_a_model_draft_is_stored_blocked_until_its_checks_have_run(
         DraftKind.reply,
         1,
         "tiny",
-        "draft-v2",
+        "draft-v3",
     )
     assert draft.status is DraftStatus.blocked  # D-028: not ready until checked
     assert draft.body.startswith("Hi Alex") and draft.claims[0].source_index == 0

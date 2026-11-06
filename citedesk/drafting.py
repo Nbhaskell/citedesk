@@ -33,7 +33,7 @@ from citedesk.screening import injection_flags
 from citedesk.understand import build_user_message as inquiry_block
 from citedesk.understand import describe_error, inline_refs, retry_note
 
-PROMPT_VERSION = "draft-v2"
+PROMPT_VERSION = "draft-v3"
 MAX_TOKENS = 800
 TEMPERATURE = 0.2  # TRD 4.5: "at most 0.2, for style"
 TIMEOUT_S = 120
@@ -357,6 +357,8 @@ guarantee.
 - Do not mention the passages, documents, sources, an assistant, a system or these rules.
 - If a list of details to ask for is given, ask for those in plain words and nothing else.
 - If the customer sent card or ID numbers, tell them not to send those by email.
+- Do not say you are sorry, glad or grateful about anything unless the customer reports a \
+problem or complaint (sorry) or good news (glad). A plain request gets a plain answer.
 - Write only the message itself: no greeting, no sign-off and no name at the end. They are \
 added for you. Put a blank line between paragraphs and keep each to one to three sentences.
 - Be friendly, plain and brief: under {max_words - FRAME_WORDS} words.

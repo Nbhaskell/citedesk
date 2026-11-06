@@ -212,6 +212,11 @@ def test_a_missing_field_for_an_intent_the_customer_did_not_ask_is_ignored() -> 
             EscalationSource.rule,
         ),
         (
+            {"names": (I.pricing_question,), "signals": [R.INJECTION_SUSPECTED]},
+            R.INJECTION_SUSPECTED,
+            EscalationSource.rule,
+        ),
+        (
             {
                 "names": (I.pricing_question,),
                 "screening_result": ScreeningResult.injection_suspected,
@@ -240,6 +245,7 @@ def test_a_missing_field_for_an_intent_the_customer_did_not_ask_is_ignored() -> 
         "refund",
         "legal",
         "policy-exception",
+        "injection-signal",
         "injection",
         "low-confidence",
         "commercial-property",
@@ -404,8 +410,8 @@ def test_two_triggers_for_one_code_make_one_reason() -> None:
     assert "commercial" in decision.reasons[0].detail
 
 
-def test_signals_can_only_be_the_three_codes_the_model_may_flag() -> None:
-    for bad in (R.HEALTH_SAFETY, R.COMPLAINT, R.INJECTION_SUSPECTED, R.LOW_CONFIDENCE, R.MANUAL):
+def test_signals_can_only_be_the_four_codes_the_model_may_flag() -> None:
+    for bad in (R.HEALTH_SAFETY, R.COMPLAINT, R.LOW_CONFIDENCE, R.MANUAL):
         with pytest.raises(ValueError, match="signal"):
             decide(I.pricing_question, signals=[bad])
 
@@ -547,3 +553,17 @@ def test_deciding_twice_gives_the_same_answer_and_changes_nothing() -> None:
     first = decide(I.booking_request, fields=given)
     second = decide(I.booking_request, fields=given)
     assert first == second and given == snapshot
+
+
+def test_the_model_can_only_add_an_injection_reason_never_remove_one() -> None:
+    by_screening = decide(I.pricing_question, screening_result=ScreeningResult.injection_suspected)
+    assert codes(by_screening) == [R.INJECTION_SUSPECTED]
+    both = decide(
+        I.pricing_question,
+        screening_result=ScreeningResult.injection_suspected,
+        signals=[R.INJECTION_SUSPECTED],
+    )
+    assert codes(both) == [R.INJECTION_SUSPECTED]  # one reason, not two
+    only_model = decide(I.pricing_question, signals=[R.INJECTION_SUSPECTED])
+    assert only_model.route is Route.escalate
+    assert decide(I.pricing_question).route is Route.draft_reply  # no signal, no change

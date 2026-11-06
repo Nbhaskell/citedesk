@@ -487,7 +487,7 @@ def test_a_recorded_ollama_reply_goes_through_provider_and_step() -> None:
         body="Can I book a leak repair for Nov 12th at my house in Fernhill?",
         received_at="2026-10-28T12:00:00Z",
         enable_thinking=False,
-        exception_check=False,  # the recording holds the main reading only
+        focused_checks=False,  # the recording holds the main reading only
     )
     assert result.output.primary_intent is Intent.booking_request
     assert result.fields.service_type is ServiceType.leak_repair

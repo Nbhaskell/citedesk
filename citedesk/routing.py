@@ -40,10 +40,23 @@ REQUIRED_FIELDS: dict[Intent, tuple[str, ...]] = {
 }
 
 # Reasons the model may flag. The others come from the intent list, the screening result, the
-# emergency net or a field, so the model cannot raise or suppress them by name.
+# emergency net or a field, so the model cannot raise or suppress them by name. A flag can only add
+# a reason: nothing the model says removes one, and the model never decides a message is safe.
+# INJECTION_SUSPECTED joined the list in D-075, next to the screening patterns that already raise
+# it: a pattern list misses new wordings, and a model reading the message can add a second chance
+# to stop it. The model reading the message is also the part an injection targets, so this is a
+# second line of defence and not a replacement for the patterns or the draft checks.
 MODEL_SIGNALS: frozenset[ReasonCode] = frozenset(
-    {ReasonCode.REFUND_OR_DISPUTE, ReasonCode.LEGAL_THREAT, ReasonCode.POLICY_EXCEPTION_REQUEST}
+    {
+        ReasonCode.REFUND_OR_DISPUTE,
+        ReasonCode.LEGAL_THREAT,
+        ReasonCode.POLICY_EXCEPTION_REQUEST,
+        ReasonCode.INJECTION_SUSPECTED,
+    }
 )
+# The ones the main reading of a message can list in its `escalation_signals`. The other is asked
+# by the focused questions (citedesk/understand.py).
+MAIN_READING_SIGNALS: frozenset[ReasonCode] = MODEL_SIGNALS - {ReasonCode.INJECTION_SUSPECTED}
 
 _ORDER = {code: position for position, code in enumerate(ReasonCode)}
 

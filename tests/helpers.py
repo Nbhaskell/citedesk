@@ -5,7 +5,7 @@ from typing import Any
 
 from citedesk import repo
 from citedesk.models import CheckCode, DraftStatus, InquiryStatus, ReasonCode
-from citedesk.routing import MODEL_SIGNALS
+from citedesk.routing import MAIN_READING_SIGNALS
 from citedesk.state import transition
 
 S = InquiryStatus
@@ -49,7 +49,7 @@ def perfect_reply(item: dict[str, Any]) -> dict[str, Any]:
         "primary_intent": labels["primary_intent"],
         "urgency": labels["urgency"],
         "sentiment": "neutral",
-        "escalation_signals": sorted(code.value for code in reasons & MODEL_SIGNALS),
+        "escalation_signals": sorted(code.value for code in reasons & MAIN_READING_SIGNALS),
         "fields": dict.fromkeys(FIELD_KEYS) | labels["fields"],
     }
 

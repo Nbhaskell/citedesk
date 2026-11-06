@@ -249,7 +249,10 @@ def test_main_calibrates_from_a_labels_file_without_a_model(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     judged = tmp_path / "judged.json"
-    judged.write_text(json.dumps({"cases": [], "results": results_of(1, 1)}), encoding="utf-8")
+    rows = results_of(1, 1)
+    judged.write_text(
+        json.dumps({"cases": [{"id": r["id"]} for r in rows], "results": rows}), encoding="utf-8"
+    )
     labels = tmp_path / "labels.json"
     labels.write_text(
         json.dumps({"labeller": "x", "labels": {"f0": "unsupported", "s0": "supported"}}),
@@ -269,3 +272,32 @@ def test_a_labels_template_lists_the_ids_in_sheet_order_and_empty_labels_are_ign
     assert list(template["labels"]) == ["b", "a"] and set(template["labels"].values()) == {""}
     results = [{"id": "a", "verdict": "supported"}, {"id": "b", "verdict": "unsupported"}]
     assert jd.agreement({"a": "supported", "b": ""}, results)["n"] == 1
+
+
+# --- the same inquiry drafted twice ------------------------------------------------------------
+
+
+def test_a_repeated_id_gets_a_suffix_so_each_draft_can_be_labelled_on_its_own() -> None:
+    assert jd.unique_ids(["a", "b", "a", "a", "c"]) == ["a", "b", "a~2", "a~3", "c"]
+
+
+def test_the_template_keeps_labels_already_written_and_adds_the_missing_ones() -> None:
+    existing = {"labeller": "Pat", "labels": {"a": "supported", "b": ""}}
+    merged = jd.merge_template(existing, ["a", "b", "a~2"])
+    assert merged["labeller"] == "Pat"
+    assert merged["labels"] == {"a": "supported", "b": "", "a~2": ""}
+
+
+def test_the_template_never_drops_a_label_the_sheet_no_longer_lists() -> None:
+    merged = jd.merge_template({"labeller": "", "labels": {"gone": "unsupported"}}, ["a"])
+    assert merged["labels"]["gone"] == "unsupported" and "a" in merged["labels"]
+
+
+def test_saved_cases_and_results_are_renamed_together_by_position() -> None:
+    cases = [{"id": "a"}, {"id": "a"}]
+    results = [{"id": "a", "verdict": "supported"}, {"id": "a", "verdict": "unsupported"}]
+    jd.apply_unique_ids(cases, results)
+    assert [c["id"] for c in cases] == ["a", "a~2"]
+    assert [r["id"] for r in results] == ["a", "a~2"]
+    labels = {"a": "supported", "a~2": "supported"}
+    assert jd.agreement(labels, results)["judge_flags_what_hand_calls_supported"] == 1

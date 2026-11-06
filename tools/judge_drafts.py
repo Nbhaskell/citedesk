@@ -328,6 +328,31 @@ def sheet_markdown(
     return "\n".join(lines)
 
 
+def unique_ids(ids: Sequence[str]) -> list[str]:
+    """The same inquiry can have two drafts (from two runs). The first keeps its id; later ones
+    get `~2`, `~3`, so each draft has its own label and verdict."""
+    seen: Counter[str] = Counter()
+    out: list[str] = []
+    for item_id in ids:
+        seen[item_id] += 1
+        out.append(item_id if seen[item_id] == 1 else f"{item_id}~{seen[item_id]}")
+    return out
+
+
+def apply_unique_ids(cases: list[Case], results: list[dict[str, Any]]) -> None:
+    """Rename in place, by position: a case and its verdict are the same position in both lists."""
+    for case, result, new in zip(cases, results, unique_ids([c["id"] for c in cases]), strict=True):
+        case["id"] = result["id"] = new
+
+
+def merge_template(existing: dict[str, Any], ids: Sequence[str]) -> dict[str, Any]:
+    """Add the ids a labels file lacks without touching any label already written."""
+    labels = dict(existing.get("labels", {}))
+    for item_id in ids:
+        labels.setdefault(item_id, "")
+    return {"labeller": existing.get("labeller", ""), "labels": labels}
+
+
 def label_template(ids: Sequence[str]) -> dict[str, Any]:
     """An empty labels file in the sheet's order, for the labeller to fill in."""
     return {"labeller": "", "labels": dict.fromkeys(ids, "")}
@@ -454,6 +479,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     saved = json.loads(args.judged.read_text("utf-8"))
     cases, results = saved["cases"], saved["results"]
+    apply_unique_ids(cases, results)
 
     if args.command == "known-bad":
         from citedesk import support
@@ -492,9 +518,10 @@ def main(argv: list[str] | None = None) -> int:
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(sheet_markdown(cases, results, order), encoding="utf-8")
         _write(RUNS_DIR / "draft-labelling-sheet.order.json", [cases[i]["id"] for i in order])
-        if not args.labels.exists():
-            _write(args.labels, label_template([cases[i]["id"] for i in order]))
-            print(f"Wrote {args.labels} to fill in (empty labels are ignored)")
+        ids = [cases[i]["id"] for i in order]
+        current = json.loads(args.labels.read_text("utf-8")) if args.labels.exists() else {}
+        _write(args.labels, merge_template(current, ids))
+        print(f"Updated {args.labels}: {len(ids)} ids, labels already written are kept")
         print(f"Wrote {out}: {len(order)} drafts, with no verdicts shown")
         return 0
 

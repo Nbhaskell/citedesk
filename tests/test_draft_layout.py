@@ -206,7 +206,7 @@ def test_a_body_with_no_content_is_retried_then_fails_like_any_bad_reply() -> No
 
 def test_the_prompt_tells_the_model_not_to_write_a_greeting_or_sign_off() -> None:
     prompt = " ".join(drafting.build_system_prompt(BUSINESS, 200).lower().split())
-    assert drafting.PROMPT_VERSION == "draft-v3"
+    assert drafting.PROMPT_VERSION == "draft-v4"
     assert "no greeting" in prompt and "no sign-off" in prompt
     assert "blank line" in prompt
     assert "under 200 words" not in prompt  # the frame is added by code, so the limit is lower

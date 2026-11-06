@@ -122,7 +122,7 @@ def test_the_header_names_the_system_and_the_data(finished: dict[str, Any]) -> N
     h = finished["header"]
     assert h["format"] == "eval-run-v1"
     assert h["stages"] == ["screen", "understand", "route", "retrieve", "draft", "check"]
-    assert h["prompt_versions"] == {"understand": "understand-v2", "draft": "draft-v3"}
+    assert h["prompt_versions"] == {"understand": "understand-v2", "draft": "draft-v4"}
     assert h["model"] == "fake-model" and h["settings"]["enable_thinking"] is True
     assert h["git"]["code_tree"] == "a" * 40 and h["rag"]["chunks"] == 83
     assert h["golden_sha256"] == "e" * 64 and h["golden"]["docs_sha256"] == "d" * 64

@@ -42,6 +42,7 @@ from citedesk import __version__, events, health, insights, intake, pipeline, re
 from citedesk.business import Business, load_business
 from citedesk.config import Settings
 from citedesk.db import connect, migrate, utc_now
+from citedesk.drafting import known_details
 from citedesk.guards import BodyLimit, RateLimiter, max_json_bytes
 from citedesk.insights import Insights
 from citedesk.intake import (
@@ -684,6 +685,7 @@ def create_app(
             raise ApiError(404, "not_found", "No inquiry has that id.")
         draft = repo.latest_draft(conn, inquiry_id)
         classification = repo.latest_classification(conn, inquiry_id)
+        extraction = repo.latest_extraction(conn, inquiry_id)
         retrievals = repo.list_retrievals(conn, inquiry_id)
         shown = (
             analyse_support(
@@ -691,6 +693,7 @@ def create_app(
                 merged_sources(retrievals),
                 f"{inquiry.subject or ''}\n{inquiry.body}",
                 sentiment=classification.sentiment.value if classification else None,
+                known_fields=known_details(extraction.fields) if extraction else None,
             )
             if draft is not None and draft.kind is DraftKind.reply
             else None
@@ -699,7 +702,7 @@ def create_app(
             inquiry=inquiry,
             screening=repo.get_screening(conn, inquiry_id),
             classification=classification,
-            extraction=repo.latest_extraction(conn, inquiry_id),
+            extraction=extraction,
             escalations=repo.list_escalations(conn, inquiry_id),
             retrievals=retrievals,
             draft=draft,

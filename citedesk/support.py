@@ -12,14 +12,16 @@ Everything it returns is text for the page to show as text (rule 5).
 """
 
 import re
+from collections.abc import Mapping
 from typing import Literal
 
 from pydantic import Field
 
 from citedesk.checks import GREETING, MAX_GREETING_WORDS, SIGN_OFF, Figure, extract_figures
+from citedesk.drafting import KNOWN_LABELS
 from citedesk.models import Source, Strict
 
-Status = Literal["supported", "routine", "from_message", "unsupported", "tone"]
+Status = Literal["supported", "routine", "from_message", "unsupported", "tone", "asks_known"]
 
 SUPPORT_OVERLAP = 0.6  # share of a sentence's content words that one source passage must hold
 MESSAGE_OVERLAP = 0.75  # share that the customer's own message must hold
@@ -80,6 +82,38 @@ _REFUSAL = re.compile(
 )
 UNHAPPY = frozenset({"negative", "angry"})
 
+# A sentence that asks for a detail (D-081): a cue that it is a request, and words for each detail.
+_ASK_CUE = re.compile(
+    r"\b(?:please|could you|can you|let us know|provide|confirm|tell us|share|send us)\b|\?",
+    re.IGNORECASE,
+)
+_ASK_WORDS: dict[str, re.Pattern[str]] = {
+    "address_area": re.compile(
+        r"neighbou?rhood|address area|area the property|which area|your area", re.IGNORECASE
+    ),
+    "property_type": re.compile(
+        r"property type|type of property|house, an apartment", re.IGNORECASE
+    ),
+    "start_date": re.compile(
+        r"date you would like|preferred date|which date|what date|when would you like",
+        re.IGNORECASE,
+    ),
+    "service_type": re.compile(r"kind of work|type of work|service type|what work", re.IGNORECASE),
+    "booking_reference": re.compile(r"booking reference|reference number", re.IGNORECASE),
+}
+
+
+def _asks_for_known(sentence: str, known: Mapping[str, str] | None) -> list[str]:
+    """The details this sentence asks for that the customer already gave, in plain words."""
+    if not known or not _ASK_CUE.search(sentence):
+        return []
+    asked = [
+        KNOWN_LABELS[name]
+        for name, pattern in _ASK_WORDS.items()
+        if name in known and pattern.search(sentence)
+    ]
+    return sorted(asked)
+
 
 def _misplaced_sympathy(plain: str, sentiment: str | None) -> bool:
     """A sympathy sentence the message does not call for. Nothing is judged when the sentiment
@@ -113,6 +147,7 @@ class SentenceSupport(Strict):
     text: str
     status: Status
     source_index: int | None
+    asks_for: list[str] = []
 
 
 class DraftSupport(Strict):
@@ -208,7 +243,11 @@ def _mismatch(figure: Figure, sentence_words: set[str], origins: list[Origin]) -
 
 
 def analyse(
-    body: str, sources: list[Source], inquiry_text: str, sentiment: str | None = None
+    body: str,
+    sources: list[Source],
+    inquiry_text: str,
+    sentiment: str | None = None,
+    known_fields: Mapping[str, str] | None = None,
 ) -> DraftSupport:
     """Judge each sentence of a draft against its sources and the customer's message, and find the
     line each figure comes from. Deterministic; changes nothing."""
@@ -247,6 +286,14 @@ def analyse(
         plain = sentence.replace("’", "'")
         status: Status = "unsupported"
         source_index: int | None = None
+        asked = _asks_for_known(plain, known_fields)
+        if asked:
+            sentences.append(
+                SentenceSupport(
+                    text=sentence, status="asks_known", source_index=None, asks_for=asked
+                )
+            )
+            continue
         if (
             not found
             and _ROUTINE.search(plain)

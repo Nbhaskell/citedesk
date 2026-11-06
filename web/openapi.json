@@ -1969,6 +1969,14 @@
       "SentenceSupport": {
         "additionalProperties": false,
         "properties": {
+          "asks_for": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Asks For",
+            "type": "array"
+          },
           "source_index": {
             "anyOf": [
               {
@@ -1986,7 +1994,8 @@
               "routine",
               "from_message",
               "unsupported",
-              "tone"
+              "tone",
+              "asks_known"
             ],
             "title": "Status",
             "type": "string"

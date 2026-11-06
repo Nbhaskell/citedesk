@@ -340,6 +340,9 @@ export const detail = {
     unsourcedMark: "Not from your documents",
     noneMarked:
       "No sentence is marked. That only means each one uses the wording of a passage or of the message. It does not mean the reply is right.",
+    asksKnown: "Asks for something the customer already gave",
+    asksKnownFor: (details: string[]): string => `Asks for the ${details.join(" and the ")}`,
+    asksKnownNote: "The message already says this. Delete the question, or reject with guidance.",
     tone: "Tone to check",
     toneMark: "Sympathy the message does not call for",
     toneNote:

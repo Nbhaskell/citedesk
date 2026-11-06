@@ -28,8 +28,14 @@ const support = (over: Partial<Support> = {}): Support => ({
       text: "Drain cleaning for one fixture starts at $149.",
       status: "supported",
       source_index: 0,
+      asks_for: [],
     },
-    { text: "Platinum customers get priority forever.", status: "unsupported", source_index: null },
+    {
+      text: "Platinum customers get priority forever.",
+      status: "unsupported",
+      source_index: null,
+      asks_for: [],
+    },
   ],
   ...over,
 });
@@ -117,6 +123,7 @@ describe("ReadingAids", () => {
         text: "<img src=x onerror=alert(1)> free pipes",
         status: "unsupported",
         source_index: null,
+        asks_for: [],
       },
     ];
     const { container } = render(
@@ -129,7 +136,12 @@ describe("ReadingAids", () => {
   it("lists a sympathy line the message does not call for, apart from the unsourced ones", () => {
     const s = support();
     s.sentences = [
-      { text: "We're sorry to hear you did it yourself.", status: "tone", source_index: null },
+      {
+        text: "We're sorry to hear you did it yourself.",
+        status: "tone",
+        source_index: null,
+        asks_for: [],
+      },
     ];
     show(s);
     expect(screen.getByText("Tone to check")).toBeTruthy();
@@ -140,5 +152,35 @@ describe("ReadingAids", () => {
   it("shows no tone section when no line is marked for tone", () => {
     show(support());
     expect(screen.queryByText("Tone to check")).toBeNull();
+  });
+
+  it("lists a question for something the customer already gave, naming the detail", () => {
+    const s = support();
+    s.sentences = [
+      {
+        text: "Please provide the neighbourhood or address area.",
+        status: "asks_known",
+        source_index: null,
+        asks_for: ["area"],
+      },
+    ];
+    show(s);
+    expect(screen.getByText("Asks for something the customer already gave")).toBeTruthy();
+    expect(screen.getByText(/Asks for the area:/)).toBeTruthy();
+    expect(screen.getByText(/Please provide the neighbourhood/)).toBeTruthy();
+  });
+
+  it("names every detail when a sentence asks for two", () => {
+    const s = support();
+    s.sentences = [
+      {
+        text: "Confirm both.",
+        status: "asks_known",
+        source_index: null,
+        asks_for: ["area", "property type"],
+      },
+    ];
+    show(s);
+    expect(screen.getByText(/Asks for the area and the property type:/)).toBeTruthy();
   });
 });

@@ -14,14 +14,14 @@ it as ready.
 
 import json
 import re
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
 from pydantic import Field, ValidationError, field_validator
 
 from citedesk.business import Business
-from citedesk.models import Claim, DraftKind, Intent, Source, Strict
+from citedesk.models import Claim, DraftKind, ExtractedFields, Intent, Source, Strict
 from citedesk.providers import (
     LLMError,
     LLMProvider,
@@ -29,11 +29,12 @@ from citedesk.providers import (
     LLMTimeout,
     LLMUnavailable,
 )
+from citedesk.routing import is_missing
 from citedesk.screening import injection_flags
 from citedesk.understand import build_user_message as inquiry_block
 from citedesk.understand import describe_error, inline_refs, retry_note
 
-PROMPT_VERSION = "draft-v3"
+PROMPT_VERSION = "draft-v4"
 MAX_TOKENS = 800
 TEMPERATURE = 0.2  # TRD 4.5: "at most 0.2, for style"
 TIMEOUT_S = 120
@@ -66,9 +67,30 @@ TOPIC_PHRASES: dict[Intent, str] = {
     Intent.billing_question: "billing",
     Intent.other: "another question",
 }
+# The details of a booking, in the words used when telling the writer what is already known.
+KNOWN_LABELS: dict[str, str] = {
+    "service_type": "type of work",
+    "start_date": "date",
+    "property_type": "property type",
+    "address_area": "area",
+    "booking_reference": "booking reference",
+}
 CARD_LINE = "Please don't send card or ID numbers by email."
 TITLES = frozenset({"mr", "mrs", "ms", "miss", "mx", "dr", "prof"})
 NAME_TOKEN = re.compile(r"^[^\W\d_][\w'’-]*$")
+
+
+def known_details(fields: ExtractedFields) -> dict[str, str]:
+    """The details the customer gave, as read by the understand step, in plain words."""
+    found: dict[str, str] = {}
+    for name in KNOWN_LABELS:
+        value = getattr(fields, name)
+        if value is None:
+            continue
+        text = str(getattr(value, "value", value)).replace("_", " ").strip()
+        if not is_missing(text):
+            found[name] = text
+    return found
 
 
 def describe_field(name: str) -> str:
@@ -359,6 +381,8 @@ guarantee.
 - If the customer sent card or ID numbers, tell them not to send those by email.
 - Do not say you are sorry, glad or grateful about anything unless the customer reports a \
 problem or complaint (sorry) or good news (glad). A plain request gets a plain answer.
+- Never ask for a detail the customer already gave (the message lists them), even if a \
+passage says it is needed to book.
 - Write only the message itself: no greeting, no sign-off and no name at the end. They are \
 added for you. Put a blank line between paragraphs and keep each to one to three sentences.
 - Be friendly, plain and brief: under {max_words - FRAME_WORDS} words.
@@ -383,6 +407,7 @@ def build_user_message(
     unanswered: Sequence[Intent],
     sensitive_data_masked: bool,
     guidance: str | None = None,
+    known: Mapping[str, str] | None = None,
 ) -> str:
     passages = "\n\n".join(
         _DATA_TAG.sub(" ", f"[{index}] {s.file} ({s.section})\n{s.text}")
@@ -402,6 +427,15 @@ def build_user_message(
     if missing_fields:
         asked = "\n".join(f"- {describe_field(name)}" for name in missing_fields)
         parts.append(f"Ask the customer for these details, in plain words:\n{asked}")
+    given = {
+        k: v for k, v in (known or {}).items() if k not in missing_fields and k in KNOWN_LABELS
+    }
+    if given:
+        lines = "\n".join(f"- {KNOWN_LABELS[k]}: {v}" for k, v in given.items())
+        parts.append(
+            "The customer already gave these details. Do not ask for them again, even if a "
+            f"passage says they are needed to book:\n{lines}"
+        )
     if sensitive_data_masked:
         parts.append("The customer sent card or ID numbers. Tell them not to send those by email.")
     if guidance:
@@ -441,6 +475,7 @@ def draft(
     sensitive_data_masked: bool,
     max_words: int,
     guidance: str | None = None,
+    known_fields: Mapping[str, str] | None = None,
 ) -> Drafted:
     """Ask the model to write a reply from the sources. Raises DraftFailed.
 
@@ -456,6 +491,7 @@ def draft(
         unanswered=unanswered,
         sensitive_data_masked=sensitive_data_masked,
         guidance=guidance,
+        known=known_fields,
     )
     schema = json_schema()
     user = first_user

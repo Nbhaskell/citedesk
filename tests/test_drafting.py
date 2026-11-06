@@ -240,7 +240,7 @@ def test_every_template_passes_every_check(masked: bool) -> None:
 
 
 def test_the_prompt_version_is_recorded() -> None:
-    assert PROMPT_VERSION == "draft-v3"
+    assert PROMPT_VERSION == "draft-v4"
 
 
 def test_the_system_prompt_sets_the_rules_the_checks_enforce() -> None:

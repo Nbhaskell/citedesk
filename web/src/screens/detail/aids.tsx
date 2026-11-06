@@ -29,6 +29,7 @@ export function ReadingAids({
 }) {
   const marked = support.sentences.filter((s) => s.status === "unsupported");
   const tone = support.sentences.filter((s) => s.status === "tone");
+  const asksKnown = support.sentences.filter((s) => s.status === "asks_known");
   const sender = firstName(senderName);
   const differs =
     support.greeting_name !== null &&
@@ -107,6 +108,23 @@ export function ReadingAids({
           ))}
         </ul>
       )}
+
+      {asksKnown.length > 0 ? (
+        <>
+          <h4>{words.aids.asksKnown}</h4>
+          <p className={styles.faint}>{words.aids.asksKnownNote}</p>
+          <ul className={styles.aidList}>
+            {asksKnown.map((sentence) => (
+              <li key={sentence.text}>
+                <span className={styles.warn}>
+                  {words.aids.asksKnownFor(sentence.asks_for ?? [])}:
+                </span>{" "}
+                {sentence.text}
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
 
       {tone.length > 0 ? (
         <>

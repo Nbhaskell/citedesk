@@ -602,6 +602,7 @@ class _DraftInputs:
     unanswered: list[Intent]
     asking: bool
     missing: list[str]
+    known: dict[str, str]
 
 
 def _draft_inputs(
@@ -626,7 +627,14 @@ def _draft_inputs(
         if asking
         else []
     )
-    return _DraftInputs(screening, retrieval.merged_sources(rows), unanswered, asking, missing)
+    return _DraftInputs(
+        screening,
+        retrieval.merged_sources(rows),
+        unanswered,
+        asking,
+        missing,
+        drafting.known_details(extraction.fields),
+    )
 
 
 def draft_stage(
@@ -693,6 +701,7 @@ def draft_stage(
             unanswered=unanswered,
             sensitive_data_masked=screening.sensitive_data_masked,
             max_words=settings.draft_max_words,
+            known_fields=inputs.known,
         )
         kind = DraftKind.request_details if asking else DraftKind.reply
         subject = written.output.subject or drafting.reply_subject(inquiry.subject)
@@ -994,6 +1003,7 @@ def redraft_stage(
             sensitive_data_masked=inputs.screening.sensitive_data_masked,
             max_words=settings.draft_max_words,
             guidance=note,
+            known_fields=inputs.known,
         )
     except drafting.DraftFailed as error:
         events.record_event(

@@ -807,13 +807,18 @@ export interface components {
         ScreeningResult: "clean" | "spam" | "injection_suspected";
         /** SentenceSupport */
         SentenceSupport: {
+            /**
+             * Asks For
+             * @default []
+             */
+            asks_for: string[];
             /** Source Index */
             source_index: number | null;
             /**
              * Status
              * @enum {string}
              */
-            status: "supported" | "routine" | "from_message" | "unsupported" | "tone";
+            status: "supported" | "routine" | "from_message" | "unsupported" | "tone" | "asks_known";
             /** Text */
             text: string;
         };

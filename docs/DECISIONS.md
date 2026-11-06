@@ -533,3 +533,26 @@ The protocol (`docs/REVIEW_TRIAL.md`) was approved and committed before the sitt
 A target missed is reported as missed.
 
 **What it still cannot show.** One AI author, so the set is unseen by the fixing session and not blind to the style of the process that wrote the documents. A single labeller. The mix is built to exercise rules and is not a real inbox. Passing would show that the fixes generalise to a second set of invented messages, not that the product works on real customers.
+
+### D-072. Held-out error analysis: where the intent misses are, and what it means for the order of fixes
+**What was done.** `tools/error_analysis.py` reads the three saved held-out passes (`eval/runs/eval-heldout-*`) and the labels and writes `eval/reports/heldout-error-analysis.md` (ids, labels and counts only). Nothing in the system, the labels or the held-out items was changed. The three passes agree almost item for item, so the misses are stable behaviour, not noise.
+
+**Counts.** 24 of 76 items had a wrong primary intent in at least one pass; 16 of those also had a wrong route. The other 8 are different readings of the same ask that end in the same route.
+
+**Groups of misses** (counts are items).
+1. **Policy exceptions are not noticed (5 of 6 missed).** `POLICY_EXCEPTION_REQUEST` is raised only from the model's escalation signals in `understand.py` (and, later, by the commitment check on a draft). On the five misses the model reported no signal and read the message as a price or booking question. Two of them went on to a ready draft reply, three to a request for details. This is the group with the highest consequence and the clearest cause: one detector, one wording-sensitive model signal.
+2. **Injection wording (3 of 4 not caught).** Screening caught one; the role-play as the owner and the fake pre-approval notice reached a ready draft, the request to paste the guidelines got a request for details. The screening patterns were written with the tuned examples in view (D-064), so this is the phrase-list weakness, shared with group 1's fix.
+3. **Hours read as availability (3 items), out-of-scope read as a booking (1).** "What time is the last visit on Saturday" and a question about the office opening are `service_question` under the labelling rules, but are read as `availability_question` and get a request for a date instead of a draft. This is a prompt boundary problem and the reply is wrong for the customer, though safe.
+4. **Spam read as sales or billing (2 of 3 wrong intent, 3 of 3 wrong route).** A bulk-review offer and a parcel-fee message are read as `partnership_or_sales` and `billing_question`, so they are escalated and not archived. The labels are not in doubt. The costs are reviewer time, not risk.
+5. **Over-firing safety net (1).** A hypothetical burst pipe in a question about call-out hours is escalated.
+6. **Route misses with the right intent**, mostly the relative date "today" (urgent items given a ready draft or a request for details against the label) and one unanswerable item given a ready draft.
+
+**Label audit.** Judgment calls found; none changed, because the held-out labels are not edited after the run (D-061).
+- Four `billing_question` primaries where the message is a refund request and a service complaint at once (the model says `complaint`); the route is the same either way. The labelling rule for the primary intent of a mixed refund-and-complaint message is not stated and is added to the guideline for the next set.
+- Two `LOW_CONFIDENCE` items: the label depends on the model reporting low confidence (the guideline says so), and asking for details is a safe outcome. They are not a reliable measure and stay out of the headline.
+- One follow-up ("do you have me down for Tuesday") and one trade-account offer labelled `draft_reply` where escalation is defensible.
+- The hours-versus-availability boundary is correct under the rule but easy to misread; the guideline gets an example.
+
+**Order of fixes that follows.** Group 1 and 2 first and together (one detector design, tested with a paraphrase set, D-071 and item 4), then the draft style fixes, then the prompt boundary of group 3 and the spam reading of group 4, then group 5 as a rule with a hypothetical-event guard. Each is measured on a development set written for it (not on the held-out items) and claimed only on the sealed run.
+
+**What this cannot show.** 76 items and a few per group, one labeller, and a model whose reading is fixed by one prompt version (`understand-v1`). The grouping is a reading by one author.

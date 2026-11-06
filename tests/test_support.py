@@ -319,3 +319,17 @@ def test_an_ordinary_sentence_is_never_marked_as_tone() -> None:
     assert tone("Drain cleaning for one fixture starts at $149.", sentiment="neutral") == [
         "supported"
     ]
+
+
+def test_a_short_sentence_sharing_one_word_with_the_message_is_not_taken_for_an_echo() -> None:
+    """Found when claims were separated for the judge (D-082): one shared word is not a repeat."""
+    result = run(
+        "We can also help with any other plumbing needs you may have.",
+        inquiry="Our plumbing is old and the sink is slow.",
+    )
+    assert statuses(result) == ["unsupported"]
+
+
+def test_a_longer_echo_of_the_message_is_still_marked_as_theirs() -> None:
+    result = run("You asked about the slow kitchen sink in Wren Common.")
+    assert statuses(result) == ["from_message"]

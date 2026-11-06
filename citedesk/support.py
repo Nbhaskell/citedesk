@@ -24,6 +24,7 @@ from citedesk.models import Source, Strict
 Status = Literal["supported", "routine", "from_message", "unsupported", "tone", "asks_known"]
 
 SUPPORT_OVERLAP = 0.6  # share of a sentence's content words that one source passage must hold
+MIN_ECHO_WORDS = 3  # fewer content words than this cannot be called a repeat of the message
 MESSAGE_OVERLAP = 0.75  # share that the customer's own message must hold
 MISMATCH_OVERLAP = 0.5  # below this, a figure's line is about something else than the sentence
 MAX_ORIGINS = 3
@@ -320,6 +321,7 @@ def analyse(
                 status, source_index = "supported", max(fitting, key=scores.__getitem__)
             elif (
                 words
+                and len(words) >= MIN_ECHO_WORDS
                 and len(words & message_words) / len(words) >= MESSAGE_OVERLAP
                 and keys <= (message_keys)
             ):

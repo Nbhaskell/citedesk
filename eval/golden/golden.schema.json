@@ -160,7 +160,8 @@
         "split": {
           "enum": [
             "tuned",
-            "heldout"
+            "heldout",
+            "sealed"
           ],
           "title": "Split",
           "type": "string"

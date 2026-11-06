@@ -301,3 +301,66 @@ def test_saved_cases_and_results_are_renamed_together_by_position() -> None:
     assert [r["id"] for r in results] == ["a", "a~2"]
     labels = {"a": "supported", "a~2": "supported"}
     assert jd.agreement(labels, results)["judge_flags_what_hand_calls_supported"] == 1
+
+
+# --- judging only the sentences that make claims (D-082) -----------------------------------------
+
+PASSAGES = ["Drain cleaning, one fixture: $149 (starting price)."]
+
+
+def test_conversation_sentences_are_left_out_and_claims_are_kept() -> None:
+    answer = (
+        "Thanks for your message. Drain cleaning for one fixture starts at $149.\n\n"
+        "Platinum customers get priority forever. A member of our team will follow up."
+    )
+    kept = jd.claims_only(answer, PASSAGES, "How much for a drain?")
+    assert kept == (
+        "Drain cleaning for one fixture starts at $149. Platinum customers get priority forever."
+    )
+
+
+def test_a_request_for_a_known_detail_and_sympathy_are_not_claims() -> None:
+    answer = "We're sorry to hear that. Drain cleaning starts at $149."
+    kept = jd.claims_only(answer, PASSAGES, "My sink in Wren Common drains slowly.")
+    assert kept == "Drain cleaning starts at $149."
+
+
+def test_a_sentence_that_repeats_the_customers_message_is_not_a_claim() -> None:
+    answer = "You asked about the slow kitchen sink in Wren Common. Drain cleaning starts at $149."
+    kept = jd.claims_only(answer, PASSAGES, "my slow kitchen sink in Wren Common")
+    assert kept == "Drain cleaning starts at $149."
+
+
+def test_a_draft_with_nothing_but_conversation_has_no_claims() -> None:
+    assert jd.claims_only("A member of our team will follow up.", PASSAGES, "q") == ""
+
+
+def test_rejudging_skips_drafts_without_claims_and_calls_the_judge_for_the_rest() -> None:
+    cases = [
+        {
+            "id": "a",
+            "question": "q",
+            "answer": "Drain cleaning starts at $149.",
+            "passages": PASSAGES,
+        },
+        {
+            "id": "b",
+            "question": "q",
+            "answer": "A member of our team will follow up.",
+            "passages": [],
+        },
+        {"id": "c", "question": "q", "answer": "Free pipes for life.", "passages": PASSAGES},
+    ]
+    judge = ScriptedJudge({"Free pipes": "unsupported"})
+    results = jd.rejudge_claims(judge, cases, labelled={"a", "b"})
+    assert [r["id"] for r in results] == ["a", "b"]  # only the labelled ones
+    assert results[1]["verdict"] == "supported" and results[1]["note"] == "no claims"
+    assert len(judge.calls) == 1 and judge.calls[0]["answer"] == "Drain cleaning starts at $149."
+
+
+def test_the_two_agreement_figures_are_computed_on_the_same_drafts() -> None:
+    labels = {"a": "supported", "b": "supported"}
+    before = [{"id": "a", "verdict": "unsupported"}, {"id": "b", "verdict": "supported"}]
+    after = [{"id": "a", "verdict": "supported"}, {"id": "b", "verdict": "supported"}]
+    result = jd.compare_agreement(labels, before, after)
+    assert result["whole_draft"]["exact"] == 1 and result["claims_only"]["exact"] == 2

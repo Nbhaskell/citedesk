@@ -358,6 +358,63 @@ def label_template(ids: Sequence[str]) -> dict[str, Any]:
     return {"labeller": "", "labels": dict.fromkeys(ids, "")}
 
 
+# --- judging only the sentences that make claims (D-082) -----------------------------------------
+
+NOT_CLAIMS = ("routine", "tone", "asks_known", "from_message")
+
+
+def claims_only(answer: str, passages: Sequence[str], question: str) -> str:
+    """The draft without the sentences that make no claim about the business: those that only manage
+    the conversation, express sympathy, ask for a detail or repeat the customer's message. Which
+    sentences those are is decided by the review aids' rules (plain code), not by a model."""
+    from citedesk import support
+
+    sources = [Source(file="", section="", page=None, text=t) for t in passages]
+    body = f"Hi,\n\n{answer}\n\nKind regards,\nX"
+    kept = [
+        s.text
+        for s in support.analyse(body, sources, question).sentences
+        if s.status not in NOT_CLAIMS
+    ]
+    return " ".join(kept)
+
+
+def rejudge_claims(
+    judge: JudgeLike, cases: Sequence[Case], labelled: set[str]
+) -> list[dict[str, Any]]:
+    """Judge only the claim sentences of the labelled drafts. A draft with no claim has nothing to
+    check and counts as supported without a call."""
+    results: list[dict[str, Any]] = []
+    for case in cases:
+        if case["id"] not in labelled:
+            continue
+        kept = claims_only(case["answer"], case["passages"], case["question"])
+        if not kept:
+            results.append(
+                {
+                    "id": case["id"],
+                    "verdict": "supported",
+                    "unsupported_claims": [],
+                    "error": None,
+                    "note": "no claims",
+                }
+            )
+            continue
+        results.append(judge_case(judge, {**case, "answer": kept}))
+    return results
+
+
+def compare_agreement(
+    labels: dict[str, str], whole: Sequence[dict[str, Any]], claims: Sequence[dict[str, Any]]
+) -> dict[str, Any]:
+    """The judge's agreement with the labels on the same drafts, before and after."""
+    ids = {r["id"] for r in claims}
+    return {
+        "whole_draft": agreement(labels, [r for r in whole if r["id"] in ids]),
+        "claims_only": agreement(labels, claims),
+    }
+
+
 def cohens_kappa(pairs: Sequence[tuple[str, str]]) -> float | None:
     if not pairs:
         return None
@@ -444,7 +501,7 @@ def _progress(label: str) -> Callable[[int, int], None]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0] if __doc__ else None)
-    parser.add_argument("command", choices=("judge", "known-bad", "sheet", "calibrate"))
+    parser.add_argument("command", choices=("judge", "known-bad", "sheet", "calibrate", "rejudge"))
     parser.add_argument("--runs", nargs="*", help="saved pipeline runs (default: all tuned ones)")
     parser.add_argument("--judged", type=Path, help="a file written by `judge`")
     parser.add_argument("--citecheck", type=Path, default=None)
@@ -526,6 +583,15 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     labels_file = json.loads(args.labels.read_text("utf-8"))
+    if args.command == "rejudge":
+        judge = make_judge(src)
+        claims = rejudge_claims(judge, cases, set(labels_file["labels"]))
+        out = RUNS_DIR / f"judge-claims-only-{_stamp()}.json"
+        _write(out, {"config": judge.config(), "results": claims})
+        both = compare_agreement(labels_file["labels"], results, claims)
+        print(json.dumps(both, indent=1))
+        _say(f"Wrote {out}")
+        return 0
     result = agreement(labels_file["labels"], results)
     print(json.dumps(result, indent=1))
     return 0

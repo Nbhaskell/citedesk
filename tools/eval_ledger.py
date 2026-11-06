@@ -1,7 +1,9 @@
-"""The held-out ledger: the held-out split is looked at once, by one fixed system (D-061, D-062).
+"""The ledgers of the locked sets: the held-out split (D-061, D-062) and the sealed set (D-071).
 
-`eval/heldout_ledger.json` is committed. Starting a held-out run writes to it *before* the first
-item is read, so a run that crashes still leaves its trace. The rules, in code and tested:
+Each is looked at once, by one fixed system. The rules are the same; only the file and the words
+differ. `eval/heldout_ledger.json` and `eval/sealed_ledger.json` are committed. Starting a run
+writes to the ledger *before* the first item is read, so a run that crashes still leaves its trace.
+The rules, in code and tested (written for the held-out set; the sealed set says "sealed"):
 
 - The first held-out run of a system declares how many passes it will make (1 to 5). Later passes of
   the same system, up to that number, need no reason: they exist to measure run-to-run spread.
@@ -23,7 +25,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-FORMAT = "heldout-ledger-v1"
+FORMATS = {"heldout": "heldout-ledger-v1", "sealed": "sealed-ledger-v1"}
+NAMES = {"heldout": "held-out", "sealed": "sealed"}
+FORMAT = FORMATS["heldout"]
 MIN_PASSES, MAX_PASSES = 1, 5
 MIN_REASON_CHARS = 20
 
@@ -32,24 +36,34 @@ class LedgerRefused(Exception):
     """The held-out ledger does not allow this run. The message says why and what would."""
 
 
-def empty() -> dict[str, Any]:
+def empty(kind: str = "heldout") -> dict[str, Any]:
+    decisions = "D-061 and D-062" if kind == "heldout" else "D-071"
     return {
-        "format": FORMAT,
+        "format": FORMATS[kind],
         "note": (
-            "Every held-out run of the evaluation, written when the run starts. The held-out "
-            "split is run once, by one fixed system; see docs/DECISIONS.md D-061 and D-062."
+            f"Every {NAMES[kind]} run of the evaluation, written when the run starts. The "
+            f"{NAMES[kind]} set is run once, by one fixed system; see docs/DECISIONS.md "
+            f"{decisions}."
         ),
         "evaluations": [],
     }
 
 
-def load(path: Path) -> dict[str, Any]:
+def load(path: Path, kind: str = "heldout") -> dict[str, Any]:
     if not path.exists():
-        return empty()
+        return empty(kind)
     data: dict[str, Any] = json.loads(path.read_text("utf-8"))
-    if data.get("format") != FORMAT:
-        raise LedgerRefused(f"{path.name} is not a held-out ledger (format {FORMAT!r})")
+    if data.get("format") != FORMATS[kind]:
+        raise LedgerRefused(f"{path.name} is not a {NAMES[kind]} ledger (format {FORMATS[kind]!r})")
     return data
+
+
+def _name(ledger: dict[str, Any]) -> str:
+    """The word for this ledger's set in a message."""
+    for kind, fmt in FORMATS.items():
+        if ledger.get("format") == fmt:
+            return NAMES[kind]
+    return "held-out"
 
 
 def save(path: Path, ledger: dict[str, Any]) -> None:
@@ -105,6 +119,7 @@ def authorize(
 ) -> Authorization:
     """Decide whether this system may make a held-out run now. Raises `LedgerRefused` if not."""
     wanted = system_id(identity)
+    name = _name(ledger)
     evaluations: list[dict[str, Any]] = ledger["evaluations"]
 
     if resume_run_id is not None:
@@ -119,7 +134,7 @@ def authorize(
                     return Authorization(
                         index, run["pass"], evaluation["passes_declared"], False, None, True
                     )
-        raise LedgerRefused(f"run {resume_run_id!r} is not an unfinished held-out run")
+        raise LedgerRefused(f"run {resume_run_id!r} is not an unfinished {name} run")
 
     if passes is not None:
         _check_passes(passes)
@@ -132,14 +147,14 @@ def authorize(
         reason = None
         if evaluations:
             reason = _need_reason(
-                "the held-out set has already been run on a different system, so it is spent "
+                f"the {name} set has already been run on a different system, so it is spent "
                 "for this one",
                 justify,
             )
         if passes is None:
             raise LedgerRefused(
-                "the first held-out run of a system must declare how many passes it will make: "
-                "use --heldout-passes N (1 to 5)"
+                f"the first {name} run of a system must declare how many passes it will make: "
+                f"use --{'heldout' if name == 'held-out' else 'sealed'}-passes N (1 to 5)"
             )
         return Authorization(None, 1, passes, reason is not None, reason, False)
 
@@ -147,14 +162,14 @@ def authorize(
     declared = evaluation["passes_declared"]
     if passes is not None and passes != declared:
         raise LedgerRefused(
-            f"this system's held-out evaluation declared {declared} passes; "
+            f"this system's {name} evaluation declared {declared} passes; "
             f"it cannot be changed to {passes}"
         )
     runs = evaluation["runs"]
     reason = None
     if any(r["status"] == "started" for r in runs):
         reason = _need_reason(
-            "an earlier held-out run of this system never finished. Resume it with "
+            f"an earlier {name} run of this system never finished. Resume it with "
             "--resume RUN_ID (that uses no pass); starting again would be a second look",
             justify,
         )
@@ -245,5 +260,40 @@ def heldout_problems(
         problems.append(
             "there are uncommitted changes to the system: commit them first, so the run names a "
             "fixed system (changes under eval/ are ignored)"
+        )
+    return problems
+
+
+def sealed_problems(
+    *,
+    split: str,
+    confirmed: bool,
+    limit: int | None,
+    dirty: bool,
+    git_known: bool,
+    hash_matches: bool,
+) -> list[str]:
+    """Reasons a sealed-set request is refused before the ledger or any item is touched (D-071)."""
+    if split != "sealed":
+        return []
+    problems: list[str] = []
+    if not confirmed:
+        problems.append(
+            "the sealed set is run once, by the evaluation, and never used to choose or tune: "
+            "ask for it explicitly with --confirm-sealed-once"
+        )
+    if limit is not None:
+        problems.append("a sealed run is the whole set: --limit is not allowed with it")
+    if not git_known:
+        problems.append("git did not answer, so the system cannot be pinned to a commit")
+    elif dirty:
+        problems.append(
+            "there are uncommitted changes to the system: commit them first, so the run names a "
+            "fixed system (changes under eval/ are ignored)"
+        )
+    if not hash_matches:
+        problems.append(
+            "the sealed file is missing or does not match the committed hash "
+            "(eval/golden/citedesk_sealed.sha256): it may have been changed since it was sealed"
         )
     return problems

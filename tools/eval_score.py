@@ -487,6 +487,14 @@ def report_markdown(run: dict[str, Any], scores: dict[str, Any]) -> str:
             f"{split} split were run.",
             "",
         ]
+    if split == "sealed":
+        lines += [
+            "**Sealed set.** Written before any fix and run once on a fixed system (D-071). "
+            "Its mix is built to exercise every rule and is not a real inbox, so overall rates say "
+            "nothing about a real business; compare per-label rates, with their counts. Targets "
+            "are in D-071.",
+            "",
+        ]
     if split == "heldout":
         lines += [
             "**Held-out split.** Run once on a fixed system (D-061). Its mix is not the tuned "
@@ -506,7 +514,9 @@ def report_markdown(run: dict[str, Any], scores: dict[str, Any]) -> str:
         f"{json.dumps(ec.rag_identity(rag), sort_keys=True)}",
         f"- started {header.get('started_at')}, finished {header.get('finished_at')}",
         "",
-        "## Headline measures (fixed before any held-out result, D-061)",
+        "## Headline measures (fixed before any "
+        f"{'sealed' if split == 'sealed' else 'held-out'} result, "
+        f"{'D-071' if split == 'sealed' else 'D-061'})",
         "",
         "| Measure | Result | Target |",
         "|---|---|---|",
@@ -711,14 +721,27 @@ def load_pass(path: Path, golden: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def golden_for_run(path: Path) -> Path:
+    """The file holding the labels of the split a saved run was made on."""
+    split = json.loads(path.read_text("utf-8"))["header"]["split"]
+    return ec.golden_file_for(str(split))
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0] if __doc__ else None)
     parser.add_argument("runs", nargs="+", type=Path, help="saved .run.json files")
     parser.add_argument("--md", type=Path, help="write the Markdown report here")
     args = parser.parse_args(argv)
 
-    golden = json.loads(ec.GOLDEN_FILE.read_text("utf-8"))
-    passes = [load_pass(path, golden) for path in args.runs]
+    cache: dict[Path, dict[str, Any]] = {}
+
+    def golden_of(path: Path) -> dict[str, Any]:
+        file = golden_for_run(path)
+        if file not in cache:
+            cache[file] = json.loads(file.read_text("utf-8"))
+        return cache[file]
+
+    passes = [load_pass(path, golden_of(path)) for path in args.runs]
     text = ""
     for path, one in zip(args.runs, passes, strict=True):
         out = path.with_name(path.name.removesuffix(".run.json") + ".scores.json")

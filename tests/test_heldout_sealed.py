@@ -46,3 +46,18 @@ def test_the_held_out_split_exists_and_is_about_a_third() -> None:
     items = load_golden()["items"]
     held = sum(i["split"] == "heldout" for i in items)
     assert 0.30 <= held / len(items) <= 0.40
+
+
+def test_no_test_names_the_sealed_file_or_its_folder() -> None:
+    """The sealed set is read only by the runner, once (D-071): a test that opened it would be a
+    tuning signal. Tests refer to it through the constants in tools/golden.py."""
+    named = {
+        path.name
+        for path in TESTS.glob("test_*.py")
+        if path.name != "test_heldout_sealed.py"
+        and (
+            "citedesk_sealed_v1" in path.read_text("utf-8")
+            or "data/sealed" in path.read_text("utf-8")
+        )
+    }
+    assert not named, f"{sorted(named)} name the sealed file"

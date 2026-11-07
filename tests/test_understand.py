@@ -49,7 +49,7 @@ def run(llm: FakeLLM, **over: Any) -> understand.Understanding:
 
 
 def test_the_prompt_version_is_recorded() -> None:
-    assert PROMPT_VERSION == "understand-v2"
+    assert PROMPT_VERSION == "understand-v3"
 
 
 def test_the_system_prompt_lists_every_value_the_model_may_use() -> None:
@@ -338,9 +338,16 @@ def test_model_signals_come_back_as_reason_codes() -> None:
 
 def test_a_dropped_date_is_reported_in_the_notes() -> None:
     fields = {**reply()["fields"], "start_date": "2026-10-01"}
-    result = run(FakeLLM([reply(fields=fields)]))
+    result = run(FakeLLM([reply(fields=fields)]), body="Could you come on Oct 1 to clear a drain?")
     assert result.fields.start_date is None
     assert result.notes == ["start_date_in_past"]
+
+
+def test_a_relative_date_is_reported_in_the_notes() -> None:
+    fields = {**reply()["fields"], "start_date": "2026-11-06"}
+    result = run(FakeLLM([reply(fields=fields)]), body="Could you come tomorrow?")
+    assert result.fields.start_date is None
+    assert result.notes == ["start_date_relative"]
 
 
 # --- the emergency net beside the model -------------------------------------------------------
@@ -494,3 +501,68 @@ def test_a_recorded_ollama_reply_goes_through_provider_and_step() -> None:
     assert result.fields.start_date == "2026-11-12"
     assert result.missing_fields == []
     assert result.model == "qwen3:8b" and result.attempts == 1
+
+
+def test_the_prompt_says_that_opening_hours_questions_are_about_the_business() -> None:
+    """D-085: hours questions that name a day were read as asks for an appointment."""
+    prompt = build_system_prompt(RECEIVED)
+    assert "earliest or latest visit it books on a day" in prompt
+    assert "even when it names a day or a time" in prompt
+    assert "availability_question: asks whether someone is free at a time" in prompt
+
+
+def test_the_prompt_lists_today_among_the_relative_dates_that_are_null() -> None:
+    """D-085: the labelling rule treats every relative date as null, "today" included."""
+    prompt = build_system_prompt(RECEIVED)
+    assert (
+        'Relative dates such as "today", "next Tuesday", "this week" or "tomorrow" are null'
+        in " ".join(prompt.split())
+    )
+
+
+# --- a date the customer did not state (D-085) -------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "Can someone come today to look at our tap?",
+        "Could you come tomorrow for a faucet replacement?",
+        "We would like a visit next Tuesday please.",
+        "Any time this week works. Friday is best.",
+        "Is the 14th free?",
+        "We need it fixed by end of day today, around 5.",
+    ],
+)
+def test_a_relative_date_is_dropped_whatever_date_the_model_worked_out(message: str) -> None:
+    fields, notes = normalise_fields(fields_from(start_date="2026-11-06"), RECEIVED, message)
+    assert fields.start_date is None and notes == ["start_date_relative"]
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "Please book Friday Nov 6 for a toilet repair.",
+        "Tuesday the 3rd of November works for us.",
+        "Could you come on 6 November?",
+        "The 6th of nov is fine.",
+        "We are free 11/6 or 11/7.",
+        "How about 2026-11-06?",
+        "Sept 12 would be best",
+    ],
+)
+def test_a_date_the_customer_wrote_out_is_kept(message: str) -> None:
+    fields, notes = normalise_fields(fields_from(start_date="2026-11-06"), RECEIVED, message)
+    assert fields.start_date == "2026-11-06" and notes == []
+
+
+def test_the_word_may_alone_is_not_a_date() -> None:
+    fields, _ = normalise_fields(
+        fields_from(start_date="2026-11-06"), RECEIVED, "We may want a visit soon."
+    )
+    assert fields.start_date is None
+
+
+def test_without_the_message_the_date_is_left_as_the_model_gave_it() -> None:
+    fields, notes = normalise_fields(fields_from(start_date="2026-11-06"), RECEIVED)
+    assert fields.start_date == "2026-11-06" and notes == []

@@ -1,0 +1,33 @@
+{
+  "header": {
+    "name": "spam_dev",
+    "purpose": "Development set for reading mass marketing and scams as spam, and a specific proposal to this business as partnership_or_sales, and a real invoice question as billing_question. Written for D-085. None of these messages is copied from the tuned, held-out or sealed items. Not a result.",
+    "synthetic": true,
+    "reference_date": "2026-11-05"
+  },
+  "items": [
+    {"id": "sp01", "expect_primary": "spam", "body": "Hello, we help local businesses get hundreds of five-star reviews each month. Reply YES for our bulk package and we will start today."},
+    {"id": "sp02", "expect_primary": "spam", "body": "Dear business owner, you qualify for a fast business loan of up to $200,000 with no paperwork. Reply to this message to receive your offer."},
+    {"id": "sp03", "expect_primary": "spam", "body": "Your parcel is waiting at our depot. A small redelivery fee of $2.99 is required before we can deliver it. Confirm your card details to release it."},
+    {"id": "sp04", "expect_primary": "spam", "body": "We noticed your website is not ranking well. Our team can put you at the top of search results for only $99 a month. Limited offer this week."},
+    {"id": "sp05", "expect_primary": "spam", "body": "Congratulations, your company was selected for a free listing in the Local Trades Directory. Confirm your details to activate it."},
+    {"id": "sp06", "expect_primary": "spam", "body": "Get cheap printer ink and toner delivered to your office. Order today and save 70% on every cartridge."},
+    {"id": "sp07", "expect_primary": "spam", "body": "URGENT: your domain registration will expire. Renew now to keep your website online. Pay the renewal fee on our payment page."},
+    {"id": "sp08", "expect_primary": "spam", "body": "Make extra income from home, no experience needed. Message us for the starter kit."},
+    {"id": "sp09", "expect_primary": "spam", "body": "I have an investment opportunity that will double your money in 30 days. Reply for details."},
+    {"id": "sp10", "expect_primary": "spam", "body": "Boost your followers and likes overnight. 10,000 followers for $20, delivered in a day."},
+    {"id": "sp11", "expect_primary": "spam", "body": "Final notice: a delivery to your address could not be completed. Pay the customs charge of $4.50 now to avoid return."},
+    {"id": "sp12", "expect_primary": "spam", "body": "Hi, we sell bulk SMS marketing lists of homeowners in your county. 50,000 contacts for $150. Interested?"},
+    {"id": "pa01", "expect_primary": "partnership_or_sales", "body": "Hi, I run a plumbing supply wholesaler in Millrace. We would like to send you our PEX fittings catalogue and offer you a trade account."},
+    {"id": "pa02", "expect_primary": "partnership_or_sales", "body": "I am a realtor and often need a reliable plumber for my sellers. Would you be open to a referral arrangement?"},
+    {"id": "pa03", "expect_primary": "partnership_or_sales", "body": "We make scheduling software for trades businesses. Could I show you a short demo with your office manager?"},
+    {"id": "pa04", "expect_primary": "partnership_or_sales", "body": "Our company supplies uniforms with logos for service vans. Can I send a quote for your technicians?"},
+    {"id": "pa05", "expect_primary": "partnership_or_sales", "body": "I am with the hardware store on Cooper Street and we can offer you a contractor discount on water heaters. Who should I speak to?"},
+    {"id": "pa06", "expect_primary": "partnership_or_sales", "body": "We run a plumbing training school and are looking for local businesses to take on apprentices. Would you be interested in a partnership?"},
+    {"id": "pa07", "expect_primary": "partnership_or_sales", "body": "I represent a manufacturer of tankless water heaters and we are looking for installers to partner with in your area."},
+    {"id": "pa08", "expect_primary": "partnership_or_sales", "body": "Our firm provides liability insurance for plumbing contractors. Could we send you a quote for your business?"},
+    {"id": "bi01", "expect_primary": "billing_question", "body": "I received invoice KH-2210 and the total looks higher than the quote I was given. Can you explain the difference?"},
+    {"id": "bi02", "expect_primary": "billing_question", "body": "Can you resend my invoice from last week? I lost the email."},
+    {"id": "bi03", "expect_primary": "billing_question", "body": "There is a $45 charge on my statement that I do not recognise. What is it for?"}
+  ]
+}

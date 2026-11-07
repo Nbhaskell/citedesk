@@ -41,7 +41,7 @@ from citedesk.safety import emergency_hits
 # v2 is the v1 reading prompt, unchanged, plus a second call with two single-purpose
 # questions: an exception request, and a message aimed at the assistant (D-074, D-075). Rewording
 # the first prompt did not help the small model; a call that asks for little else did.
-PROMPT_VERSION = "understand-v2"
+PROMPT_VERSION = "understand-v3"
 FOCUSED_PROMPT_VERSION = "focused-v1"
 MAX_TOKENS = 1500
 TIMEOUT_S = 120
@@ -65,7 +65,7 @@ Signal = Literal["REFUND_OR_DISPUTE", "LEGAL_THREAT", "POLICY_EXCEPTION_REQUEST"
 FAILURE_REASONS = frozenset(
     {"timeout", "unavailable", "bad_response", "truncated", "invalid_json", "invalid_output"}
 )
-NOTE_CODES = frozenset({"start_date_invalid", "start_date_in_past"})
+NOTE_CODES = frozenset({"start_date_invalid", "start_date_in_past", "start_date_relative"})
 
 
 # --- what the model must return ---------------------------------------------------------------
@@ -167,7 +167,10 @@ low. Use only these intents:
 - booking_change: asks to move an existing booking
 - cancellation: asks to cancel an existing booking
 - policy_question: asks about terms: warranty, payment, cancelling, access, discounts, estimates
-- service_question: asks what the business does, its opening hours or its service area
+- service_question: asks what the business does, its opening hours or its service area. Opening \
+hours means when the office opens or closes, when it answers the phone, which days it works \
+(weekends, holidays), or the earliest or latest visit it books on a day. That is a question about \
+the business, even when it names a day or a time, and the customer has no job in mind.
 - complaint: unhappy about service already received
 - health_or_safety: a gas smell, carbon monoxide, flooding, a burst pipe, sewage coming up, water \
 near electrics, or any other risk to people or property that is happening now
@@ -202,9 +205,9 @@ fixture_installation (taps, toilets, sinks, shower fittings), inspection, other 
 plumbing work), or unknown. Set it whenever the customer indicates the work, even for a price \
 question.
 - start_date: the date the customer wants a visit, as YYYY-MM-DD, only when it is unambiguous: a \
-month and day, or a weekday that agrees with a stated date. Relative dates such as "next \
-Tuesday", "this week" or "tomorrow" are null. If no year is given, use the next such date on or \
-after today.
+month and day, or a weekday that agrees with a stated date. Relative dates such as "today", \
+"next Tuesday", "this week" or "tomorrow" are null. If no year is given, use the next such date \
+on or after today.
 - property_type: house, apartment, commercial (a business, office, shop, restaurant or other \
 non-residential building), other, or unknown
 - address_area: the neighbourhood or area, as the customer wrote it
@@ -241,15 +244,40 @@ def _clean(value: str | None, limit: int) -> str | None:
     return None if text.lower() in PLACEHOLDERS or not text else text
 
 
+_MONTH = (
+    r"(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?"
+    r"|sept?(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)"
+)
+_DAY = r"\d{1,2}(?:st|nd|rd|th)?"
+_WRITTEN_DATE = re.compile(
+    rf"\b{_MONTH}\.?\s+{_DAY}\b"  # Nov 6, November 6th
+    rf"|\b{_DAY}\s+(?:of\s+)?{_MONTH}\b"  # 6 November, the 3rd of November
+    r"|\b\d{4}-\d{2}-\d{2}\b"  # 2026-11-06
+    r"|\b\d{1,2}/\d{1,2}\b",  # 11/6
+    re.IGNORECASE,
+)
+
+
+def states_a_date(message: str) -> bool:
+    """True if the customer wrote out a calendar date: a month with a day, or a numeric date.
+    "Today", "tomorrow", "next Tuesday", "this week" and a bare weekday or day number are relative,
+    and the labelling rules (D-085) leave them null however the model worked them out."""
+    return _WRITTEN_DATE.search(message) is not None
+
+
 def normalise_fields(
-    fields: ExtractedFields, received_at: str
+    fields: ExtractedFields, received_at: str, message: str | None = None
 ) -> tuple[ExtractedFields, list[str]]:
-    """Tidy the model's fields. A visit date must be a real date, not before the message arrived.
+    """Tidy the model's fields. A visit date must be a real date, not before the message arrived,
+    and, when the message is passed, one the customer wrote out.
 
     Returns the fields and a list of notes (codes) for anything dropped.
     """
     notes: list[str] = []
     start = fields.start_date
+    if start is not None and message is not None and not states_a_date(message):
+        start = None
+        notes.append("start_date_relative")
     if start is not None:
         try:
             parsed = date.fromisoformat(start)
@@ -512,9 +540,10 @@ def _finish(
     body: str,
     received_at: str,
 ) -> Understanding:
-    fields, notes = normalise_fields(output.fields, received_at)
+    message = f"{subject or ''}\n{body}"
+    fields, notes = normalise_fields(output.fields, received_at, message)
     intents = [item.intent for item in output.intents]
-    net = bool(emergency_hits(f"{subject or ''}\n{body}"))
+    net = bool(emergency_hits(message))
     urgency = output.urgency
     if net and URGENCY_ORDER[urgency] < URGENCY_ORDER[NET_FLOOR]:
         urgency = NET_FLOOR

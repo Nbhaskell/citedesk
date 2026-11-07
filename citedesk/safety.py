@@ -72,11 +72,30 @@ def _is_history(text: str, match: re.Match[str], breaks: list[tuple[int, int]]) 
     return bool(HISTORICAL.search(clause)) and not PRESENT.search(clause)
 
 
-def _fires(pattern: re.Pattern[str], text: str, breaks: list[tuple[int, int]]) -> bool:
-    """True if any match of the pattern, overlapping ones included, is not past history."""
+# A water event that is only imagined ("if a pipe bursts at night, do you come out?", D-085). The
+# cue must sit right before the term in its own clause, and nothing in the clause may say it is
+# happening. Gas, carbon monoxide and electrical terms are never discounted this way: a customer
+# who asks what to do if they smell gas should still be looked at.
+HYPOTHETICAL = re.compile(r"\b(?:if|in case(?: of)?|what if|suppose|supposing)\b[^.!?;,]{0,28}$")
+IMAGINABLE = frozenset({"flooding", "burst_pipe", "sewage"})
+
+
+def _is_imagined(text: str, match: re.Match[str], breaks: list[tuple[int, int]]) -> bool:
+    start = max((end for begin, end in breaks if end <= match.start()), default=0)
+    stop = min((begin for begin, _ in breaks if begin >= match.end()), default=len(text))
+    return bool(HYPOTHETICAL.search(text[start : match.start()])) and not PRESENT.search(
+        text[start:stop]
+    )
+
+
+def _fires(name: str, pattern: re.Pattern[str], text: str, breaks: list[tuple[int, int]]) -> bool:
+    """True if any match of the pattern, overlapping ones included, is neither past history nor
+    (for water events) imagined."""
     position = 0
     while (match := pattern.search(text, position)) is not None:
-        if not _is_history(text, match, breaks):
+        if not _is_history(text, match, breaks) and not (
+            name in IMAGINABLE and _is_imagined(text, match, breaks)
+        ):
             return True
         position = match.start() + 1
     return False
@@ -87,7 +106,9 @@ def emergency_hits(text: str) -> list[str]:
     normalised = normalise(text)
     breaks = [(m.start(), m.end()) for m in CLAUSE_BREAK.finditer(normalised)]
     return [
-        name for name, pattern in EMERGENCY_PATTERNS.items() if _fires(pattern, normalised, breaks)
+        name
+        for name, pattern in EMERGENCY_PATTERNS.items()
+        if _fires(name, pattern, normalised, breaks)
     ]
 
 

@@ -1,0 +1,175 @@
+{
+  "header": {
+    "name": "hours_availability_dev",
+    "purpose": "Development set for the boundary between service_question (opening hours, service area, what the business does) and availability_question (whether someone is free at a time). Written for D-085. None of these messages is copied from the tuned, held-out or sealed items. Not a result.",
+    "synthetic": true,
+    "reference_date": "2026-11-05"
+  },
+  "items": [
+    {
+      "id": "h01",
+      "expect_primary": "service_question",
+      "body": "What time do you close on Saturdays?"
+    },
+    {
+      "id": "h02",
+      "expect_primary": "service_question",
+      "body": "Is your office open on Sundays? I might call in the morning."
+    },
+    {
+      "id": "h03",
+      "expect_primary": "service_question",
+      "body": "What is the latest visit you can book on a Friday? I finish work at five."
+    },
+    {
+      "id": "h04",
+      "expect_primary": "service_question",
+      "body": "Do you answer the phone after 6pm on weekdays?"
+    },
+    {
+      "id": "h05",
+      "expect_primary": "service_question",
+      "body": "When does the office open in the morning? I want to ring first thing."
+    },
+    {
+      "id": "h06",
+      "expect_primary": "service_question",
+      "body": "Are you open on public holidays like Thanksgiving?"
+    },
+    {
+      "id": "h07",
+      "expect_primary": "service_question",
+      "body": "What are your hours over the Christmas week?"
+    },
+    {
+      "id": "h08",
+      "expect_primary": "service_question",
+      "body": "Hi, what time does the first appointment of the day usually start?"
+    },
+    {
+      "id": "h09",
+      "expect_primary": "service_question",
+      "body": "Do you work weekends at all, or is it Monday to Friday only?"
+    },
+    {
+      "id": "h11",
+      "expect_primary": "service_question",
+      "body": "What days of the week do your technicians do house calls?"
+    },
+    {
+      "id": "h12",
+      "expect_primary": "service_question",
+      "body": "Is the shop open Saturday afternoon or only the mornings?"
+    },
+    {
+      "id": "h13",
+      "expect_primary": "service_question",
+      "body": "Just checking your opening times for next week before I drive over with a part."
+    },
+    {
+      "id": "h14",
+      "expect_primary": "service_question",
+      "body": "Until what time are you taking calls on Monday evenings?"
+    },
+    {
+      "id": "h15",
+      "expect_primary": "service_question",
+      "body": "Which hours is the front desk staffed? I need to drop off a form."
+    },
+    {
+      "id": "a01",
+      "expect_primary": "availability_question",
+      "body": "Is anyone free next Tuesday morning to look at a dripping kitchen tap?"
+    },
+    {
+      "id": "a02",
+      "expect_primary": "availability_question",
+      "body": "Can someone come out on Thursday afternoon for a slow bathtub drain?"
+    },
+    {
+      "id": "a03",
+      "expect_primary": "availability_question",
+      "body": "When is your next opening for a drain cleaning? Any time this week works."
+    },
+    {
+      "id": "a04",
+      "expect_primary": "availability_question",
+      "body": "Do you have anything available on the 14th for a water heater flush?"
+    },
+    {
+      "id": "a05",
+      "expect_primary": "availability_question",
+      "body": "Are you able to fit us in this Saturday? Toilet keeps running."
+    },
+    {
+      "id": "a06",
+      "expect_primary": "availability_question",
+      "body": "Is there a slot open Monday morning for a leak check at our place in Wren Common?"
+    },
+    {
+      "id": "a07",
+      "expect_primary": "availability_question",
+      "body": "What is the earliest you could send someone to replace a faucet?"
+    },
+    {
+      "id": "a08",
+      "expect_primary": "availability_question",
+      "body": "Any chance of a visit tomorrow after 4? Garbage disposal is jammed."
+    },
+    {
+      "id": "a09",
+      "expect_primary": "availability_question",
+      "body": "How soon could you get a plumber to the house? Sink is backing up slowly."
+    },
+    {
+      "id": "a10",
+      "expect_primary": "availability_question",
+      "body": "Do you have a free appointment on Wednesday the 18th for a shower valve?"
+    },
+    {
+      "id": "a11",
+      "expect_primary": "availability_question",
+      "body": "Are there openings next week for a sewer camera inspection?"
+    },
+    {
+      "id": "a12",
+      "expect_primary": "availability_question",
+      "body": "I need a toilet looked at. Who is free on Friday?"
+    },
+    {
+      "id": "a13",
+      "expect_primary": "availability_question",
+      "body": "Can I get a Saturday 9am slot or is that already taken?"
+    },
+    {
+      "id": "a14",
+      "expect_primary": "availability_question",
+      "body": "Earliest date you have for a pipe repair in Tamarind Park please."
+    },
+    {
+      "id": "a15",
+      "expect_primary": "availability_question",
+      "body": "Is your Tuesday the 17th booked solid, or is there room for a quick faucet job?"
+    },
+    {
+      "id": "a16",
+      "expect_primary": "availability_question",
+      "body": "Would someone be available between 1 and 3 on Thursday to quote a bathroom job?"
+    },
+    {
+      "id": "s01",
+      "expect_primary": "service_question",
+      "body": "Do you service the Saltmarsh area, and how far out do you go?"
+    },
+    {
+      "id": "s02",
+      "expect_primary": "service_question",
+      "body": "What kinds of plumbing work do you take on? Just repairs or full installs too?"
+    },
+    {
+      "id": "s03",
+      "expect_primary": "service_question",
+      "body": "Do you cover the Millrace neighbourhood?"
+    }
+  ]
+}

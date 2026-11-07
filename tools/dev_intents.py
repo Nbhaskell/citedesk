@@ -19,7 +19,10 @@ from citedesk.config import Settings
 from citedesk.providers import LLMProvider
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-SETS = {"hours": REPO_ROOT / "eval/dev/hours_availability_dev.json"}
+SETS = {
+    "hours": REPO_ROOT / "eval/dev/hours_availability_dev.json",
+    "spam": REPO_ROOT / "eval/dev/spam_dev.json",
+}
 
 
 def load_items(path: Path) -> list[dict[str, Any]]:

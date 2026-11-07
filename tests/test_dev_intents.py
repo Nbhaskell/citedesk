@@ -37,3 +37,12 @@ def test_the_hours_and_availability_file_is_valid_and_has_both_kinds() -> None:
     kinds = [i["expect_primary"] for i in loaded]
     assert kinds.count("service_question") >= 12
     assert kinds.count("availability_question") >= 12
+
+
+def test_the_spam_file_is_valid_and_has_the_three_kinds() -> None:
+    loaded = dev_intents.load_items(dev_intents.SETS["spam"])
+    assert len({i["id"] for i in loaded}) == len(loaded)
+    kinds = [i["expect_primary"] for i in loaded]
+    assert kinds.count("spam") >= 10
+    assert kinds.count("partnership_or_sales") >= 6
+    assert kinds.count("billing_question") >= 3

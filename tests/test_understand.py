@@ -502,3 +502,12 @@ def test_the_prompt_says_that_opening_hours_questions_are_about_the_business() -
     assert "earliest or latest visit it books on a day" in prompt
     assert "even when it names a day or a time" in prompt
     assert "availability_question: asks whether someone is free at a time" in prompt
+
+
+def test_the_prompt_lists_today_among_the_relative_dates_that_are_null() -> None:
+    """D-085: the labelling rule treats every relative date as null, "today" included."""
+    prompt = build_system_prompt(RECEIVED)
+    assert (
+        'Relative dates such as "today", "next Tuesday", "this week" or "tomorrow" are null'
+        in " ".join(prompt.split())
+    )

@@ -138,3 +138,47 @@ def test_a_historical_mention_never_hides_a_present_one(text: str, expected: set
 def test_history_discounts_only_the_clause_it_is_in() -> None:
     hits = emergency_hits("The pipe burst last month. I smell gas now.")
     assert hits == ["gas_smell"]
+
+
+# --- an event that is only imagined (D-085) ---------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "If a pipe bursts at night, do you send someone out, and what do you charge?",
+        "Do you come out after hours in case of a burst pipe?",
+        "What if the basement floods, is there an emergency number?",
+        "If the toilet overflows on a Sunday do you work weekends?",
+        "What are your call-out hours? I want to know who to ring if a pipe bursts.",
+    ],
+)
+def test_an_imagined_water_event_is_not_an_emergency(text: str) -> None:
+    assert emergency_hits(text) == []
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "A pipe burst in the kitchen wall",
+        "If you can't come soon the basement will flood",
+        "A pipe burst and if you can't come the flood will get worse",
+        "What if it floods again? The basement flooded this morning",
+        "If a pipe bursts again we are in trouble. The pipe burst this morning.",
+        "water everywhere, what if the pipe bursts",
+    ],
+)
+def test_a_real_water_event_still_fires_next_to_an_imagined_one(text: str) -> None:
+    assert emergency_hits(text) != []
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "What should I do if I smell gas?",
+        "If the carbon monoxide alarm goes off what do I do",
+        "In case of sparks near the panel do you come out?",
+    ],
+)
+def test_gas_carbon_monoxide_and_electrical_terms_always_fire(text: str) -> None:
+    assert emergency_hits(text) != []

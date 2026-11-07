@@ -205,9 +205,9 @@ fixture_installation (taps, toilets, sinks, shower fittings), inspection, other 
 plumbing work), or unknown. Set it whenever the customer indicates the work, even for a price \
 question.
 - start_date: the date the customer wants a visit, as YYYY-MM-DD, only when it is unambiguous: a \
-month and day, or a weekday that agrees with a stated date. Relative dates such as "next \
-Tuesday", "this week" or "tomorrow" are null. If no year is given, use the next such date on or \
-after today.
+month and day, or a weekday that agrees with a stated date. Relative dates such as "today", \
+"next Tuesday", "this week" or "tomorrow" are null. If no year is given, use the next such date \
+on or after today.
 - property_type: house, apartment, commercial (a business, office, shop, restaurant or other \
 non-residential building), other, or unknown
 - address_area: the neighbourhood or area, as the customer wrote it

@@ -46,3 +46,13 @@ def test_the_spam_file_is_valid_and_has_the_three_kinds() -> None:
     assert kinds.count("spam") >= 10
     assert kinds.count("partnership_or_sales") >= 6
     assert kinds.count("billing_question") >= 3
+
+
+def test_the_billing_and_follow_up_file_is_valid_and_has_look_alikes() -> None:
+    loaded = dev_intents.load_items(dev_intents.SETS["billing"])
+    assert len({i["id"] for i in loaded}) == len(loaded)
+    kinds = [i["expect_primary"] for i in loaded]
+    assert kinds.count("other") >= 10
+    assert kinds.count("billing_question") >= 10
+    assert kinds.count("pricing_question") >= 6
+    assert kinds.count("policy_question") >= 3

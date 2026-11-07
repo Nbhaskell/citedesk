@@ -22,6 +22,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 SETS = {
     "hours": REPO_ROOT / "eval/dev/hours_availability_dev.json",
     "spam": REPO_ROOT / "eval/dev/spam_dev.json",
+    "billing": REPO_ROOT / "eval/dev/billing_followup_dev.json",
 }
 
 

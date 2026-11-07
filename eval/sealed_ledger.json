@@ -1,0 +1,75 @@
+{
+  "format": "sealed-ledger-v1",
+  "note": "Every sealed run of the evaluation, written when the run starts. The sealed set is run once, by one fixed system; see docs/DECISIONS.md D-071.",
+  "evaluations": [
+    {
+      "system_id": "bd0b8466f336484c",
+      "identity": {
+        "code_tree": "9ec707d4ffd3f7aafb8bfd2af7d000424350962c",
+        "universe_tree": "5e8d3853c5bffb5674446d086542b4da93546020",
+        "model": "qwen3:8b",
+        "prompt_versions": {
+          "understand": "understand-v3",
+          "draft": "draft-v4"
+        },
+        "settings": {
+          "enable_thinking": true,
+          "escalate_on_low_confidence": true,
+          "spam_threshold": 0.8,
+          "duplicate_window_hours": 24,
+          "draft_max_words": 200,
+          "max_body_chars": 10000
+        },
+        "rag": {
+          "chat_model": "qwen3:8b",
+          "embed_model": "embeddinggemma",
+          "thinking": true,
+          "split_search": true,
+          "files": 8,
+          "chunks": 83
+        },
+        "split_sha256": "e3d38a2cb724488af2d4eb42bc965453742279a4c63e49c03159ba113f1413b8"
+      },
+      "passes_declared": 3,
+      "created_at": "2026-11-07T03:15:54+00:00",
+      "runs": [
+        {
+          "run_id": "eval-sealed-20261107-031554-p1",
+          "run_file": "eval-sealed-20261107-031554-p1.run.json",
+          "pass": 1,
+          "status": "completed",
+          "started_at": "2026-11-07T03:15:54+00:00",
+          "finished_at": "2026-11-07T03:55:43+00:00",
+          "items": 164,
+          "failed": 0,
+          "outside_plan": false,
+          "justification": null
+        },
+        {
+          "run_id": "eval-sealed-20261107-035543-p2",
+          "run_file": "eval-sealed-20261107-035543-p2.run.json",
+          "pass": 2,
+          "status": "completed",
+          "started_at": "2026-11-07T03:55:43+00:00",
+          "finished_at": "2026-11-07T04:36:26+00:00",
+          "items": 164,
+          "failed": 0,
+          "outside_plan": false,
+          "justification": null
+        },
+        {
+          "run_id": "eval-sealed-20261107-043626-p3",
+          "run_file": "eval-sealed-20261107-043626-p3.run.json",
+          "pass": 3,
+          "status": "completed",
+          "started_at": "2026-11-07T04:36:26+00:00",
+          "finished_at": "2026-11-07T05:15:59+00:00",
+          "items": 164,
+          "failed": 0,
+          "outside_plan": false,
+          "justification": null
+        }
+      ]
+    }
+  ]
+}

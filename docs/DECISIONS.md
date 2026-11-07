@@ -748,3 +748,29 @@ No measure fell. The intent figure in D-074 (84.6%, 104 of 123) came from a run 
 **Decision.** The change was reverted (`understand-v3` is as in D-085). Gaining three intent labels at the price of two escalations is the wrong trade: a missed escalation costs a customer, a misread follow-up costs a wrong route that a reviewer sees. It also shows that any wording change to the main reading prompt can move unrelated items, which is the same lesson as D-074 and D-085, so a change to it needs the tuned split rerun and the escalation recall read first.
 
 **Not done, and options.** (1) A follow-up question in the existing focused call (no extra call), with code allowing it to set `other` only when the intents hold nothing that escalates. (2) Leave follow-ups as they are: they reach a reviewer either way (the tuned follow-ups were routed to details or a draft, and a reviewer sees both). The billing wordings are judgment calls under the labelling rule, so no fix is proposed.
+
+### D-087. The sealed run: intent accuracy 73.1% against a target of 85%
+**What was run.** The sealed set (164 invented items, hash checked, never opened by the session that built the fixes) was run once by one fixed system, three declared passes, with the runner lock of D-078. System: commit `58a06db`, `qwen3:8b` with thinking on, `understand-v3`, `draft-v4`, rag-project with 83 chunks. The run is in `eval/sealed_ledger.json`; the scored passes are in `eval/reports/sealed-run.md` (ids, codes and counts only). Nothing in the system, the labels or the set was changed after seeing the numbers. The sealed set is now spent: any change made because of it needs a fresh set (D-061, D-071).
+
+**Provenance the report has to carry.** The sealed set was written before the later prompt changes (D-074 to D-085) were designed, but after the held-out error analysis (D-072), whose findings drove the first fixes. It is unseen by the fixing session, not blind to the style of the process that wrote the documents. One labeller.
+
+**Targets of D-071, as they came out (mean of 3 passes).**
+1. Primary-intent accuracy at least 85%: **missed.** 73.1% (117 of 160 items the model read; passes 73.8%, 71.2%, 74.4%; 95% interval 65.8% to 79.4%, Wilson on 160 items; the pass-to-pass interval is ±4.1). The upper end is below the target.
+2. `HEALTH_SAFETY` escalation recall: **met.** 15 of 15 in all three passes. With n = 15 that is compatible with a true miss rate near one in five.
+3. `STRUCTURE` check on model-written drafts: **met.** 100% (43 of 43, 44 of 44, 43 of 43).
+4. Compared with the held-out values. `POLICY_EXCEPTION_REQUEST` recall 21 of 22 (95.5%, interval 78.2% to 99.2%) against 1 of 6 on the held-out set (16.7%, 3.0% to 56.4%): the intervals do not overlap, so an improvement is claimed for this reason, with the caveat that the fixes were designed after the held-out analysis and the two sets differ in mix. `INJECTION_SUSPECTED` recall 7 of 15 (46.7%, 24.8% to 69.9%) against 1 of 4 on the held-out set (25.0%, 4.6% to 69.9%): the intervals overlap, so no improvement is claimed.
+
+**Other measures (mean of 3 passes).** Route accuracy 74.0% (±0.9; held-out 68.9%). Escalation precision 78.1% (±2.0; held-out 85.0%). Escalation recall 89.6% (±1.5; held-out 69.1%). The mix differs between sets, so these are not directly comparable. Run-to-run spread is small: 7 of 164 items moved intent between passes.
+
+**Where it misses, from `sealed-run.md` (pass 1; the passes agree on most items).**
+- **Spam.** 1 of 9 spam items took the expected route (archive); 7 were escalated and 1 went to a draft reply. Archiving needs both a code score of at least 0.8 and a model reading of "only spam" (D-085), and this design is unchanged. The items were not opened to see why each missed.
+- **Injection.** Screening caught 7 of 15; 8 were not caught and 4 of those reached a reviewer as a reply. One of 15 near misses was flagged.
+- **Over-escalation.** 24 items were escalated that should not have been (pass 1). At the reason level `POLICY_EXCEPTION_REQUEST` carries 23 false flags and `NOT_IN_KNOWLEDGE_BASE` 14 (one item can carry several reasons). These cost a reviewer's time and send nothing.
+- **Legal threats.** `LEGAL_THREAT` recall 5 to 6 of 9.
+- **Low confidence.** 0 of 5 expected `LOW_CONFIDENCE` items were escalated for that reason.
+- **Categories with weak intent reading:** edge (1 of 6), unanswerable (5 of 10), partnership_sales route (0 of 3), near-miss route (7 of 15).
+- **Draft checks.** `FIGURES_GROUNDED` 97.7% and `NO_COMMITMENT` 95.3% on model-written drafts; 3 drafts were blocked in pass 1.
+
+**What this means.** The 85% target is not met on unseen messages. The development figure of about 83% on the tuned split (the split the prompts were written with in view) does not carry over: 73.1% on the sealed set. The held-out set scored 69.8% on the system as it stood before D-074 to D-085; the two sets differ in mix and wording, so the 3.3-point difference is not a measured effect of those changes. Escalation recall on unseen messages rose from 69.1% to 89.6%, which is the measure that protects a customer, at the cost of more escalations that did not need one. Passing here would not show the product works on real customers, and missing does not show it fails on them.
+
+**Not done.** No fix follows from this run. The next claim needs a fresh set; a sealed set of this kind can be written again by a separate session that is given the labelling rules and not the results (D-071).

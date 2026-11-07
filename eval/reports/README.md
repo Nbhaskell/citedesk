@@ -11,6 +11,7 @@
 | `tuned-think-on.md` / `.json` | The same with `ENABLE_THINKING` on |
 | `tuned-thinking-comparison.md` / `.json` | Off against on: difference, pass interval, paired bootstrap, and a call per measure |
 | `heldout-think-on.md` / `.json` | The held-out split: three passes of the one fixed system (thinking on), scored one by one, then the spread |
+| `sealed-run.md` | The sealed split (164 items): three passes of the one fixed final system (thinking on), scored one by one, then the spread. The run is in `eval/sealed_ledger.json` (D-087) |
 
 Produced by `tools.eval_run`, `tools.eval_score` and `tools.eval_compare` (D-062). The tuned files
 come from six saved runs on 2026-10-29: code at commit `2d959c4`, model `qwen3:8b`, `understand-v1` and `draft-v1`

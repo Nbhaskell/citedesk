@@ -1,0 +1,43 @@
+{
+  "header": {
+    "name": "billing_followup_dev",
+    "purpose": "Development set for reading a question about an invoice or charge as billing_question and a follow-up on an earlier message or booking as other, with pricing and policy questions as look-alikes that must keep their own intent. Written for D-086. None of these messages is copied from the tuned, held-out or sealed items. Not a result.",
+    "synthetic": true,
+    "reference_date": "2026-11-05"
+  },
+  "items": [
+    {"id": "fu01", "expect_primary": "other", "body": "Hi, I sent a message on Tuesday about the sewer camera quote. Has anyone had a chance to look at it?"},
+    {"id": "fu02", "expect_primary": "other", "body": "Did you receive the pictures of the cracked shower valve I sent this morning?"},
+    {"id": "fu03", "expect_primary": "other", "body": "Just checking that my appointment tomorrow is still on. I have not had a confirmation."},
+    {"id": "fu04", "expect_primary": "other", "body": "Following up on my earlier email about the faucet install. Any news?"},
+    {"id": "fu05", "expect_primary": "other", "body": "I haven't heard back about the water heater estimate. Can you let me know where it stands?"},
+    {"id": "fu06", "expect_primary": "other", "body": "Hi again, wanted to make sure you got my last message about the leak check."},
+    {"id": "fu07", "expect_primary": "other", "body": "Any update on the price you were going to send me for the bathroom job?"},
+    {"id": "fu08", "expect_primary": "other", "body": "Can you confirm you got the form with my property details? I sent it Monday."},
+    {"id": "fu09", "expect_primary": "other", "body": "Checking in on the quote I asked for last week for the disposal install."},
+    {"id": "fu10", "expect_primary": "other", "body": "Is the technician still coming this afternoon? Nobody has called me."},
+    {"id": "fu11", "expect_primary": "other", "body": "Just following up, I never got a reply about the drain cleaning I asked about."},
+    {"id": "fu12", "expect_primary": "other", "body": "Hello, did my earlier message go through? There was an error when I sent it."},
+    {"id": "bl01", "expect_primary": "billing_question", "body": "Is there tax on labour on the final bill, or only on the parts?"},
+    {"id": "bl02", "expect_primary": "billing_question", "body": "My invoice shows a $150 evening surcharge. Can you explain what that covers?"},
+    {"id": "bl03", "expect_primary": "billing_question", "body": "Can you send me a copy of my invoice from the job on Maple Street? I lost the email."},
+    {"id": "bl04", "expect_primary": "billing_question", "body": "The total on my bill is higher than the number I was quoted over the phone. What happened?"},
+    {"id": "bl05", "expect_primary": "billing_question", "body": "When is payment due on my invoice, and can I pay it by card?"},
+    {"id": "bl06", "expect_primary": "billing_question", "body": "I was charged twice for the same visit. Can you check my account?"},
+    {"id": "bl07", "expect_primary": "billing_question", "body": "Why is there a line called disposal fee on my invoice?"},
+    {"id": "bl08", "expect_primary": "billing_question", "body": "The receipt you emailed has the wrong address on it. Can it be corrected?"},
+    {"id": "bl09", "expect_primary": "billing_question", "body": "Please itemise the charges on invoice KH-3302. I only see one total."},
+    {"id": "bl10", "expect_primary": "billing_question", "body": "My statement shows a deposit I do not remember paying. Can you look into it?"},
+    {"id": "bl11", "expect_primary": "billing_question", "body": "After you fixed the faucet I got a bill with an extra half hour of labour on it. Is that right?"},
+    {"id": "pr01", "expect_primary": "pricing_question", "body": "How much do you charge to replace a toilet fill valve?"},
+    {"id": "pr02", "expect_primary": "pricing_question", "body": "What is your call-out fee for a Sunday evening visit?"},
+    {"id": "pr03", "expect_primary": "pricing_question", "body": "Roughly what would a new shower faucet cost installed?"},
+    {"id": "pr04", "expect_primary": "pricing_question", "body": "Do you charge extra for emergency visits at night?"},
+    {"id": "pr05", "expect_primary": "pricing_question", "body": "What is the price of a camera inspection of a sewer line?"},
+    {"id": "pr06", "expect_primary": "pricing_question", "body": "Is there a fee just to come and look at a leaking pipe?"},
+    {"id": "pr07", "expect_primary": "pricing_question", "body": "Do your prices include parts or just labour?"},
+    {"id": "po01", "expect_primary": "policy_question", "body": "What is your cancellation policy if I need to move a visit?"},
+    {"id": "po02", "expect_primary": "policy_question", "body": "Does the workmanship warranty cover parts as well as labour?"},
+    {"id": "po03", "expect_primary": "policy_question", "body": "Does someone over 18 need to be home during the visit?"}
+  ]
+}

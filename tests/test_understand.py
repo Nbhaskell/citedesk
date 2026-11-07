@@ -49,7 +49,7 @@ def run(llm: FakeLLM, **over: Any) -> understand.Understanding:
 
 
 def test_the_prompt_version_is_recorded() -> None:
-    assert PROMPT_VERSION == "understand-v2"
+    assert PROMPT_VERSION == "understand-v3"
 
 
 def test_the_system_prompt_lists_every_value_the_model_may_use() -> None:
@@ -494,3 +494,11 @@ def test_a_recorded_ollama_reply_goes_through_provider_and_step() -> None:
     assert result.fields.start_date == "2026-11-12"
     assert result.missing_fields == []
     assert result.model == "qwen3:8b" and result.attempts == 1
+
+
+def test_the_prompt_says_that_opening_hours_questions_are_about_the_business() -> None:
+    """D-085: hours questions that name a day were read as asks for an appointment."""
+    prompt = build_system_prompt(RECEIVED)
+    assert "earliest or latest visit it books on a day" in prompt
+    assert "even when it names a day or a time" in prompt
+    assert "availability_question: asks whether someone is free at a time" in prompt

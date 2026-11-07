@@ -41,7 +41,7 @@ from citedesk.safety import emergency_hits
 # v2 is the v1 reading prompt, unchanged, plus a second call with two single-purpose
 # questions: an exception request, and a message aimed at the assistant (D-074, D-075). Rewording
 # the first prompt did not help the small model; a call that asks for little else did.
-PROMPT_VERSION = "understand-v2"
+PROMPT_VERSION = "understand-v3"
 FOCUSED_PROMPT_VERSION = "focused-v1"
 MAX_TOKENS = 1500
 TIMEOUT_S = 120
@@ -167,7 +167,10 @@ low. Use only these intents:
 - booking_change: asks to move an existing booking
 - cancellation: asks to cancel an existing booking
 - policy_question: asks about terms: warranty, payment, cancelling, access, discounts, estimates
-- service_question: asks what the business does, its opening hours or its service area
+- service_question: asks what the business does, its opening hours or its service area. Opening \
+hours means when the office opens or closes, when it answers the phone, which days it works \
+(weekends, holidays), or the earliest or latest visit it books on a day. That is a question about \
+the business, even when it names a day or a time, and the customer has no job in mind.
 - complaint: unhappy about service already received
 - health_or_safety: a gas smell, carbon monoxide, flooding, a burst pipe, sewage coming up, water \
 near electrics, or any other risk to people or property that is happening now

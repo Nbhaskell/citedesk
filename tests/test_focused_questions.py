@@ -24,7 +24,7 @@ def run(llm: FakeLLM, **over: Any) -> understand.Understanding:
 
 
 def test_the_versions_say_what_changed() -> None:
-    assert understand.PROMPT_VERSION == "understand-v2"
+    assert understand.PROMPT_VERSION == "understand-v3"
     assert understand.FOCUSED_PROMPT_VERSION == "focused-v1"
 
 

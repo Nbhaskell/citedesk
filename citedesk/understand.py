@@ -25,6 +25,7 @@ from citedesk.models import (
     Intent,
     ReasonCode,
     Sentiment,
+    ServiceType,
     Strict,
     Urgency,
 )
@@ -125,9 +126,15 @@ def inline_refs(node: Any, defs: dict[str, Any]) -> Any:
     return node
 
 
-def json_schema() -> dict[str, Any]:
+def json_schema(trade: Trade = PLUMBING) -> dict[str, Any]:
+    """The schema the model's reply must follow. The service types are the trade's own (D-098):
+    a plumbing business is never offered an electrical one."""
     raw = UnderstandOutput.model_json_schema()
     schema: dict[str, Any] = inline_refs(raw, raw.get("$defs", {}))
+    service = schema["properties"]["fields"]["properties"]["service_type"]
+    for option in service["anyOf"]:
+        if "enum" in option:
+            option["enum"] = [member.value for member in trade.service_types]
     return schema
 
 
@@ -461,7 +468,7 @@ def understand(
     """
     system = build_system_prompt(received_at, trade)
     first_user = build_user_message(subject, body)
-    schema = json_schema()
+    schema = json_schema(trade)
     user = first_user
     reason = "bad_response"
     elapsed_ms = 0
@@ -550,6 +557,9 @@ def _finish(
 ) -> Understanding:
     message = f"{subject or ''}\n{body}"
     fields, notes = normalise_fields(output.fields, received_at, message)
+    if fields.service_type is not None and fields.service_type not in trade.service_types:
+        # Another trade's service type cannot reach the code that routes (D-098).
+        fields = fields.model_copy(update={"service_type": ServiceType.other})
     intents = [item.intent for item in output.intents]
     net = bool(emergency_hits(message, trade.emergency_patterns, trade.imaginable))
     urgency = output.urgency

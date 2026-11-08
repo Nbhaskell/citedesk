@@ -22,9 +22,11 @@ Conventions: ids are integers; timestamps are ISO 8601 UTC strings; JSON columns
 | `draft_kind` | `reply`, `request_details`, `holding_reply` |
 | `draft_status` | `ready`, `blocked`, `approved`, `rejected`, `superseded` |
 | `decision` | `approve`, `edit_approve`, `reject`, `escalate`, `resolve` |
-| `service_type` | `emergency_repair`, `drain_cleaning`, `leak_repair`, `sewer_line_repair`, `water_heater`, `fixture_installation`, `inspection`, `other`, `unknown` |
+| `service_type` | `emergency_repair`, `drain_cleaning`, `leak_repair`, `sewer_line_repair`, `water_heater`, `fixture_installation`, `inspection`, `panel_upgrade`, `outlet_and_switch`, `lighting_installation`, `ev_charger_installation`, `wiring_repair`, `other`, `unknown` |
 | `property_type` | `house`, `apartment`, `commercial`, `other`, `unknown` |
 | `stage` | `screen`, `understand`, `route`, `retrieve`, `draft`, `check` |
+
+Each trade uses its own subset of `service_type` (D-098), and the model is offered only that subset. Plumbing: emergency_repair, drain_cleaning, leak_repair, sewer_line_repair, water_heater, fixture_installation, inspection, other, unknown. Electrical: emergency_repair, panel_upgrade, outlet_and_switch, lighting_installation, ev_charger_installation, wiring_repair, inspection, other, unknown.
 
 ## 2. Required fields per intent (kept in code, shown here for reference)
 

@@ -11,7 +11,7 @@ import pytest
 from citedesk import drafting, retrieval, screening, understand
 from citedesk.business import Business, load_business
 from citedesk.models import ExtractedFields, Intent, ServiceType
-from citedesk.trade import PLUMBING, Trade, load_trade, trade_named, trade_of_facts
+from citedesk.trade import PLUMBING, TRADES, Trade, load_trade, trade_named, trade_of_facts
 
 # An invented trade for the tests only: no plumbing word anywhere in it.
 GARDENING = Trade(
@@ -63,8 +63,11 @@ def test_the_real_fact_sheet_is_plumbing() -> None:
     assert trade_of_facts(json.loads(Path("universe/facts.json").read_text("utf-8"))) is PLUMBING
 
 
-def test_every_plumbing_service_type_has_a_label_entry() -> None:
-    assert set(PLUMBING.service_types) == set(ServiceType)
+def test_the_trades_together_cover_every_service_type() -> None:
+    covered = set().union(*(trade.service_types for trade in TRADES.values()))
+    assert covered == set(ServiceType)
+    for trade in TRADES.values():
+        assert {ServiceType.other, ServiceType.unknown} <= set(trade.service_types), trade.key
 
 
 def test_the_prompts_of_another_trade_hold_no_plumbing_words() -> None:

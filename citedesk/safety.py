@@ -49,6 +49,47 @@ EMERGENCY_PATTERNS: dict[str, re.Pattern[str]] = {
     ),
 }
 
+# The electrical trade (D-098). Gas and carbon monoxide are kept: any customer may report them.
+# A breaker panel or a fuse box named on its own is not an emergency here, because an electrician
+# is asked about panels every day; what makes one an emergency is a sign of heat, fire or shock.
+ELECTRICAL_EMERGENCY_PATTERNS: dict[str, re.Pattern[str]] = {
+    "gas_smell": EMERGENCY_PATTERNS["gas_smell"],
+    "carbon_monoxide": EMERGENCY_PATTERNS["carbon_monoxide"],
+    "burning_smell": re.compile(
+        r"\b(?:burning|melting|scorched?|singed)\b.{0,15}\b(?:smell|smells|odou?r|plastic)\b"
+        r"|\b(?:smell|smells|smelled|odou?r)\b.{0,15}\b(?:burning|melting|scorched?)\b"
+    ),
+    "sparks_or_smoke": re.compile(
+        r"\bspark(?:s|ed|ing|y)?\b|\barc(?:ing|ed)\b"
+        r"|\bsmoke\b.{0,20}\b(?:from|out of|coming)\b.{0,25}"
+        r"\b(?:outlet|socket|switch|panel|breaker|wall|light|fixture|plug|wire|wiring)s?\b"
+        r"|\b(?:on fire|caught fire|flames?)\b"
+    ),
+    "shock": re.compile(
+        # "shocked at the price" is not a shock: a person must get one, or it must be electric
+        r"\belectric(?:al)?\s+shocks?\b"
+        r"|\b(?:got|get|gets|getting|gave me|giving|felt)\s+(?:a\s+)?(?:\w+\s+)?shocks?\b"
+        r"|\bshocks?\s+(?:from|when|off)\b|\belectrocut\w*\b|\bgot a (?:jolt|zap)\b"
+    ),
+    "exposed_wires": re.compile(
+        r"\b(?:exposed|bare|live|loose|dangling|hanging)\b.{0,10}\bwir(?:e|es|ing)\b"
+    ),
+    "hot_fitting": re.compile(
+        r"\b(?:outlet|socket|switch|plug|panel|breaker)s?\b.{0,25}"
+        # "the breaker for the hot tub" is not a hot breaker
+        r"\b(?:(?:is|are|feels?|getting|gets|too|very|really)\s+hot|hot to the touch|warm to the "
+        r"touch|melted|melting|scorched|blackened|buzzing)\b"
+    ),
+    "downed_line": re.compile(
+        r"\b(?:power|electric(?:al)?|utility)\s+lines?\b.{0,20}\b(?:down|fell|fallen|ground)\b"
+        r"|\bdowned\s+(?:power\s+)?lines?\b"
+    ),
+    "water_and_electrics": re.compile(
+        r"\bwater\b.{0,30}\b(?:outlet|socket|panel|breaker|wiring|light fixture)s?\b"
+        r"|\b(?:outlet|socket|panel|breaker|wiring)s?\b.{0,30}\b(?:wet|soaked|flooded)\b"
+    ),
+}
+
 # A mention of an emergency is discounted when its own clause says it was long ago ("a pipe burst in
 # our kitchen last month") and does not also say it is happening again. The window is one clause,
 # so "last year ... please help, water everywhere" still fires on the second half.

@@ -95,6 +95,47 @@ describe("Insights: figures", () => {
     await expectAccessible(container);
   });
 
+  it("shows draft quality from reviews, with samples and the small-sample rule", async () => {
+    const { client } = insightsClient();
+    const { container } = renderApp(client, "/insights");
+    await screen.findByText("41 inquiries, 20 Oct 2026 to 28 Oct 2026.");
+    expect(screen.getByRole("heading", { name: "How good the drafts were" })).toBeInTheDocument();
+
+    const rejected = screen.getByRole("group", { name: "Rejected" });
+    expect(within(rejected).getByText("13%")).toBeInTheDocument();
+    expect(within(rejected).getByText("of 23 reviewed replies")).toBeInTheDocument();
+
+    const edits = screen.getByRole("group", { name: "Words changed when edited (median)" });
+    expect(within(edits).getByText("12%")).toBeInTheDocument();
+    expect(within(edits).getByText("of 5 edited replies")).toBeInTheDocument();
+    expect(
+      within(edits).getByText("Only 5 so far, so treat this as a rough guide"),
+    ).toBeInTheDocument();
+
+    // 8 drafts with a warning is under the minimum, so no share is shown for them
+    const warned = screen.getByRole("group", {
+      name: "Approved as written: drafts with a warning",
+    });
+    expect(
+      within(warned).getByText("Too few approved replies to show a share (8 so far)"),
+    ).toBeInTheDocument();
+    const clean = screen.getByRole("group", {
+      name: "Approved as written: drafts with no warning",
+    });
+    expect(within(clean).getByText("92%")).toBeInTheDocument();
+    expect(within(clean).getByText("of 12 approved replies")).toBeInTheDocument();
+    await expectAccessible(container);
+  });
+
+  it("says no reply has been edited when there is no edit to measure", async () => {
+    const { client } = insightsClient(async () =>
+      insightsFixture({ median_edit_share: null, edit_size_sample: 0 }),
+    );
+    renderApp(client, "/insights");
+    const edits = await screen.findByRole("group", { name: "Words changed when edited (median)" });
+    expect(within(edits).getByText("No reply has been edited yet")).toBeInTheDocument();
+  });
+
   it("lists what Citedesk did and what reviewers decided, in plain words, zeros included", async () => {
     const { client } = insightsClient();
     renderApp(client, "/insights");

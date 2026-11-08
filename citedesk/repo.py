@@ -718,6 +718,20 @@ def approval_review_seconds(conn: sqlite3.Connection) -> list[int]:
     return [int(r["review_seconds"]) for r in rows]
 
 
+def approvals_for_quality(conn: sqlite3.Connection) -> list[sqlite3.Row]:
+    """Each approval with its draft's text, the edited text if any, and whether the draft failed a
+    warning check (a check that does not block). For counting in memory only (D-095): the text is
+    never returned by the API, logged or stored anywhere else."""
+    rows: list[sqlite3.Row] = conn.execute(
+        "SELECT r.decision AS decision, d.body AS body, r.edited_body AS edited_body, "
+        "EXISTS (SELECT 1 FROM draft_checks c WHERE c.draft_id = d.id "
+        "AND c.blocking = 0 AND c.passed = 0) AS warned "
+        "FROM reviews r JOIN drafts d ON d.id = r.draft_id "
+        "WHERE r.decision IN ('approve', 'edit_approve')"
+    ).fetchall()
+    return rows
+
+
 def insert_export(
     conn: sqlite3.Connection,
     *,

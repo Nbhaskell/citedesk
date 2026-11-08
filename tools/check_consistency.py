@@ -7,6 +7,7 @@ money amounts, times, dates, percentages, phone numbers, emails, other numbers, 
 names and phrases that must appear in a named document.
 """
 
+import argparse
 import json
 import re
 import sys
@@ -188,9 +189,14 @@ def check(facts: dict[str, Any], docs: dict[str, str]) -> list[str]:
     return problems
 
 
-def main() -> int:
-    facts = json.loads((UNIVERSE / "facts.json").read_text("utf-8"))
-    docs = {p.name: p.read_text("utf-8") for p in sorted((UNIVERSE / "docs").glob("*.md"))}
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Check documents against their fact sheet.")
+    parser.add_argument("--universe", type=Path, default=UNIVERSE)
+    universe = parser.parse_args(argv).universe
+    if not universe.is_absolute():
+        universe = REPO_ROOT / universe
+    facts = json.loads((universe / "facts.json").read_text("utf-8"))
+    docs = {p.name: p.read_text("utf-8") for p in sorted((universe / "docs").glob("*.md"))}
     problems = check(facts, docs)
     if problems:
         print(f"{len(problems)} problem(s) found:")

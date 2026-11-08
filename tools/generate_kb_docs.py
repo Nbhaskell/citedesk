@@ -1,12 +1,16 @@
 """Render the knowledge-base documents from universe/facts.json.
 
-Run: python -m tools.generate_kb_docs
+Run: python -m tools.generate_kb_docs [--universe universe-electrical]
+
+A fact sheet names its trade (D-097, D-098). Plumbing is rendered here; the electrical business
+is rendered by tools/kb_electrical.py, which reuses the parts that do not depend on the trade.
 
 Fix the generator, not the generated files. The output is deterministic (no randomness, so no
 seed). After writing, the consistency check runs and the command fails if any document disagrees
 with the fact sheet. Every figure in the text comes from facts.json.
 """
 
+import argparse
 import hashlib
 import json
 import re
@@ -242,7 +246,7 @@ def services(f: dict[str, Any]) -> str:
     return document("Services", [("What we offer", intro), *sections])
 
 
-def pricing(f: dict[str, Any]) -> str:
+def pricing(f: dict[str, Any], job_groups: list[tuple[str, str]] | None = None) -> str:
     p = f["pricing"]
     emerg, labour = p["emergency_call_out_fee"], p["labour"]
     pay = p["payment"]
@@ -271,7 +275,7 @@ def pricing(f: dict[str, Any]) -> str:
             f"{join_and(f['service_area']['outer']['areas'])}.",
         ),
     ]
-    for service_type, heading in JOB_GROUPS:
+    for service_type, heading in JOB_GROUPS if job_groups is None else job_groups:
         lines = []
         for job in p["flat_price_jobs"]:
             if job["service_type"] != service_type:
@@ -483,15 +487,29 @@ RENDERERS = {
 
 
 def render_docs(facts: dict[str, Any]) -> dict[str, str]:
-    return {name: render(facts) for name, render in RENDERERS.items()}
+    trade = facts.get("business", {}).get("trade") or "plumbing"
+    if trade == "electrical":
+        from tools import kb_electrical
+
+        renderers = kb_electrical.RENDERERS
+    elif trade == "plumbing":
+        renderers = RENDERERS
+    else:
+        raise ValueError(f"no document renderers for the trade {trade!r}")
+    return {name: render(facts) for name, render in renderers.items()}
 
 
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def main() -> int:
-    facts_path = UNIVERSE / "facts.json"
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Render the knowledge-base documents.")
+    parser.add_argument("--universe", type=Path, default=UNIVERSE)
+    universe = parser.parse_args(argv).universe
+    if not universe.is_absolute():
+        universe = REPO_ROOT / universe
+    facts_path = universe / "facts.json"
     facts = json.loads(facts_path.read_text("utf-8"))
     docs = render_docs(facts)
 
@@ -502,7 +520,7 @@ def main() -> int:
             print(f"  - {problem}")
         return 1
 
-    out_dir = UNIVERSE / "docs"
+    out_dir = universe / "docs"
     out_dir.mkdir(parents=True, exist_ok=True)
     for stale in out_dir.glob("*.md"):
         if stale.name not in docs:
@@ -519,7 +537,7 @@ def main() -> int:
         "facts_sha256": sha256_bytes(facts_path.read_bytes()),
         "docs": {name: sha256_bytes((out_dir / name).read_bytes()) for name in sorted(docs)},
     }
-    (UNIVERSE / "manifest.json").write_bytes(
+    (universe / "manifest.json").write_bytes(
         (json.dumps(manifest, indent=2) + "\n").encode("utf-8")
     )
     print(f"Wrote {len(docs)} documents to {out_dir.relative_to(REPO_ROOT)}; consistency OK")

@@ -81,7 +81,7 @@ _EXCLUDED_SUFFIXES = (
     "tests/test_check_personal_info.py",
 )
 # The invented business's documents and the labelled messages are written in a customer's voice.
-_EXCLUDED_PREFIXES = ("universe/docs/", "eval/golden/src/")
+_EXCLUDED_PREFIXES = ("universe/docs/", "universe-electrical/docs/", "eval/golden/src/")
 
 
 @dataclass(frozen=True)

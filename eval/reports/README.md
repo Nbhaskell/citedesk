@@ -13,6 +13,7 @@
 | `heldout-think-on.md` / `.json` | The held-out split: three passes of the one fixed system (thinking on), scored one by one, then the spread |
 | `sealed-run.md` | The sealed split (164 items): three passes of the one fixed final system (thinking on), scored one by one, then the spread. The run is in `eval/sealed_ledger.json` (D-087) |
 | `intent-label-agreement.md` | A second labeller against the existing intent labels on a 60-item blind sample (tuned and held-out items), with a comparison against a saved model run. Labels in `eval/labels/intent_agreement.labels.json` (D-088, D-089) |
+| `intent-baseline.md` | Primary intent from two methods with no model (majority, naive Bayes), trained on the tuned split and scored once on the held-out split, paired with the three saved held-out model passes (D-093) |
 
 Produced by `tools.eval_run`, `tools.eval_score` and `tools.eval_compare` (D-062). The tuned files
 come from six saved runs on 2026-10-29: code at commit `2d959c4`, model `qwen3:8b`, `understand-v1` and `draft-v1`

@@ -856,3 +856,21 @@ No measure fell. The intent figure in D-074 (84.6%, 104 of 123) came from a run 
 **Checked.** 26 new tests, and a live server on a spare port: a rebinding `Host` got 400, a post with a foreign `Origin` got 403 and changed nothing, and the requests the Vite proxy sends (`Host: 127.0.0.1:5174`, `Origin: http://127.0.0.1:5174`) and a tool without `Origin` went through.
 
 **Limits.** Any program running on the machine can still call the API; there is no authentication, and v1 is for one person on one machine. The web app was also run against the real API after the change: the queue loaded through the Vite proxy at `http://localhost:5174`, and a POST from the page (with the browser's own `Origin`) was answered 200.
+
+### D-093. An intent baseline with no model: naive Bayes reaches 51%, the model about 70%, on the held-out split
+**Why.** A project review found no comparison with a cheap method. Primary-intent accuracy was reported against the PRD target (85%) and between system versions, but not against a classifier without a language model. Without one, it is not known how much `qwen3:8b` adds on this step.
+
+**What was built.** `tools/intent_baseline.py` (plain code, no new dependency; tests in `tests/test_intent_baseline.py` on invented fixtures):
+- **Majority:** always the commonest primary intent of the training items.
+- **Naive Bayes:** multinomial, on lower-case words and pairs of neighbouring words from the subject and body, add-one smoothing, ties to the intent that sorts first. No setting is tuned; the method and features were fixed before the held-out score was produced.
+- Trained on the tuned split (135 items), scored on the held-out split (76 items), with leave-one-out on the tuned split as well. The sealed split is refused. With `--run`, a paired comparison with saved model runs on the same items. The report (`eval/reports/intent-baseline.md`) holds ids, intents and counts only.
+
+**Result (run once; a rerun after a wording change to the report gave the same numbers, as the method has no random part).**
+- Majority (`booking_request`): 14 of 76 held-out (18.4%).
+- Naive Bayes: 39 of 76 held-out (51.3%; 95% interval 40.3% to 62.2%); tuned leave-one-out 59 of 135 (43.7%).
+- Paired with the three saved held-out passes of the model (the system of 2026-10-29, thinking on; 75 items it read): the model was right on 52, 52 and 53 (69.3% to 70.7%), naive Bayes on 39 of the same 75. The model alone was right on 21 to 22 items, naive Bayes alone on 8, both wrong on 14 to 15.
+- The largest naive Bayes errors: `health_or_safety` read as `booking_request` (5) or `service_question` (3). In the system those messages are escalated by the safety-keyword net in code as well as by intent, so this is a weakness of the baseline, not a claim about routing.
+
+**What it means.** The model adds about 18 points of primary-intent accuracy over a word-count method on unseen messages (both on the same 75 items), and the paired counts favour it by 21 or 22 items to 8. The step earns its cost on this measure. A word-count method still gets half the items right, which bounds how much of the model's score comes from reading beyond the words.
+
+**Limits.** The held-out set is small (76 items) and written by the same author as the tuned set, which helps a word-count method through shared wording. The model runs are of the system before D-074 to D-085; the sealed set cannot be used here (D-071), so no baseline exists for the final system's 73.1%. Primary intent only: routing, escalation and drafting are not compared. A stronger cheap baseline (embeddings with a linear classifier) was not tried, because it needs a model of its own.

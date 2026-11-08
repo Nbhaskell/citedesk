@@ -63,6 +63,7 @@ Escalations are 54% of the held-out items, against 35% of the tuned ones: the ra
 **Intents.** `intents` lists everything the customer asks for; `primary_intent` is what they most want answered.
 - Opening hours, service area, and what the business does: `service_question`. Terms (warranty, cancelling, payment, access, discounts): `policy_question`. Whether someone is free at a time: `availability_question`.
 - Asking for a visit: `booking_request`. Moving a visit: `booking_change`. Cancelling: `cancellation`.
+- Booking or availability is decided by what the customer asks (D-090). Asking whether someone is free, available or has an opening at a time ("is anyone free Friday?"): `availability_question`. Asking the business to come, book or look at a described problem, even as a question ("can you come Thursday?"): `booking_request`. A question about a visit that already exists ("is my visit still on for Friday?") is neither; the golden set labels it `other`.
 - Gas smell, carbon monoxide, flooding, a burst pipe or sewage backing up: `health_or_safety`, always with reason `HEALTH_SAFETY` and urgency `urgent`.
 - Marketing and bulk offers: `spam`. A real question inside an injection attempt keeps its real intent.
 

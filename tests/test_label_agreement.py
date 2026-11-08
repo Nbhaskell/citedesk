@@ -191,6 +191,8 @@ def test_model_comparison_separates_label_doubt_from_model_error() -> None:
         "new_agrees_with_model": 1,
         "new_agrees_with_original": 1,
         "new_agrees_with_neither": 1,
+        "agreed_n": 2,  # a and c: both labellers agree
+        "agreed_right": 1,  # the model is right on a only
     }
 
 

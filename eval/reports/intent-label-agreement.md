@@ -53,6 +53,7 @@ Items both labelled and read by the model: 33.
   - the second labeller sides with the model: 1 (doubt about the label)
   - the second labeller sides with the existing label: 2 (model error)
   - the second labeller agrees with neither: 0 (the item is hard)
+- On the 26 items where both labellers agree, the model is right on 24 (92.3%)
 
 ## What this cannot tell you
 

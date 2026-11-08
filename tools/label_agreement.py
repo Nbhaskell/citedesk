@@ -233,6 +233,10 @@ def score(
             "new_agrees_with_model": sum(n == m for m, _, n in wrong),
             "new_agrees_with_original": sum(n == o for _, o, n in wrong),
             "new_agrees_with_neither": sum(n != m and n != o for m, o, n in wrong),
+            # Items whose label both labellers agree on: a score with less doubt about the label
+            # in it (D-094).
+            "agreed_n": sum(o == n for _, o, n in both),
+            "agreed_right": sum(o == n == m for m, o, n in both),
         }
     return result
 
@@ -293,6 +297,8 @@ def render(result: dict[str, Any]) -> str:
             f"{m['new_agrees_with_original']} (model error)",
             f"  - the second labeller agrees with neither: {m['new_agrees_with_neither']} "
             "(the item is hard)",
+            f"- On the {m['agreed_n']} items where both labellers agree, the model is right on "
+            f"{m['agreed_right']} ({percent(m['agreed_right'], m['agreed_n'])})",
             "",
         ]
     lines += [

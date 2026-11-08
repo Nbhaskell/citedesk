@@ -103,6 +103,39 @@ NUMBER = re.compile(
     r"\b(?:\d+(?:,\d{3})*(?:\.\d+)?(?:st|nd|rd|th)?|" + "|".join(NUMBER_WORDS) + r")\b",
     re.IGNORECASE,
 )
+# Spelled-out money ("fifty dollars", "two hundred bucks"): a figure like any other (D-091).
+_UNITS = {
+    "zero": 0, "one": 1, "a": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
+    "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13,
+    "fourteen": 14, "fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18,
+    "nineteen": 19, "twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60,
+    "seventy": 70, "eighty": 80, "ninety": 90,
+}  # fmt: skip
+_SCALES = {"hundred": 100, "thousand": 1000}
+_NUMBER_WORD = "|".join(sorted([*_UNITS, *_SCALES], key=len, reverse=True))
+SPELLED_MONEY = re.compile(
+    rf"\b((?:(?:{_NUMBER_WORD})[\s-]+(?:and[\s-]+)?)*(?:{_NUMBER_WORD}))\s+(?:dollars?|bucks)\b",
+    re.IGNORECASE,
+)
+
+
+def spelled_number(words: str) -> int | None:
+    """ "one hundred forty-nine" -> 149. None when the words do not make a number."""
+    total, current, seen = 0, 0, False
+    for word in re.split(r"[\s-]+", words.lower().strip()):
+        if word in ("", "and"):
+            continue
+        if word in _UNITS:
+            current += _UNITS[word]
+        elif word == "hundred":
+            current = max(current, 1) * 100
+        elif word == "thousand":
+            total += max(current, 1) * 1000
+            current = 0
+        else:
+            return None
+        seen = True
+    return total + current if seen else None
 
 
 @dataclass(frozen=True)
@@ -171,6 +204,12 @@ def extract_figures(text: str) -> list[Figure]:
     take(MONTH_DAY, month_day)
     take(DAY_MONTH, day_month)
     take(MONEY, lambda m: Figure("money", _decimal_key(m.group(1)), m.group(0)))
+
+    def spelled_money(match: re.Match[str]) -> Figure | None:
+        value = spelled_number(match.group(1))
+        return None if value is None else Figure("money", str(value), match.group(0))
+
+    take(SPELLED_MONEY, spelled_money)
     take(PHONE, lambda m: Figure("phone", re.sub(r"\D", "", m.group(0)), m.group(0)))
     take(PERCENT, lambda m: Figure("percent", _decimal_key(m.group(1)), m.group(0)))
     take(TIME, time_of_day)
@@ -235,11 +274,22 @@ COMMITMENT_PATTERNS: Mapping[str, re.Pattern[str]] = {
         r"|\b(?:confirmed|booked|scheduled) (?:for|on) (?:\w+day|\d)"
         r"|\bwe(?:'ll|’ll| will) (?:be there|arrive|see you)\b"
         r"|\bsee you (?:on|at|then|tomorrow)\b"
+        # other wordings (D-091)
+        r"|\blocked in\b|\bpencil+ed (?:you |it )?in\b"
+        r"|\b(?:we )?(?:have|got) you (?:down|booked|scheduled|in) for\b"
+        r"|\byou(?:'re|’re| are) all set\b"
+        # someone will come, with a time: "a technician will come to check" names no time
+        r"|\b(?:(?:a|an|our|the) (?:technician|plumber|tech|engineer) will "
+        r"(?:be there|be with you|come|arrive|see you|be out)"
+        r"|we(?:'ll|’ll| will) send (?:a |an |our )?(?:technician|plumber|tech|engineer"
+        r"|someone|somebody)(?: out| over| round)?)"
+        r"(?: \w+){0,3} (?:on|at|by|tomorrow|today|tonight|this|next)\b"
     ),
     "refund promised": _p(
         r"\b(?:we|i|you)(?:'ll|’ll| will) (?:\w+ )?(?:refund|be refunded)\b"
         r"|\bfull refund\b|\bmoney back\b"
         r"|\b(?:issue|process|arrange)(?:d|ing)? (?:a |your |the )?refund\b"
+        r"|\breimburs(?:e|ed|ing|ement)\b"
     ),
     "discount or waiver": _p(
         r"\b\d+\s?% (?:off|discount)\b|\bdiscount of\b"
@@ -247,8 +297,23 @@ COMMITMENT_PATTERNS: Mapping[str, re.Pattern[str]] = {
         r"|\bwaive[ds]? (?:the|your|that) (?:\w+ )?(?:fee|charge)\b"
         r"|\bat no (?:extra )?(?:charge|cost)\b|\bfree of charge\b|\bcomplimentary\b"
         r"|\bprice match\b"
+        # other wordings (D-091)
+        r"|\bhalf (?:price|off)\b|\b(?:percent|per cent) off\b"
+        r"|\b(?:knock|take|shave)\w* (?:\S+ ){0,4}off (?:the|your)\b"
+        r"|\b(?:apply|give|add|issue|put)\w* (?:\S+ ){0,3}(?:credit|rebate|discount)\b"
+        r"|\b(?:take care of|cover|pick up) (?:the|your) (?:\w+ )?(?:fee|charge|cost|bill)\b"
+        r"|\b(?:is|are|it's|it’s|be|was) (?:\w+ )?on (?:us|the house)\b"
     ),
     "guarantee": _p(r"\bguarantee[sd]?\b|\b(?:we|i) promise\b"),
+}
+# Promises worded as a negative ("you won't be charged"): a negation cannot excuse them, because
+# the negation is the promise (D-091). Wording the sources use is still allowed.
+NEGATIVE_PROMISE_PATTERNS: Mapping[str, re.Pattern[str]] = {
+    "discount or waiver": _p(
+        r"\b(?:won't|won’t|wont|will not|do not|don't|don’t|shouldn't|shouldn’t)"
+        r" (?:have to |need to )?(?:be )?(?:pay|charged?)\b"
+        r"|\bno charge\b|\bnot be charged\b|\bwithout charge\b"
+    ),
 }
 ADVICE_PATTERNS: Mapping[str, re.Pattern[str]] = {
     "safety advice": _p(
@@ -260,23 +325,51 @@ ADVICE_PATTERNS: Mapping[str, re.Pattern[str]] = {
         r"\b(?:is|are|it's|it is|it’s) (?:safe|not dangerous|harmless)\b"
         r"|\bno need to worry\b|\bdon't worry\b|\bdon’t worry\b"
         r"|\byou (?:should|will) be (?:fine|ok|okay)\b"
+        # other wordings (D-091)
+        r"|\bnothing to (?:worry|be (?:worried|concerned)) about\b"
+        r"|\b(?:probably|likely|almost certainly|most likely) (?:nothing|fine|harmless|ok|okay"
+        r"|not (?:serious|dangerous|a problem))\b"
+        r"|\bnot (?:an emergency|serious|a concern|dangerous)\b"
+        r"|\b(?:is|are|it's|it’s|it is) (?:perfectly |completely |totally |quite )?normal\b"
     ),
 }
-EXCUSES = re.compile(
+NEGATIONS = re.compile(
     r"\b(?:not|never|no|cannot|unable|without|nor|don't|doesn't|won't|can't|can’t"
-    r"|don’t|doesn’t|won’t)\b|n't\b"
-    r"|\b(?:if|once|until|unless|when|after|pending|subject to)\b",
+    r"|don’t|doesn’t|won’t)\b|n't\b",
     re.IGNORECASE,
 )
-CLAUSE_START = re.compile(r"[.!?;:\n]")
+EXCUSES = re.compile(
+    NEGATIONS.pattern + r"|\b(?:if|once|until|unless|when|after|pending|subject to)\b",
+    re.IGNORECASE,
+)
+# A clause ends at a comma too: in "No problem, we'll refund you" the "no" belongs to the first
+# clause and excuses nothing (D-091).
+CLAUSE_START = re.compile(r"[.!?;:,\n]")
+# Negative words that are only a figure of speech and deny nothing.
+FIGURES_OF_SPEECH = re.compile(
+    r"\b(?:no (?:problem|worries|worry|trouble)|not a problem|no need to worry)\b", re.IGNORECASE
+)
 
 
-def _excused(text: str, start: int) -> bool:
-    """Negation or "if/once/until" earlier in the same sentence ("we cannot guarantee")."""
+def _clause_before(text: str, start: int) -> str:
     before = text[max(0, start - 60) : start]
     boundary = [m.end() for m in CLAUSE_START.finditer(before)]
     clause = before[boundary[-1] :] if boundary else before
-    return bool(EXCUSES.search(clause))
+    return FIGURES_OF_SPEECH.sub(" ", clause)
+
+
+def _excused(text: str, start: int) -> bool:
+    """Negation or "if/once/until" earlier in the same clause ("we cannot guarantee")."""
+    return bool(EXCUSES.search(_clause_before(text, start)))
+
+
+def _quotes_an_affirmative_source(phrase: str, sources: str) -> bool:
+    """The phrase appears in the sources in a clause that does not deny it. "We do not offer a
+    full refund" does not let a draft say "a full refund" (D-091)."""
+    return any(
+        not NEGATIONS.search(_clause_before(sources, m.start()))
+        for m in re.finditer(re.escape(phrase), sources)
+    )
 
 
 def _subject_without_the_customers_words(data: CheckInput) -> str:
@@ -311,11 +404,16 @@ def check_no_commitment(
     promise_patterns = COMMITMENT_PATTERNS if patterns is None else patterns
     for name, pattern in promise_patterns.items():
         for hit in pattern.finditer(text):
-            if hit.group(0).lower() in sources or _excused(text, hit.start()):
+            phrase = hit.group(0).lower()
+            if _quotes_an_affirmative_source(phrase, sources) or _excused(text, hit.start()):
                 continue
             if name not in matched:
                 matched.append(name)
     if patterns is None:
+        for name, pattern in NEGATIVE_PROMISE_PATTERNS.items():
+            for hit in pattern.finditer(text):
+                if hit.group(0).lower() not in sources and name not in matched:
+                    matched.append(name)
         for name, pattern in ADVICE_PATTERNS.items():
             for hit in pattern.finditer(_canonical_advice(text)):
                 if hit.group(0).lower() not in sources and name not in matched:
@@ -389,7 +487,13 @@ def check_claims_have_sources(data: CheckInput) -> CheckOutcome:
 
 # --- injection echo -----------------------------------------------------------------------------
 
-LINK = re.compile(r"https?://[^\s<>\"')]+|www\.[^\s<>\"')]+|[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
+LINK = re.compile(
+    r"https?://[^\s<>\"')]+|www\.[^\s<>\"')]+|[\w.+-]+@[\w-]+(?:\.[\w-]+)+"
+    # a bare domain ("kestrel-billing.net"), for the common endings only (D-091)
+    r"|\b[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9-]+)*\.(?:com|net|org|info|biz|io|co|us"
+    r"|app|online|site|xyz|shop|store|link|me|ly)\b(?:/[^\s<>\"')]*)?",
+    re.IGNORECASE,
+)
 
 
 def _echoes_prompt(draft: str, prompt: str) -> bool:

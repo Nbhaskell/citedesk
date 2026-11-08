@@ -63,6 +63,7 @@ from citedesk.providers import LLMProvider, LLMStepFailed
 from citedesk.safety import emergency_hits
 from citedesk.screening import screen
 from citedesk.state import RETRY_TARGET, transition
+from citedesk.trade import load_trade
 
 logger = logging.getLogger("citedesk.pipeline")
 
@@ -77,7 +78,12 @@ def _screening_for(
     inquiry = repo.get_inquiry(conn, inquiry_id)
     if inquiry is None:
         raise LookupError(f"no inquiry {inquiry_id}")
-    outcome = screen(inquiry.subject, inquiry.body, spam_threshold=settings.spam_threshold)
+    outcome = screen(
+        inquiry.subject,
+        inquiry.body,
+        spam_threshold=settings.spam_threshold,
+        trade=load_trade(settings.business_facts_path),
+    )
     repo.upsert_screening(
         conn,
         inquiry_id=inquiry_id,
@@ -120,7 +126,8 @@ def screen_stage(
             now=now,
         )
         text = f"{inquiry.subject or ''}\n{inquiry.body}"
-        terms = emergency_hits(text)
+        trade = load_trade(settings.business_facts_path)
+        terms = emergency_hits(text, trade.emergency_patterns, trade.imaginable)
         known = repo.has_clean_history(conn, inquiry.sender_email, exclude_id=inquiry_id)
 
         payload: dict[str, Any] = {
@@ -224,6 +231,7 @@ def understand_stage(
         body=inquiry.body,
         received_at=inquiry.received_at,
         enable_thinking=settings.enable_thinking,
+        trade=load_trade(settings.business_facts_path),
     )
     output = found.output
 
@@ -405,7 +413,10 @@ def _ordered_intents(classification: Classification) -> list[Intent]:
 
 
 def _questions_for(
-    inquiry: Inquiry, classification: Classification, extraction: Extraction
+    inquiry: Inquiry,
+    classification: Classification,
+    extraction: Extraction,
+    settings: Settings,
 ) -> list[retrieval.Question]:
     return retrieval.build_questions(
         intents=_ordered_intents(classification),
@@ -413,6 +424,7 @@ def _questions_for(
         subject=inquiry.subject,
         body=inquiry.body,
         only_open=inquiry.route is Route.request_details,
+        trade=load_trade(settings.business_facts_path),
     )
 
 
@@ -488,7 +500,7 @@ def retrieve_stage(
     screening = _screening_for(conn, inquiry_id, settings, now)
     if classification is None or extraction is None:
         raise LookupError(f"inquiry {inquiry_id} is routed but has no stored result")
-    questions = _questions_for(inquiry, classification, extraction)
+    questions = _questions_for(inquiry, classification, extraction, settings)
     events.record_event(
         conn,
         event_type=AuditEventType.stage_started,
@@ -619,7 +631,7 @@ def _draft_inputs(
     if classification is None or extraction is None:
         raise LookupError(f"inquiry {inquiry.id} has no stored result")
     rows = repo.list_retrievals(conn, inquiry.id)
-    questions = _questions_for(inquiry, classification, extraction)
+    questions = _questions_for(inquiry, classification, extraction, settings)
     unanswered = (
         [q.intent for q, row in zip(questions, rows, strict=True) if row.declined]
         if len(questions) == len(rows)

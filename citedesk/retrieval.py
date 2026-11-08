@@ -9,27 +9,19 @@ such questions with a partial answer that reads as helpful (D-045).
 """
 
 import re
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 from citedesk.knowledge import KBResult, KnowledgeBase, timed
 from citedesk.models import ExtractedFields, Intent, Retrieval, ServiceType, Source
+from citedesk.trade import PLUMBING, Trade
 
 MAX_QUESTIONS = 3
 MAX_CUSTOMER_TEXT = 300
 MAX_QUESTION_SENTENCES = 2
 
-SERVICE_LABELS: dict[ServiceType, str | None] = {
-    ServiceType.emergency_repair: "emergency plumbing repair",
-    ServiceType.drain_cleaning: "drain cleaning",
-    ServiceType.leak_repair: "leak repair",
-    ServiceType.sewer_line_repair: "sewer line repair",
-    ServiceType.water_heater: "water heater service or replacement",
-    ServiceType.fixture_installation: "fixture installation",
-    ServiceType.inspection: "plumbing inspection",
-    ServiceType.other: "plumbing repair",
-    ServiceType.unknown: None,
-}
+# How a question names each service type comes from the trade (D-097); plumbing's by default.
+SERVICE_LABELS: Mapping[ServiceType, str | None] = PLUMBING.service_labels
 
 # Never sent: nothing the documents say could answer them, or a person must see them first.
 NOT_ASKED = frozenset(
@@ -74,16 +66,24 @@ def customer_questions(subject: str | None, body: str) -> str:
     return _short(body, MAX_CUSTOMER_TEXT)
 
 
-def _label(fields: ExtractedFields) -> str | None:
-    return None if fields.service_type is None else SERVICE_LABELS[fields.service_type]
+def _label(fields: ExtractedFields, trade: Trade = PLUMBING) -> str | None:
+    if fields.service_type is None:
+        return None
+    return trade.service_labels.get(fields.service_type)
 
 
-def _question_for(intent: Intent, fields: ExtractedFields, subject: str | None, body: str) -> str:
-    label = _label(fields)
+def _question_for(
+    intent: Intent,
+    fields: ExtractedFields,
+    subject: str | None,
+    body: str,
+    trade: Trade = PLUMBING,
+) -> str:
+    label = _label(fields, trade)
     if intent is Intent.pricing_question:
         return f"How much does {label} cost?" if label else "What are your prices and fees?"
     if intent is Intent.booking_request:
-        return f"What is needed to book {label or 'plumbing work'} and how does booking work?"
+        return f"What is needed to book {label or trade.generic_work} and how does booking work?"
     if intent is Intent.booking_change:
         return "How do I change or reschedule a booking, and what is the policy?"
     if intent is Intent.cancellation:
@@ -99,6 +99,7 @@ def build_questions(
     subject: str | None,
     body: str,
     only_open: bool = False,
+    trade: Trade = PLUMBING,
 ) -> list[Question]:
     """One question per askable intent, in the order given, without repeats.
 
@@ -109,7 +110,7 @@ def build_questions(
     for intent in intents:
         if intent in NOT_ASKED or (only_open and intent in BOOKING_INTENTS):
             continue
-        text = _short(_question_for(intent, fields, subject, body), 2000)
+        text = _short(_question_for(intent, fields, subject, body, trade), 2000)
         if all(existing.text != text for existing in found):
             found.append(Question(intent=intent, text=text))
     return found[:MAX_QUESTIONS]

@@ -18,6 +18,7 @@ from dataclasses import dataclass
 from citedesk.models import ScreeningResult
 from citedesk.safety import emergency_hits
 from citedesk.textnorm import ZERO_WIDTH, normalise
+from citedesk.trade import PLUMBING, Trade
 
 # --- sensitive data --------------------------------------------------------------------------
 
@@ -297,13 +298,8 @@ URL = re.compile(r"https?://\S+|www\.\S+")
 MONEY_HYPE = re.compile(r"\$\s?\d[\d,]{2,}\b.{0,30}\b(?:day|week|month|yesterday|daily)\b")
 PHISH_TOPIC = re.compile(r"\b(?:invoice|statement|payment|account)\b")
 PHISH_THREAT = re.compile(r"\b(?:overdue|suspend|suspension|closed|immediately|urgent|expire)")
-# Plumbing and service vocabulary only. Words such as price, cost, quote or book also appear in
-# spam, so they would hide the "no business words" signal.
-BUSINESS = re.compile(
-    r"plumb|drain|leak|toilet|water|pipe|sink|faucet|\btap\b|heater|sewer|shower|\btub\b|bath|"
-    r"clog|flood|\bgas\b|\bhot\b|overflow|repair|install|appointment|warranty|invoice|receipt|"
-    r"emergency"
-)
+# The trade's customer vocabulary (D-097); plumbing's is the default.
+BUSINESS = PLUMBING.business_words
 
 
 SPAM_SIGNALS = (
@@ -326,7 +322,7 @@ class SpamResult:
     signals: list[str]
 
 
-def spam_score(subject: str, body: str) -> SpamResult:
+def spam_score(subject: str, body: str, trade: Trade = PLUMBING) -> SpamResult:
     """A score from 0 to 1 built from simple signals. Capital letters alone can never reach the
     usual threshold, so an urgent message written in capitals is not mistaken for spam."""
     raw = f"{subject}\n{body}"
@@ -365,7 +361,7 @@ def spam_score(subject: str, body: str) -> SpamResult:
         signals.append("phishing_combo")
         score += 0.3
 
-    if not BUSINESS.search(text):
+    if not trade.business_words.search(text):
         signals.append("no_business_words")
         score += 0.2
 
@@ -387,7 +383,9 @@ class ScreeningOutcome:
     result: ScreeningResult
 
 
-def screen(subject: str | None, body: str, *, spam_threshold: float) -> ScreeningOutcome:
+def screen(
+    subject: str | None, body: str, *, spam_threshold: float, trade: Trade = PLUMBING
+) -> ScreeningOutcome:
     """Mask sensitive data, then look for injection, emergencies and spam in what remains.
 
     Injection beats spam. An emergency term stops a message being archived as spam. Nothing
@@ -399,9 +397,9 @@ def screen(subject: str | None, body: str, *, spam_threshold: float) -> Screenin
     subject_text = masked_subject.text if masked_subject else None
     combined = f"{subject_text or ''}\n{masked_body.text}"
 
-    spam = spam_score(subject_text or "", masked_body.text)
+    spam = spam_score(subject_text or "", masked_body.text, trade)
     flags = injection_flags(combined)
-    emergencies = emergency_hits(combined)
+    emergencies = emergency_hits(combined, trade.emergency_patterns, trade.imaginable)
 
     if flags:
         result = ScreeningResult.injection_suspected

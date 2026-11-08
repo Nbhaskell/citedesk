@@ -99,3 +99,39 @@ def max_json_bytes(max_body_chars: int) -> int:
     """The most a JSON request may weigh: a message at its character limit with every character
     escaped (6 bytes each), plus room for the other fields."""
     return max_body_chars * 6 + 64 * 1024
+
+
+# --- who may talk to the API (D-092) -------------------------------------------------------------
+
+# The names of this machine. The server listens on 127.0.0.1 only, so a request with another Host
+# came through a name that an outside site pointed here (DNS rebinding).
+LOCAL_HOSTS: frozenset[str] = frozenset({"127.0.0.1", "localhost", "::1"})
+UNSAFE_METHODS: frozenset[str] = frozenset({"POST", "PUT", "PATCH", "DELETE"})
+
+
+def _hostname(netloc: str) -> str:
+    """The name part of "host:port", "[::1]:8100" or "localhost", lower case."""
+    netloc = netloc.strip().lower()
+    if netloc.startswith("["):
+        return netloc[1 : netloc.find("]")] if "]" in netloc else ""
+    return netloc.rsplit(":", 1)[0] if netloc.count(":") == 1 else netloc
+
+
+def host_allowed(host: str, allowed: frozenset[str]) -> bool:
+    """The Host header names this machine."""
+    return bool(host) and _hostname(host) in allowed
+
+
+def origin_allowed(origin: str | None, allowed: frozenset[str]) -> bool:
+    """A request that changes something comes from a page on this machine, or from a tool.
+
+    Browsers send Origin with every cross-site POST, so a missing header means a client that is not
+    a browser (the import tool, a script), which the Host check already limits to this machine.
+    "null" is what a sandboxed page or a local file sends, and is refused.
+    """
+    if origin is None:
+        return True
+    scheme, sep, rest = origin.partition("://")
+    if not sep or scheme.lower() not in ("http", "https"):
+        return False
+    return host_allowed(rest.split("/", 1)[0], allowed)

@@ -47,3 +47,12 @@ def client(api_settings: Settings) -> Iterator[TestClient]:
     app = create_app(api_settings, start_worker=False)
     with TestClient(app, raise_server_exceptions=False) as test_client:
         yield test_client
+
+
+@pytest.fixture(autouse=True)
+def allow_test_client_host(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The test client calls itself "testserver"; the API answers only this machine's names
+    (D-092), so the tests add that one name. tests/test_host_origin.py uses 127.0.0.1."""
+    import citedesk.api
+
+    monkeypatch.setattr(citedesk.api, "ALLOWED_HOSTS", citedesk.api.ALLOWED_HOSTS | {"testserver"})

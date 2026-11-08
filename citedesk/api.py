@@ -43,7 +43,15 @@ from citedesk.business import Business, load_business
 from citedesk.config import Settings
 from citedesk.db import connect, migrate, utc_now
 from citedesk.drafting import known_details
-from citedesk.guards import BodyLimit, RateLimiter, max_json_bytes
+from citedesk.guards import (
+    LOCAL_HOSTS,
+    UNSAFE_METHODS,
+    BodyLimit,
+    RateLimiter,
+    host_allowed,
+    max_json_bytes,
+    origin_allowed,
+)
 from citedesk.insights import Insights
 from citedesk.intake import (
     DuplicateExternalId,
@@ -81,6 +89,8 @@ logger = logging.getLogger("citedesk.api")
 
 MAX_IMPORT_BYTES = 5 * 1024 * 1024
 IMPORT_PATH = "/api/inquiries/import"
+# Host names the API answers to (D-092). The tests add the test client's name.
+ALLOWED_HOSTS: frozenset[str] = LOCAL_HOSTS
 JSONL_TYPES = {"application/x-ndjson", "application/jsonl", "application/json-lines", "text/jsonl"}
 IMPORT_REASONS = {
     "no_header": "the file has no header row",
@@ -358,6 +368,26 @@ def create_app(
         BodyLimit,
         limit_for=lambda path: MAX_IMPORT_BYTES if path == IMPORT_PATH else json_limit,
     )
+    allowed_hosts = ALLOWED_HOSTS
+
+    # Added before the request-id middleware below, so it sits inside it and its refusals get an id.
+    @app.middleware("http")
+    async def only_this_machine(request: Request, call_next: Any) -> Response:
+        """Serve only requests addressed to this machine's names, and take changes only from
+        pages on it or from tools (D-092)."""
+        if not host_allowed(request.headers.get("host", ""), allowed_hosts):
+            return error_response(
+                request, 400, "host_not_allowed", "This server answers only on its own address."
+            )
+        if request.method in UNSAFE_METHODS and not origin_allowed(
+            request.headers.get("origin"), allowed_hosts
+        ):
+            return error_response(
+                request, 403, "origin_not_allowed", "Changes are accepted only from this machine."
+            )
+        response: Response = await call_next(request)
+        return response
+
     limiter = RateLimiter(settings.intake_rate_limit_per_minute)
 
     def limit_intake_rate() -> None:

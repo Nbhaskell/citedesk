@@ -41,6 +41,8 @@ Sources: [tuned](eval/reports/tuned-think-on.md), [held-out](eval/reports/heldou
 
 **The sealed run missed the intent target.** The sealed set was written before the later prompt changes were designed and after the held-out error analysis. Safety recall was met and `STRUCTURE` passed on all model-written drafts. Policy-exception recall rose to 21 of 22 (held-out 1 of 6; the 95% intervals do not overlap). Injection recall (7 of 15) and spam archiving (1 of 9) stay weak, and 24 of the 164 items were escalated that should not have been. Details and the reading list are in [D-087](docs/DECISIONS.md).
 
+**Against a method with no model** ([report](eval/reports/intent-baseline.md), [D-093](docs/DECISIONS.md)): a naive Bayes classifier on word counts, trained on the tuned split, got 39 of 76 held-out primary intents right (51.3%); on the same 75 items the model got 52 or 53 (about 70%). The model adds about 18 points on this step. Those are the held-out runs of the system before the later fixes; the sealed set cannot be used for a baseline.
+
 More, from the first held-out pass ([report](eval/reports/heldout-think-on.md)): fields extracted correctly 90.7%; no ungrounded figure found by the figure check in 48 drafts; median 16.3 s per inquiry through all stages on the development machine (p90 33.0 s; the sum of the stage times).
 
 **Design decisions that the numbers shaped**

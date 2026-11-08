@@ -841,3 +841,18 @@ No measure fell. The intent figure in D-074 (84.6%, 104 of 123) came from a run 
 **Also changed.** `tests/test_injection_end_to_end.py`: the "notice to the desk" case ("I will apply a goodwill credit") was a recorded residual; it is now blocked by `NO_COMMITMENT`, so its expected status is `escalated`.
 
 **Limits.** The set was written by the same session that changed the checks, so passing it is by construction and says nothing about wordings nobody has seen. The checks are still phrase lists. No model run, prompt, label or golden item changed. A catch rate needs sentences written by someone who has not read the checks.
+
+### D-092. The API answers only this machine's names, and takes changes only from pages on it
+**Why.** A project review found two ways a website open in the same browser could reach the API, which listens on 127.0.0.1 with no authentication. **DNS rebinding:** a site can make its own name resolve to 127.0.0.1; the browser then treats the API as that site's own origin and lets its page read `GET /api/inquiries`, which holds the invented customer messages (or real ones, in a pilot). Nothing checked the `Host` header. **Cross-site form posts:** a form on another site can post to an endpoint that takes no body, such as `POST /api/inquiries/{id}/reprocess`, without a CORS preflight. The endpoints with a JSON body were already safe, because a cross-site JSON request needs a preflight the API does not answer.
+
+**What changed.** A middleware in `citedesk/api.py`, with the rules as plain functions in `citedesk/guards.py`:
+- `Host` must name this machine (`127.0.0.1`, `localhost` or `::1`, any port), or the answer is 400 `host_not_allowed`.
+- A `POST`, `PUT`, `PATCH` or `DELETE` with an `Origin` header must come from a page on one of those names (http or https), or the answer is 403 `origin_not_allowed`. `Origin: null` (a sandboxed page or local file) is refused.
+- A request with no `Origin` is allowed: browsers send it on every cross-site POST, so its absence means a tool such as `tools.import_inquiries`, and the `Host` check already limits it to this machine.
+- Both refusals use the API's error shape and carry the request id.
+
+**Choices.** A fixed list of names rather than a setting: the server binds to 127.0.0.1 only (TRD section 8), so no other name is right, and a setting would be one more way to open it by mistake. Cross-origin reads with a local `Host` are not refused, because the browser already keeps their answers from the page (no CORS headers). The test client's name, "testserver", is added in `tests/conftest.py` only; `tests/test_host_origin.py` uses 127.0.0.1 and checks the refusals.
+
+**Checked.** 26 new tests, and a live server on a spare port: a rebinding `Host` got 400, a post with a foreign `Origin` got 403 and changed nothing, and the requests the Vite proxy sends (`Host: 127.0.0.1:5174`, `Origin: http://127.0.0.1:5174`) and a tool without `Origin` went through.
+
+**Limits.** Any program running on the machine can still call the API; there is no authentication, and v1 is for one person on one machine. The web app was also run against the real API after the change: the queue loaded through the Vite proxy at `http://localhost:5174`, and a POST from the page (with the browser's own `Origin`) was answered 200.

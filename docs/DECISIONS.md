@@ -789,3 +789,21 @@ No measure fell. The intent figure in D-074 (84.6%, 104 of 123) came from a run 
 **Not done.** The labelling itself, which needs a person who has not written the labels. No result is claimed.
 
 **Also checked.** The web checks (lint, format, typecheck, 354 tests, build, API types) pass on `main`.
+
+### D-089. Second labeller on the intent labels: 73.3% agreement, kappa 0.70, and a rule that needs a decision
+**What was run.** One person labelled the 60-item blind sheet of D-088 (38 tuned and 22 held-out items, seed 0) and `tools.label_agreement score` compared the labels with the existing ones and with the saved tuned run `understand-v3-tuned-20261107-011757`. The report is `eval/reports/intent-label-agreement.md` (ids, labels and counts only); the labels are in `eval/labels/intent_agreement.labels.json`. The labeller field was left blank. Nothing in the system, the existing labels or the rules was changed.
+
+**Result.**
+- Exact agreement on primary intent: 44 of 60 (73.3%; 95% interval about 61% to 83%, Wilson). Cohen's kappa 0.70.
+- Items marked unsure: 4. Agreement on those 2 of 4, on the other 56 items 42 of 56.
+- 16 differences. The largest group is `booking_request` labelled `availability_question` (4 items), with 1 more `other` labelled `availability_question`: five of the 16 involve the booking-or-availability line. Two differences are injection messages with no separate question, labelled `other` against `billing_question` and `booking_request` (both marked unsure). The rest are single items across many pairs.
+- Against the model (33 labelled items the model read, all tuned, so flattered): right against the existing label 30 of 33 (90.9%), right against the second labeller 25 of 33 (75.8%). Of the 3 misses against the existing label, the second labeller sides with the model on 1 (doubt about the label), with the existing label on 2 (model error), with neither on 0. Three items are too few to conclude from.
+
+**Limits that the result carries.**
+- One extra labeller. Two people can agree and both be wrong. The existing labels were written by the author of the system, and the second labeller read the rules cold.
+- The 73.3% (two labellers on a 60-item sample) and the sealed 73.1% (the model against one labeller on 164 items) are different measures. They are similar in size, which is consistent with label doubt being a large part of the gap to 85%, but it does not show how large.
+- The sample is from the tuned and held-out splits. The sealed set was not used.
+
+**What it means.** The 85% target (D-071) looks hard to reach under the current labelling rules: two readers of the same rules agree on about three items in four. The rules do not say whether "can you come at this time" is a booking or an availability question, and that gap accounts for the largest group of differences. A decision on that line is needed before more prompt work on intent.
+
+**Not done.** No label, rule or prompt was changed, because the items are tuned or held-out and a change made because of this result needs a fresh sealed set to claim (D-061). The rule for booking versus availability was not written.

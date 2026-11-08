@@ -655,14 +655,22 @@ export interface components {
             by_route: components["schemas"]["Count"][];
             /** By Status */
             by_status: components["schemas"]["Count"][];
+            /** Clean Approvals */
+            clean_approvals: number;
+            /** Clean Unchanged */
+            clean_unchanged: number;
             /** Decisions */
             decisions: components["schemas"]["Count"][];
             /** Draft Time Sample */
             draft_time_sample: number;
+            /** Edit Size Sample */
+            edit_size_sample: number;
             /** Edited Share */
             edited_share: number | null;
             /** Escalations By Reason */
             escalations_by_reason: components["schemas"]["Count"][];
+            /** Median Edit Share */
+            median_edit_share: number | null;
             /** Median Review Seconds */
             median_review_seconds: number | null;
             /** Median Seconds To Draft */
@@ -671,12 +679,18 @@ export interface components {
             period_end: string | null;
             /** Period Start */
             period_start: string | null;
+            /** Reject Share */
+            reject_share: number | null;
             /** Review Time Sample */
             review_time_sample: number;
             /** Synthetic Data */
             synthetic_data: boolean;
             /** Total Inquiries */
             total_inquiries: number;
+            /** Warned Approvals */
+            warned_approvals: number;
+            /** Warned Unchanged */
+            warned_unchanged: number;
         };
         /**
          * Intent

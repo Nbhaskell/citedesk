@@ -1473,6 +1473,14 @@
             "title": "By Status",
             "type": "array"
           },
+          "clean_approvals": {
+            "title": "Clean Approvals",
+            "type": "integer"
+          },
+          "clean_unchanged": {
+            "title": "Clean Unchanged",
+            "type": "integer"
+          },
           "decisions": {
             "items": {
               "$ref": "#/components/schemas/Count"
@@ -1482,6 +1490,10 @@
           },
           "draft_time_sample": {
             "title": "Draft Time Sample",
+            "type": "integer"
+          },
+          "edit_size_sample": {
+            "title": "Edit Size Sample",
             "type": "integer"
           },
           "edited_share": {
@@ -1501,6 +1513,17 @@
             },
             "title": "Escalations By Reason",
             "type": "array"
+          },
+          "median_edit_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Edit Share"
           },
           "median_review_seconds": {
             "anyOf": [
@@ -1546,6 +1569,17 @@
             ],
             "title": "Period Start"
           },
+          "reject_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reject Share"
+          },
           "review_time_sample": {
             "title": "Review Time Sample",
             "type": "integer"
@@ -1556,6 +1590,14 @@
           },
           "total_inquiries": {
             "title": "Total Inquiries",
+            "type": "integer"
+          },
+          "warned_approvals": {
+            "title": "Warned Approvals",
+            "type": "integer"
+          },
+          "warned_unchanged": {
+            "title": "Warned Unchanged",
             "type": "integer"
           }
         },
@@ -1571,6 +1613,13 @@
           "review_time_sample",
           "median_seconds_to_draft",
           "draft_time_sample",
+          "reject_share",
+          "median_edit_share",
+          "edit_size_sample",
+          "warned_approvals",
+          "warned_unchanged",
+          "clean_approvals",
+          "clean_unchanged",
           "period_start",
           "period_end",
           "synthetic_data"

@@ -6,6 +6,7 @@ import { decisionWords, insights as words, reason, route } from "../../copy";
 import { useResource } from "../../hooks/useResource";
 import {
   approvedCount,
+  countOf,
   formatDuration,
   formatMinutes,
   loadAssumption,
@@ -191,6 +192,53 @@ function TimeSaved({ data }: { data: Insights }) {
   );
 }
 
+/** Draft quality from what reviewers did (D-095). */
+function Quality({ data }: { data: Insights }) {
+  const judged = approvedCount(data.decisions) + countOf(data.decisions, "reject");
+  const shareOrNull = (part: number, whole: number) => (whole ? part / whole : null);
+  return (
+    <section className={styles.block}>
+      <h2>{words.quality}</h2>
+      <p className={styles.sample}>{words.qualityNote}</p>
+      <div className={styles.figures}>
+        <Figure label={words.rejected}>
+          {data.reject_share !== null && judged >= MIN_SAMPLE ? (
+            <>
+              <p className={styles.value}>{percent(data.reject_share)}</p>
+              <p className={styles.sample}>{words.rejectedOf(judged)}</p>
+            </>
+          ) : (
+            <p className={styles.sample}>{words.tooFewRejected(judged)}</p>
+          )}
+        </Figure>
+        <Figure label={words.editSize}>
+          {data.median_edit_share === null ? (
+            <p className={styles.sample}>{words.noEdits}</p>
+          ) : (
+            <>
+              <p className={styles.value}>{percent(data.median_edit_share)}</p>
+              <p className={styles.sample}>{words.editOf(data.edit_size_sample)}</p>
+              {data.edit_size_sample < MIN_SAMPLE ? (
+                <p className={styles.caution}>{words.fewTimes(data.edit_size_sample)}</p>
+              ) : null}
+            </>
+          )}
+        </Figure>
+        <Share
+          label={words.withWarning}
+          share={shareOrNull(data.warned_unchanged, data.warned_approvals)}
+          approved={data.warned_approvals}
+        />
+        <Share
+          label={words.withoutWarning}
+          share={shareOrNull(data.clean_unchanged, data.clean_approvals)}
+          approved={data.clean_approvals}
+        />
+      </div>
+    </section>
+  );
+}
+
 function Figures({ data }: { data: Insights }) {
   const approved = approvedCount(data.decisions);
   const total = data.total_inquiries;
@@ -228,6 +276,8 @@ function Figures({ data }: { data: Insights }) {
           />
         </div>
       </section>
+
+      <Quality data={data} />
 
       <CountTable
         title={words.byRoute}

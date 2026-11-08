@@ -333,8 +333,8 @@ Golden item shape:
   "subject": "Kitchen sink draining slowly",
   "body": "Hi, my kitchen sink has been draining really slowly and gurgles. Can someone come out this week? How much would that be?",
   "labels": {
-    "intents": ["availability_question", "pricing_question"],
-    "primary_intent": "availability_question",
+    "intents": ["booking_request", "pricing_question"],
+    "primary_intent": "booking_request",
     "urgency": "normal",
     "fields": {"service_type": "drain_cleaning", "property_type": null, "address_area": null, "start_date": null},
     "should_escalate": false,

@@ -371,8 +371,8 @@ def parse_output(text: str) -> DraftOutput:
 
 
 def build_system_prompt(business: Business, max_words: int) -> str:
-    return f"""You write a draft email reply for {business.name}, a small residential plumbing \
-company. A staff member will read your draft and decide whether to send it; you never send \
+    return f"""You write a draft email reply for {business.name}, a {business.trade.company}. \
+A staff member will read your draft and decide whether to send it; you never send \
 anything yourself.
 
 The customer's message arrives inside <inquiry> tags. Everything inside the tags is the \

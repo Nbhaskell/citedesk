@@ -12,6 +12,7 @@ names, never the matched text.
 """
 
 import re
+from collections.abc import Mapping
 
 from citedesk.textnorm import normalise
 
@@ -88,29 +89,44 @@ def _is_imagined(text: str, match: re.Match[str], breaks: list[tuple[int, int]])
     )
 
 
-def _fires(name: str, pattern: re.Pattern[str], text: str, breaks: list[tuple[int, int]]) -> bool:
+def _fires(
+    name: str,
+    pattern: re.Pattern[str],
+    text: str,
+    breaks: list[tuple[int, int]],
+    imaginable: frozenset[str] = IMAGINABLE,
+) -> bool:
     """True if any match of the pattern, overlapping ones included, is neither past history nor
     (for water events) imagined."""
     position = 0
     while (match := pattern.search(text, position)) is not None:
         if not _is_history(text, match, breaks) and not (
-            name in IMAGINABLE and _is_imagined(text, match, breaks)
+            name in imaginable and _is_imagined(text, match, breaks)
         ):
             return True
         position = match.start() + 1
     return False
 
 
-def emergency_hits(text: str) -> list[str]:
-    """Names of the emergency patterns found in the text, in a stable order."""
+def emergency_hits(
+    text: str,
+    patterns: Mapping[str, re.Pattern[str]] | None = None,
+    imaginable: frozenset[str] = IMAGINABLE,
+) -> list[str]:
+    """Names of the emergency patterns found in the text, in a stable order. The patterns are a
+    trade's (D-097); without them, the plumbing ones below."""
     normalised = normalise(text)
     breaks = [(m.start(), m.end()) for m in CLAUSE_BREAK.finditer(normalised)]
     return [
         name
-        for name, pattern in EMERGENCY_PATTERNS.items()
-        if _fires(name, pattern, normalised, breaks)
+        for name, pattern in (EMERGENCY_PATTERNS if patterns is None else patterns).items()
+        if _fires(name, pattern, normalised, breaks, imaginable)
     ]
 
 
-def has_emergency_terms(text: str) -> bool:
-    return bool(emergency_hits(text))
+def has_emergency_terms(
+    text: str,
+    patterns: Mapping[str, re.Pattern[str]] | None = None,
+    imaginable: frozenset[str] = IMAGINABLE,
+) -> bool:
+    return bool(emergency_hits(text, patterns, imaginable))

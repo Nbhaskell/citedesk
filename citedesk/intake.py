@@ -26,6 +26,7 @@ from citedesk.db import transaction, utc_now
 from citedesk.models import Channel, InquiryStatus
 from citedesk.screening import screen
 from citedesk.textnorm import normalise
+from citedesk.trade import load_trade
 
 MAX_IMPORT_RECORDS = 5000
 FUTURE_SKEW = timedelta(minutes=5)
@@ -183,7 +184,12 @@ def submit(
         raise InvalidInquiry("received_at is in the future")
 
     try:
-        outcome = screen(inquiry.subject, inquiry.body, spam_threshold=settings.spam_threshold)
+        outcome = screen(
+            inquiry.subject,
+            inquiry.body,
+            spam_threshold=settings.spam_threshold,
+            trade=load_trade(settings.business_facts_path),
+        )
     except Exception as error:
         raise IntakeFailure("screening failed, so nothing was stored") from error
 

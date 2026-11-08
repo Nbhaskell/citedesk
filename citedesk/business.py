@@ -8,6 +8,8 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
+from citedesk.trade import PLUMBING, Trade, trade_of_facts
+
 
 @dataclass(frozen=True)
 class Business:
@@ -15,6 +17,7 @@ class Business:
     phone: str
     emergency_phone: str
     email: str
+    trade: Trade = PLUMBING
 
     @property
     def trusted_text(self) -> str:
@@ -32,4 +35,5 @@ def load_business(path: Path) -> Business:
         phone=str(details["phone"]),
         emergency_phone=str(details["emergency_phone"]),
         email=str(details["email"]),
+        trade=trade_of_facts(data),
     )

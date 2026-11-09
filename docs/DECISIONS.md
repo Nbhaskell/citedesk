@@ -941,3 +941,14 @@ No measure fell. The intent figure in D-074 (84.6%, 104 of 123) came from a run 
 - Kestrel Hollow Plumbing is unchanged where the model or the customer could see it: the fingerprint of the prompts, schemas, screening, safety net, spam scores and retrieval questions for 211 items is identical to phase A, except the list of internal words that the non-blocking `STRUCTURE` check flags in drafts, which now also holds the five new service-type names. Regenerating the plumbing documents changes no byte of `universe/`.
 
 **Limits.** The electrical emergency terms were written by the same session that wrote the tests for them, so the tests show the intent, not a recall rate; phase C's labelled set is the first measure. The labelling rules (`eval/golden/README.md`) and the golden tools still assume one universe; phase C extends them. No model run has used the electrical business yet.
+
+### D-099. A second trade, phase C prepared: named golden sets, and a brief for a blind writer
+**Why.** The golden tools validated every label against `universe/docs` and the plumbing service types only, so a labelled set for the invented electrician could not be built. The set itself is to be written by a separate session that is blind to the system (D-097), so the tools and the brief come first, here.
+
+**What changed.**
+- `tools/golden.py`: a `GoldenSet` names where a set's items, built file and documents are, which splits it may hold, and its trade. `kestrel` is the existing set, unchanged and the default; `fernhollow` is `eval/golden-electrical/` against `universe-electrical/docs`, held-out items only (it is never used to change the system). `build`, `validate` and `report` take `--set`. The validator also refuses a `service_type` that is not one of the set's trade (D-098). The plumbing set rebuilds byte for byte.
+- `eval/golden-electrical/README.md`: the brief for the writing session. It may read the labelling rules, the schema names, and the electrician's fact sheet and documents; it may not open the code, the tests, the plumbing items the system was tuned on, the decisions, the reports or the runs, and it runs no model. It says how the labelling rules apply to an electrician, and asks for about 80 items with a mix close to the plumbing held-out split (about half escalating, at least 10 safety items, including buried ones, and near misses), and real-looking writing.
+- `tools/check_personal_info.py`: the new set's source items are excluded, as the plumbing ones are.
+- Tests: `tests/test_golden_sets.py` (6).
+
+**Limits.** The writing session is the same model family as the one that wrote the system, so the set is unseen and blind to the prompts, not independent of the author. The brief's mix targets were chosen here, which shapes the set; they are stated so they can be read beside the results.

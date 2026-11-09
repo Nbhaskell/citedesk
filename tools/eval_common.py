@@ -17,12 +17,15 @@ from typing import Any
 from urllib.parse import urlparse
 
 from citedesk.providers.ollama import LOOPBACK_HOSTS
-from tools.golden import GOLDEN_FILE, REPO_ROOT, SEALED_FILE
+from tools.golden import GOLDEN_FILE, REPO_ROOT, SEALED_FILE, SETS
 
 RUNS_DIR = REPO_ROOT / "eval/runs"
 REPORTS_DIR = REPO_ROOT / "eval/reports"
 LEDGER_FILE = REPO_ROOT / "eval/heldout_ledger.json"
 SEALED_LEDGER_FILE = REPO_ROOT / "eval/sealed_ledger.json"
+# The invented electrician's set (D-099, D-100) is a locked held-out set with its own ledger.
+FERNHOLLOW_LEDGER_FILE = REPO_ROOT / "eval/fernhollow_ledger.json"
+GOLDEN_SETS = tuple(SETS)
 SPLITS = ("tuned", "heldout", "sealed")
 LOCKED_SPLITS = ("heldout", "sealed")
 
@@ -30,6 +33,7 @@ LOCKED_SPLITS = ("heldout", "sealed")
 IGNORED_FOR_DIRTY = (
     "eval/heldout_ledger.json",
     "eval/sealed_ledger.json",
+    "eval/fernhollow_ledger.json",
     "eval/runs/",
     "eval/reports/",
 )
@@ -49,9 +53,20 @@ def select_split(golden: dict[str, Any], split: str) -> list[dict[str, Any]]:
     return [item for item in golden["items"] if item["split"] == split]
 
 
-def golden_file_for(split: str) -> Path:
-    """The file the labels of a split are in: the sealed set is kept apart (D-071)."""
+def golden_file_for(split: str, golden_set: str = "kestrel") -> Path:
+    """The file the labels of a split are in: the sealed set is kept apart (D-071), and a named
+    set other than the plumber's has its own file and held-out items only (D-100)."""
+    if golden_set != "kestrel":
+        target = SETS[golden_set]
+        if split not in target.splits:
+            raise ValueError(f"the {golden_set} set has only held-out items, not {split!r}")
+        return target.golden_file
     return SEALED_FILE if split == "sealed" else GOLDEN_FILE
+
+
+def ledger_file_for(golden_set: str) -> Path:
+    """The ledger of a set's held-out runs."""
+    return FERNHOLLOW_LEDGER_FILE if golden_set == "fernhollow" else LEDGER_FILE
 
 
 def split_sha256(items: Iterable[dict[str, Any]]) -> str:

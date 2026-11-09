@@ -723,8 +723,8 @@ def load_pass(path: Path, golden: dict[str, Any]) -> dict[str, Any]:
 
 def golden_for_run(path: Path) -> Path:
     """The file holding the labels of the split a saved run was made on."""
-    split = json.loads(path.read_text("utf-8"))["header"]["split"]
-    return ec.golden_file_for(str(split))
+    header = json.loads(path.read_text("utf-8"))["header"]
+    return ec.golden_file_for(str(header["split"]), str(header.get("golden_set") or "kestrel"))
 
 
 def main(argv: list[str]) -> int:

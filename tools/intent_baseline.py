@@ -230,10 +230,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--golden", type=Path, default=GOLDEN_FILE)
     parser.add_argument("--run", type=Path, action="append", default=[])
     parser.add_argument("--md", type=Path)
+    parser.add_argument(
+        "--test-golden",
+        type=Path,
+        help="score on the held-out items of another file, such as another business's set; "
+        "training stays on --golden's tuned items (D-100)",
+    )
     args = parser.parse_args(argv)
 
     items = json.loads(args.golden.read_text(encoding="utf-8"))["items"]
     train, test = split_items(items)
+    if args.test_golden:
+        _, test = split_items(json.loads(args.test_golden.read_text(encoding="utf-8"))["items"])
     result: dict[str, Any] = {"n_train": len(train), "n_test": len(test)}
     for name, kind in (("Majority", Majority), ("Naive Bayes", NaiveBayes)):
         result[name] = {

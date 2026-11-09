@@ -136,3 +136,15 @@ def test_the_report_holds_ids_and_counts_but_no_message_text(tmp_path: Path) -> 
     text = report.read_text(encoding="utf-8")
     assert marker not in text
     assert "Naive Bayes" in text and "Majority" in text
+
+
+def test_the_test_items_can_come_from_another_file(tmp_path: Path) -> None:
+    train_file, test_file = tmp_path / "train.json", tmp_path / "test.json"
+    train = [*TRAIN, item("h0", "spam", "ignored held-out", "heldout")]
+    test = [item("x1", "pricing_question", "how much for this", "heldout")]
+    train_file.write_text(json.dumps({"header": {}, "items": train}), encoding="utf-8")
+    test_file.write_text(json.dumps({"header": {}, "items": test}), encoding="utf-8")
+    report = tmp_path / "report.md"
+    assert ib.main(["--golden", str(train_file), "--test-golden", str(test_file),
+                    "--md", str(report)]) == 0  # fmt: skip
+    assert "scored once on the held-out split (1 items)" in report.read_text(encoding="utf-8")

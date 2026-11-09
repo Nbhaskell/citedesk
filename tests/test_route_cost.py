@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 from tools import route_cost as rc
+from tools.golden import file_hash
 
 
 def labels(route: str, reasons: list[str] | None = None) -> dict:
@@ -102,6 +103,52 @@ def test_items_missing_from_the_run_are_refused() -> None:
 def test_a_sealed_item_is_refused() -> None:
     with pytest.raises(ValueError, match="sealed"):
         rc.labels_for([{"id": "x", "split": "sealed", "labels": labels("archive")}], "sealed")
+
+
+def _ledger(passes: int, completed: int) -> dict:
+    runs = [{"status": "completed" if n < completed else "running"} for n in range(passes)]
+    return {"evaluations": [{"passes_declared": passes, "runs": runs}]}
+
+
+def test_a_sealed_set_is_spent_only_when_every_declared_pass_completed() -> None:
+    assert rc.is_spent(_ledger(3, 3))
+    assert not rc.is_spent(_ledger(3, 2))
+    assert not rc.is_spent({"evaluations": []})
+
+
+def _fake_sealed_set(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, completed: int) -> Path:
+    items = [{"id": "a", "split": "sealed", "body": "x", "labels": labels("escalate")}]
+    sealed = tmp_path / "sealed.json"
+    sealed.write_text(json.dumps({"header": {}, "items": items}), encoding="utf-8")
+    hash_file = tmp_path / "sealed.sha256"
+    hash_file.write_text(file_hash(sealed), encoding="utf-8")
+    ledger = tmp_path / "ledger.json"
+    ledger.write_text(json.dumps(_ledger(3, completed)), encoding="utf-8")
+    monkeypatch.setattr(rc, "sealed_files_for", lambda name: (sealed, hash_file))
+    monkeypatch.setattr(rc, "sealed_ledger_file_for", lambda name: ledger)
+    run = tmp_path / "x.run.json"
+    run.write_text(json.dumps({"items": [{"id": "a", "route": "escalate"}]}), encoding="utf-8")
+    return run
+
+
+def test_a_spent_sealed_set_can_be_costed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    run = _fake_sealed_set(tmp_path, monkeypatch, completed=3)
+    report = tmp_path / "r.md"
+    assert rc.main(["--sealed-set", "kestrel-2", "--md", str(report), str(run)]) == 0
+    assert "sealed (kestrel-2, spent)" in report.read_text(encoding="utf-8")
+
+
+def test_a_sealed_set_before_its_run_finished_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    run = _fake_sealed_set(tmp_path, monkeypatch, completed=2)
+    assert rc.main(["--sealed-set", "kestrel-2", str(run)]) == 2
+
+
+def test_a_changed_sealed_file_is_refused(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    run = _fake_sealed_set(tmp_path, monkeypatch, completed=3)
+    (tmp_path / "sealed.sha256").write_text("0" * 64, encoding="utf-8")
+    assert rc.main(["--sealed-set", "kestrel-2", str(run)]) == 2
 
 
 def test_the_report_holds_ids_and_counts_but_no_message_text(tmp_path: Path) -> None:

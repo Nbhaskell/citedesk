@@ -1097,3 +1097,28 @@ The pictures in `docs/screenshots/` predated two screen changes: the "How good t
 **Caveats.** The items and labels were written by a separate session that did not see the code, prompts or results (D-104); that session read one side-session hand-over note about the first electrician set (D-105). The documents and labelling rules were written by the system's author. Counts per reason are small. A fixed seed gives little spread (1 item moved route between passes). The route cost was not computed: `tools.route_cost` does not accept sealed labels.
 
 **Next.** The set is spent. Any further change to the plumbing system needs a fresh set before it can be claimed.
+
+### D-109. Spent sealed sets can be costed, and who caught the electrician's safety items
+**Route cost on a spent sealed set.** `tools.route_cost --sealed-set NAME` reads a sealed set's labels only when its ledger records the one run with every declared pass completed and the file matches its committed hash; before that it refuses, as D-071 requires. Costs are the assumptions of D-094.
+
+| Set | Routing, cost per 100 (3 passes) | Escalate everything | Break-even cost of a missed escalation |
+|---|---|---|---|
+| First sealed set (`kestrel`, D-087) | 161, 171, 171 | 157 | 17.6 to 19.2 (assumed 20) |
+| Second sealed set (`kestrel-2`, D-108) | 66, 81, 66 | 188 | 68.3 to 102.5 |
+| Electrician's sealed set (`fernhollow-2`, D-107) | 519, 536, 526 | 181 | none: the five missed safety messages alone cost more |
+
+On the second sealed set the plumbing system costs less than escalating everything under these costs. That is the first unseen result where it does. The sets differ in mix (D-108).
+
+**Who flagged the safety items.** The run files already record whether the keyword net fired on each item the model read; the report now prints, per pass, how many safety items were flagged by the model, the net, both or neither. On `fernhollow-2` it is the same in every pass: both 11, model only 5, net only 7, neither 6 (of 29). On `kestrel-2`: both 9, model only 7.
+
+**What the D-106 terms added.** On the spent `fernhollow-2` set, run with counts only: the terms before D-106 fire on 10 of 29 safety items, the D-106 terms on 18; both fire on 2 of the 84 other items. Only 1 safety item per pass was escalated because of the new terms alone (the model missed it and the old terms did not fire). Without D-106 the result would have been 22 of 29, not 23.
+
+**The six misses** (the set is spent, so they were read). The kinds of wording that neither the model nor the terms caught:
+- a service wire "from the pole to our house" pulled down and lying across the yard;
+- "scorching at the terminal" of a breaker, quoted from a home inspector inside a request for a quote;
+- a switch "crackling" with a plate that "feels warm", inside a reply to an earlier email;
+- an outlet with its cover off where "you can see the screws and the wires behind it";
+- water "coming through the ceiling light";
+- "a little blue flash and a pop" and "a black mark" on a plug, told in the past tense with "no rush".
+
+The model read all six as a price, booking or service question. Changes made from these are development figures: there is no unseen electrician set left to judge them.

@@ -17,6 +17,7 @@
 | `route-cost-heldout.md`, `route-cost-tuned.md` | Route errors weighted by an assumed cost in a person's minutes, next to escalating everything and drafting everything, with a break-even figure (D-094) |
 | `fernhollow-run.md` | The invented electrician's set (83 held-out items, written by a separate session): three passes of the final system, scored one by one, then the spread. The run is in `eval/fernhollow_ledger.json` (D-100) |
 | `sealed-v2-run.md` | The plumber's second sealed set `kestrel-2` (136 items, written by a blind session): three passes of the system at `0672de1`. The run is in `eval/sealed_v2_ledger.json` (D-108) |
+| `route-cost-sealed.md`, `route-cost-sealed-v2.md`, `route-cost-fernhollow-sealed.md` | The route cost of the three spent sealed sets, against escalating and drafting everything (D-109) |
 | `fernhollow-sealed-run.md` | The sealed electrician set `fernhollow-2` (113 items, written by a blind session before D-106): three passes of the system at `26baa46`. The run is in `eval/fernhollow_sealed_ledger.json` (D-107) |
 | `route-cost-fernhollow.md`, `intent-baseline-fernhollow.md` | The route cost and the intent baseline on the electrician's set; the baseline is trained on the plumbing tuned split (D-100) |
 

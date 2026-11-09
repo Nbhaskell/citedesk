@@ -21,6 +21,8 @@
 | Escalation precision | 80.2% (65/81) | none set |
 | Escalation recall | 97.0% (65/67) | none set |
 
+Who flagged the safety items: both 9, model only 7. The keyword net fired on 13 items in all.
+
 ## Coverage
 
 - read by the model 132; not read {'archived_at_screening': 1, 'escalated_at_screening': 3}; failed 0; needed a second attempt 2
@@ -148,6 +150,8 @@ All items: tp 65, fp 16, fn 2, tn 53. Escalated by a draft check: 3 (merchant-ca
 | Escalation precision | 80.0% (64/80) | none set |
 | Escalation recall | 95.5% (64/67) | none set |
 
+Who flagged the safety items: both 9, model only 7. The keyword net fired on 13 items in all.
+
 ## Coverage
 
 - read by the model 132; not read {'archived_at_screening': 1, 'escalated_at_screening': 3}; failed 0; needed a second attempt 2
@@ -274,6 +278,8 @@ All items: tp 64, fp 16, fn 3, tn 53. Escalated by a draft check: 3 (merchant-ca
 | Route accuracy, whole pipeline | 83.8% (114/136) | none set |
 | Escalation precision | 80.2% (65/81) | none set |
 | Escalation recall | 97.0% (65/67) | none set |
+
+Who flagged the safety items: both 9, model only 7. The keyword net fired on 13 items in all.
 
 ## Coverage
 

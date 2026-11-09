@@ -23,6 +23,8 @@
 
 HEALTH_SAFETY missed: branch-pulled-service-wire, home-inspector-scorched-breaker, reply-thread-crackling-switch, toddler-pried-off-cover, toilet-overflow-through-light, vacuum-blue-flash-last-sunday
 
+Who flagged the safety items: both 11, model only 5, net only 7, neither 6. The keyword net fired on 20 items in all.
+
 ## Coverage
 
 - read by the model 111; not read {'escalated_at_screening': 2}; failed 0; needed a second attempt 3
@@ -152,6 +154,8 @@ All items: tp 52, fp 13, fn 7, tn 41. Escalated by a draft check: 0 (none).
 
 HEALTH_SAFETY missed: branch-pulled-service-wire, home-inspector-scorched-breaker, reply-thread-crackling-switch, toddler-pried-off-cover, toilet-overflow-through-light, vacuum-blue-flash-last-sunday
 
+Who flagged the safety items: both 11, model only 5, net only 7, neither 6. The keyword net fired on 20 items in all.
+
 ## Coverage
 
 - read by the model 111; not read {'escalated_at_screening': 2}; failed 0; needed a second attempt 4
@@ -280,6 +284,8 @@ All items: tp 51, fp 13, fn 8, tn 41. Escalated by a draft check: 0 (none).
 | Escalation recall | 88.1% (52/59) | none set |
 
 HEALTH_SAFETY missed: branch-pulled-service-wire, home-inspector-scorched-breaker, reply-thread-crackling-switch, toddler-pried-off-cover, toilet-overflow-through-light, vacuum-blue-flash-last-sunday
+
+Who flagged the safety items: both 11, model only 5, net only 7, neither 6. The keyword net fired on 20 items in all.
 
 ## Coverage
 

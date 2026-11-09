@@ -480,6 +480,11 @@ def test_the_report_shows_counts_beside_rates() -> None:
     assert "HEALTH_SAFETY" in text and "n = 1" in text
 
 
+def test_the_report_says_who_flagged_the_safety_items() -> None:
+    assert "Who flagged the safety items:" in report_for()
+    assert "The keyword net fired on" in report_for()
+
+
 def test_the_report_says_what_it_cannot_tell_you() -> None:
     assert "What this cannot tell you" in report_for()
 

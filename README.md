@@ -136,19 +136,18 @@ Copy-Item .env.example .env
 
 **The web app's checks** (from `web\`, once `npm ci`): `npm run lint; npm run typecheck; npm test; npm run build`.
 
-**The demo** needs Ollama and rag-project running. Start rag-project on Citedesk's documents (how: [docs/knowledge-base-contract.md](docs/knowledge-base-contract.md)), index them, then:
+**The demo, in one command.** Start Ollama (with `qwen3:8b` and `embeddinggemma` pulled), install the web app once (`cd web; npm ci`), and have [rag-project](https://github.com/Nbhaskell/rag-project) set up in a folder next to this one (or pass `--rag-project <folder>`). Then:
 
 ```powershell
-.\.venv\Scripts\python.exe -m citedesk
+.\.venv\Scripts\python.exe -m tools.start
 ```
 
-In a second terminal, load a few invented inquiries, then start the web app:
+It checks Ollama, starts rag-project on the invented plumber's documents (indexing them the first time) or reuses one that already serves them, then starts the API and the web app, and stops what it started on Ctrl+C. `--business fernhollow` runs the invented electrician instead (D-098, D-102). Starting each part by hand is described in [docs/knowledge-base-contract.md](docs/knowledge-base-contract.md).
+
+In a second terminal, load a few invented inquiries:
 
 ```powershell
 .\.venv\Scripts\python.exe -m tools.import_inquiries --limit 8
-cd web
-npm ci
-npm run dev
 ```
 
 Open <http://127.0.0.1:5174>. The API is at <http://127.0.0.1:8100/api/status>. Each inquiry takes 25 to 45 seconds to read, retrieve, draft and check on the development machine.

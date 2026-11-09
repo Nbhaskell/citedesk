@@ -990,3 +990,19 @@ No measure fell. The intent figure in D-074 (84.6%, 104 of 123) came from a run 
 **Checked.** 15 backend tests (`tests/test_retention.py`): every table is emptied for the inquiry, the event holds no text, in-flight statuses are refused, duplicates are unlinked, the purge picks only closed inquiries past the period, the command and its refusals, the API answers and the cross-site refusal. A test writes a marker into a database file, deletes it and finds the marker in none of the files; it fails with `secure_delete` off. 5 web tests (asks first, can be called off, focus, failure, not offered while preparing). In the running app, on a copy of the demo database: the confirmation, the deletion, the return to the queue, a 404 for the deleted inquiry, the event row, and no trace of the deleted text in the database files.
 
 **Limits.** Deleting removes the inquiry from Insights counts too, so the figures describe the inquiries still kept. Copies of the database file (backups, the evaluation run files in `eval/runs/`) are outside this code. There is no undo and no "deleted by" field: the app has one local user.
+
+### D-102. The whole demo in one command
+**Why.** Running the demo took four programs started by hand in the right order, with rag-project given four environment variables, and nothing stopped a rag-project indexed on one business from serving the other's API (D-098 added a second business).
+
+**What was built.** `python -m tools.start [--business kestrel|fernhollow] [--rag-project PATH] [--no-web]`, plain Python with no new dependency:
+1. Checks that Ollama answers and has the chat model and `embeddinggemma`. It does not start Ollama, which is a system service.
+2. If rag-project answers on 127.0.0.1:8000, it is reused only when its passages hold the chosen business's phone or email (the runner's check from D-100); otherwise the command stops and says why. If it does not answer, it is started from its folder (`--rag-project`, then `RAG_PROJECT_DIR`, then a `rag-project` folder next to this repository) with that business's documents, its own index folder (`data/kb_index` or `data/kb_index_electrical`), `RAG_LOG=0` and `RAG_WATCH=0`, and indexed if the index is empty.
+3. Starts the API with that business's fact sheet. If something already answers on the API's port, the command stops: it cannot tell which business that API was started for.
+4. Starts the web app (`npm run dev`), after checking `npm ci` was run.
+5. Ctrl+C stops what the command started, newest first, and nothing it found running; on Windows each service is stopped with its process tree (`taskkill /T`), because npm starts node. If a started service exits on its own, the rest are stopped.
+
+**Checked.** 10 unit tests (`tests/test_start.py`) for the plain decisions: each business's paths, rag-project's environment (logging off), the API's fact sheet, finding rag-project, its virtual environment, npm and stopping per platform, the model check, the waiting loop, and that a failed first step starts nothing. Live on the development machine: with rag-project serving the electrician, the default (plumber) start refused; `--business fernhollow` reused it and started the API and the web app, and `/api/status` answered through the web app's proxy; killing the API stopped the web app and left the reused rag-project running; from cold, the plumber start launched rag-project on `universe/docs`, checked its passages, and started the API and the web app.
+
+**Not checked.** The Ctrl+C path was not pressed in a console; the live runs were stopped by ending the process tree, after which all three services were down. The first-time indexing path was not run live (both indexes existed). macOS and Linux are untested.
+
+**Limits.** Both businesses use the same database file (`CITEDESK_DB_PATH`), so inquiries loaded for one are drafted with the other's facts if the business is switched. Ollama must be started separately.

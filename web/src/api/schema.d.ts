@@ -846,7 +846,7 @@ export interface components {
          * ServiceType
          * @enum {string}
          */
-        ServiceType: "emergency_repair" | "drain_cleaning" | "leak_repair" | "sewer_line_repair" | "water_heater" | "fixture_installation" | "inspection" | "other" | "unknown";
+        ServiceType: "emergency_repair" | "drain_cleaning" | "leak_repair" | "sewer_line_repair" | "water_heater" | "fixture_installation" | "inspection" | "panel_upgrade" | "outlet_and_switch" | "lighting_installation" | "ev_charger_installation" | "wiring_repair" | "other" | "unknown";
         /** SettingsView */
         SettingsView: {
             business: components["schemas"]["BusinessOut"] | null;

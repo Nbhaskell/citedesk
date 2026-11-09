@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any
 
 from citedesk.models import ServiceType
-from citedesk.safety import EMERGENCY_PATTERNS, IMAGINABLE
+from citedesk.safety import ELECTRICAL_EMERGENCY_PATTERNS, EMERGENCY_PATTERNS, IMAGINABLE
 
 
 @dataclass(frozen=True)
@@ -86,7 +86,51 @@ PLUMBING = Trade(
     ),
 )
 
-TRADES: Mapping[str, Trade] = {PLUMBING.key: PLUMBING}
+ELECTRICAL = Trade(
+    key="electrical",
+    company="small residential electrical company",
+    service_type_gloss=(
+        "emergency_repair (an emergency call-out), panel_upgrade (replacing or upgrading the "
+        "breaker panel or the electrical service), outlet_and_switch (repairing, adding or "
+        "replacing outlets and switches), lighting_installation (light fixtures, ceiling fans, "
+        "outdoor lighting), ev_charger_installation (a charger for an electric car), "
+        "wiring_repair (finding faults, breakers that trip, rewiring), inspection, other (any "
+        "other electrical work), or unknown."
+    ),
+    service_labels={
+        ServiceType.emergency_repair: "emergency electrical repair",
+        ServiceType.panel_upgrade: "a panel upgrade",
+        ServiceType.outlet_and_switch: "outlet and switch work",
+        ServiceType.lighting_installation: "lighting installation",
+        ServiceType.ev_charger_installation: "EV charger installation",
+        ServiceType.wiring_repair: "wiring repair and troubleshooting",
+        ServiceType.inspection: "an electrical inspection",
+        ServiceType.other: "electrical repair",
+        ServiceType.unknown: None,
+    },
+    generic_work="electrical work",
+    safety_examples=(
+        "a burning smell, sparks or smoke from an outlet, switch, panel or fixture, an electric "
+        "shock, exposed live wires, an outlet or switch that is hot to the touch, a power line "
+        "down, water near electrics, a gas smell or carbon monoxide, or any other risk to people "
+        "or property that is happening now"
+    ),
+    high_urgency_examples=(
+        'no power to part of the home, a breaker that keeps tripping, "as soon as possible", '
+        '"today", or an angry customer'
+    ),
+    emergency_patterns=ELECTRICAL_EMERGENCY_PATTERNS,
+    # Nothing electrical is discounted as imagined: a customer who asks what to do if an outlet
+    # sparks should still be looked at.
+    imaginable=frozenset(),
+    business_words=re.compile(
+        r"electric|outlet|socket|switch|breaker|panel|wir(?:e|es|ing)|light|lamp|fixture|"
+        r"circuit|volt|\bamps?\b|charger|\bev\b|power|fuse|\bfan\b|smoke (?:alarm|detector)|"
+        r"\bgfci\b|repair|install|appointment|warranty|invoice|receipt|emergency"
+    ),
+)
+
+TRADES: Mapping[str, Trade] = {PLUMBING.key: PLUMBING, ELECTRICAL.key: ELECTRICAL}
 
 
 def trade_named(key: str) -> Trade:

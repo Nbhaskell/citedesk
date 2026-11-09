@@ -279,9 +279,9 @@ COMMITMENT_PATTERNS: Mapping[str, re.Pattern[str]] = {
         r"|\b(?:we )?(?:have|got) you (?:down|booked|scheduled|in) for\b"
         r"|\byou(?:'re|’re| are) all set\b"
         # someone will come, with a time: "a technician will come to check" names no time
-        r"|\b(?:(?:a|an|our|the) (?:technician|plumber|tech|engineer) will "
+        r"|\b(?:(?:a|an|our|the) (?:technician|plumber|electrician|tech|engineer) will "
         r"(?:be there|be with you|come|arrive|see you|be out)"
-        r"|we(?:'ll|’ll| will) send (?:a |an |our )?(?:technician|plumber|tech|engineer"
+        r"|we(?:'ll|’ll| will) send (?:a |an |our )?(?:technician|plumber|electrician|tech|engineer"
         r"|someone|somebody)(?: out| over| round)?)"
         r"(?: \w+){0,3} (?:on|at|by|tomorrow|today|tonight|this|next)\b"
     ),

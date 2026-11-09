@@ -1,0 +1,120 @@
+{
+  "_comment": "SYNTHETIC TEST DATA. Single source of truth for the second invented business, an electrician in the same invented town as Kestrel Hollow Plumbing. Every document is derived from this file. Nothing here is real.",
+  "schema_version": 1,
+  "synthetic": true,
+  "business": {
+    "name": "Fernhollow Electric",
+    "trade": "electrical",
+    "type": "residential electrical service",
+    "address": "9 Copperleaf Row, Alderbrook (invented street and town)",
+    "phone": "555-0181",
+    "emergency_phone": "555-0182",
+    "email": "fernhollow@example.com",
+    "website": "none (inquiries arrive by web form and email)",
+    "currency": "USD",
+    "credentials": "Licensed and insured electrical contractor (invented credentials)",
+    "customers": "Homes and small residential buildings of up to 4 units"
+  },
+  "staff": [
+    {"name": "Imogen Halloway", "role": "Owner and master electrician", "handles": "complaints, refunds and disputes, policy exceptions, landlord and property-manager accounts, supplier and partnership offers"},
+    {"name": "Teodor Briggs", "role": "Office manager and dispatcher", "handles": "scheduling, availability, rescheduling, invoices, permits"},
+    {"name": "Priya Castellan", "role": "Lead electrician", "handles": "on-site work, inspections"},
+    {"name": "Martin Oyelaran", "role": "Electrician", "handles": "on-site work"}
+  ],
+  "services_offered": [
+    {"name": "Emergency electrical repair", "service_type": "emergency_repair", "pricing": "emergency call-out fee plus hourly labour and parts"},
+    {"name": "Panel upgrade", "service_type": "panel_upgrade", "pricing": "quote only, after a site visit"},
+    {"name": "Outlet and switch work", "service_type": "outlet_and_switch", "pricing": "flat price"},
+    {"name": "Lighting and ceiling fan installation", "service_type": "lighting_installation", "pricing": "flat price for a standard fixture or fan; new circuits are quote only"},
+    {"name": "EV charger installation", "service_type": "ev_charger_installation", "pricing": "flat price for a standard installation; longer runs are quote only"},
+    {"name": "Wiring repair and troubleshooting", "service_type": "wiring_repair", "pricing": "hourly labour plus parts"},
+    {"name": "Electrical inspection", "service_type": "inspection", "pricing": "flat price"},
+    {"name": "General electrical repair", "service_type": "other", "pricing": "hourly labour plus parts, with a written estimate over $400"}
+  ],
+  "service_area": {
+    "core": ["Alderbrook Heights", "Millrace", "Saltmarsh", "Tamarind Park", "Wren Common"],
+    "outer": {"areas": ["Dunmore Flats", "Old Quarry"], "travel_fee": 35},
+    "not_served": "Anywhere else"
+  },
+  "hours": {
+    "office": {
+      "monday_to_friday": {"open": "08:00", "close": "17:30"},
+      "saturday": {"open": "09:00", "close": "12:00"},
+      "sunday": "closed"
+    },
+    "scheduled_visits": {
+      "monday_to_friday": {"first_arrival": "08:30", "last_arrival": "15:30"},
+      "saturday": {"first_arrival": "09:00", "last_arrival": "11:00"},
+      "arrival_windows_hours": 3,
+      "courtesy_call_minutes_before": 20
+    },
+    "emergency_line": "Answered 24 hours a day, every day including holidays",
+    "closed_dates": [
+      {"date": "2026-11-26", "name": "Thanksgiving Day"},
+      {"date": "2026-12-24", "name": "Christmas Eve"},
+      {"date": "2026-12-25", "name": "Christmas Day"},
+      {"date": "2027-01-01", "name": "New Year's Day"}
+    ],
+    "closed_dates_note": "The office and scheduled visits are closed on these dates. The emergency line still answers and after-hours emergency pricing applies."
+  },
+  "pricing": {
+    "call_out_fee": {"price": 95, "note": "Covers travel and diagnosis. Credited toward the work if the customer approves it during the same visit."},
+    "emergency_call_out_fee": {"price": 195, "applies": "Emergency visits, and any visit outside scheduled-visit hours, on Sundays or on closed dates. Replaces the standard call-out fee."},
+    "labour": {"price_per_hour": 125, "billing": "30-minute increments after the first hour, minimum 1 hour", "excludes": "parts"},
+    "parts": {"note": "Priced on the written estimate. Parts carry sales tax; labour does not.", "parts_sales_tax_rate": 0.07},
+    "flat_price_jobs": [
+      {"job": "Outlet or switch replacement, each", "service_type": "outlet_and_switch", "price": 120},
+      {"job": "GFCI outlet installation, each", "service_type": "outlet_and_switch", "price": 165, "note": "For kitchens, bathrooms, laundry rooms and outdoor outlets"},
+      {"job": "Dimmer switch installation, each", "service_type": "outlet_and_switch", "price": 140},
+      {"job": "Light fixture installation, customer supplies the fixture", "service_type": "lighting_installation", "price": 175, "price_note": "starting price"},
+      {"job": "Ceiling fan installation on an existing fixture box, customer supplies the fan", "service_type": "lighting_installation", "price": 225},
+      {"job": "Level 2 EV charger installation, up to 25 feet from the panel, customer supplies the charger", "service_type": "ev_charger_installation", "price": 850, "note": "Includes the permit"},
+      {"job": "Whole-home electrical inspection with written summary", "service_type": "inspection", "price": 265, "note": "About 2 hours. Summary sent within 2 business days."},
+      {"job": "Hardwired smoke or carbon monoxide alarm replacement, each", "service_type": "other", "price": 95}
+    ],
+    "quote_only": ["Panel upgrade (100 to 200 amps)", "Subpanel installation", "Whole-home rewiring", "New circuits", "EV charger installation more than 25 feet from the panel", "Generator transfer switch installation"],
+    "written_estimate_required_over": 400,
+    "discounts": "None offered. No senior, military, repeat-customer or price-match discounts.",
+    "payment": {"methods": ["card", "check", "cash"], "when": "On completion of the visit", "invoice": "Emailed the same day", "late_fee_percent_per_month": 1.5, "late_fee_after_days": 30}
+  },
+  "emergencies": {
+    "definition": "Sparks, smoke or a burning smell from an outlet, switch, panel or fixture, an electric shock, exposed live wires, an outlet or switch that is hot to the touch, or water reaching wiring or the panel.",
+    "response": "Electrician dispatched through the emergency line, usually within 2 hours (not guaranteed).",
+    "urgent_not_emergency": "No power to part of the home, a breaker that keeps tripping, and an outlet that has stopped working are booked as the next available visit, same day if requested before 12:00 and there is room.",
+    "standard_lead_time": "Standard appointments are usually 3 to 5 business days out; staff confirm the exact day."
+  },
+  "safety_instructions": {
+    "_note": "The only advice staff may give in a reply. Anything beyond this goes to a person.",
+    "sparks_or_burning": "If it is safe to reach, switch off the breaker for that circuit or the main breaker. Do not touch the outlet, switch or wires. If there is fire or smoke that will not stop, leave the building and call 911.",
+    "shock": "Do not touch a person who is still in contact with the source. Switch off the power if it is safe to do so, and call 911 if anyone is hurt.",
+    "downed_line": "Stay at least 30 feet away and call the power utility's emergency number or 911. Fernhollow Electric does not work on utility lines.",
+    "water_and_electrics": "Do not touch the panel, switches or outlets while standing in water. Stay out of the wet area and call the emergency line.",
+    "gas_smell": "Leave the building at once. Do not use switches, lighters or phones inside. Call the gas utility's emergency number or 911 from outside.",
+    "carbon_monoxide_alarm": "Leave the building and call 911."
+  },
+  "policies": {
+    "reschedule_and_cancel": {
+      "free_with_notice_hours": 24,
+      "late_fee": 50,
+      "no_show_or_no_access": "The call-out fee of $95 is charged",
+      "emergency_cancelled_after_dispatch": "The emergency call-out fee of $195 is charged"
+    },
+    "warranty": {
+      "workmanship_months": 24,
+      "parts": "Covered by the manufacturer's warranty, not by Fernhollow Electric",
+      "voided_by": "Work altered or repaired by someone else"
+    },
+    "access": "An adult aged 18 or over must be present during the visit. The electrician needs clear access to the panel.",
+    "estimates": "No work over $400 starts without a written estimate the customer has approved.",
+    "permits": "Panel upgrades, EV chargers and new circuits need a permit. Fernhollow Electric applies for it, and the permit fee is included in the price or the quote.",
+    "refunds_and_disputes": "The call-out fee is not refundable but is credited to approved work. Complaints and disputes are reviewed by the owner. Staff cannot promise a refund, credit or discount in a reply.",
+    "insurance": "Fernhollow Electric can provide an itemised invoice and photos for an insurance claim. It does not file claims or give opinions on coverage.",
+    "power_outages": "If the whole street has no power, the outage is the power utility's to fix; call the utility first. Fernhollow Electric works on wiring inside the home and up to the meter.",
+    "communication": "No visit is confirmed until a staff member confirms it. A reply is never an automatic confirmation or a price guarantee.",
+    "not_offered": ["Plumbing", "Gas line or gas appliance work", "Heating and air conditioning", "Commercial or industrial buildings", "Solar panel installation", "Utility power lines", "Security cameras and home networking"]
+  },
+  "contact_rules": {
+    "booking_requires": ["service type", "preferred date", "property type", "neighbourhood or address area"],
+    "availability_note": "Live availability is not in the documents. Staff check the schedule before answering availability questions."
+  }
+}

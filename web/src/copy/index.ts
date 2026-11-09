@@ -211,6 +211,11 @@ export const service: Words<Schemas["ServiceType"]> = {
   water_heater: "Water heater",
   fixture_installation: "Fixture installation",
   inspection: "Inspection",
+  panel_upgrade: "Panel upgrade",
+  outlet_and_switch: "Outlets and switches",
+  lighting_installation: "Lighting installation",
+  ev_charger_installation: "EV charger installation",
+  wiring_repair: "Wiring repair",
   other: "Other work",
   unknown: "Not stated",
 };

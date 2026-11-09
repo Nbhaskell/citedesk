@@ -23,7 +23,7 @@ from typing import Any
 from citedesk import models, understand
 from citedesk.db import utc_now
 from citedesk.models import AuditEvent, AuditEventType, InquiryStatus, Stage
-from citedesk.safety import EMERGENCY_PATTERNS
+from citedesk.safety import ELECTRICAL_EMERGENCY_PATTERNS, EMERGENCY_PATTERNS
 from citedesk.screening import DERIVED_FLAGS, SPAM_SIGNALS, STRONG, WEAK
 
 KEY = re.compile(r"^[a-z][a-z0-9_]{0,40}$")
@@ -49,6 +49,7 @@ KNOWN_CODES: frozenset[str] = frozenset(
 KNOWN_CODES = (
     KNOWN_CODES
     | frozenset(EMERGENCY_PATTERNS)
+    | frozenset(ELECTRICAL_EMERGENCY_PATTERNS)
     | frozenset(STRONG)
     | frozenset(WEAK)
     | frozenset(SPAM_SIGNALS)

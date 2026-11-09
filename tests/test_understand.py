@@ -18,6 +18,7 @@ from citedesk.models import (
     Urgency,
 )
 from citedesk.providers import FakeLLM, LLMBadResponse, LLMResult, LLMTimeout, LLMUnavailable
+from citedesk.trade import TRADES
 from citedesk.understand import (
     PROMPT_VERSION,
     UnderstandFailed,
@@ -54,9 +55,15 @@ def test_the_prompt_version_is_recorded() -> None:
 
 def test_the_system_prompt_lists_every_value_the_model_may_use() -> None:
     prompt = build_system_prompt(RECEIVED)
-    for enum in (Intent, ServiceType, PropertyType):
+    for enum in (Intent, PropertyType):
         for member in enum:
             assert member.value in prompt, member
+    # the service types are the trade's own (D-098); each trade's prompt lists all of its own
+    for trade in TRADES.values():
+        own = build_system_prompt(RECEIVED, trade)
+        for member in trade.service_types:
+            assert member.value in own, (trade.key, member)
+    assert set().union(*(t.service_types for t in TRADES.values())) == set(ServiceType)
     for code in (
         ReasonCode.REFUND_OR_DISPUTE,
         ReasonCode.LEGAL_THREAT,

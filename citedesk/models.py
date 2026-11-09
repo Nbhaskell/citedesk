@@ -133,6 +133,12 @@ class ServiceType(StrEnum):
     water_heater = "water_heater"
     fixture_installation = "fixture_installation"
     inspection = "inspection"
+    # the electrical trade (D-098)
+    panel_upgrade = "panel_upgrade"
+    outlet_and_switch = "outlet_and_switch"
+    lighting_installation = "lighting_installation"
+    ev_charger_installation = "ev_charger_installation"
+    wiring_repair = "wiring_repair"
     other = "other"
     unknown = "unknown"
 

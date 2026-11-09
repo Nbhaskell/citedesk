@@ -531,6 +531,18 @@ def report_markdown(run: dict[str, Any], scores: dict[str, Any]) -> str:
     ]
     if safety["missed"]:
         lines += [f"HEALTH_SAFETY missed: {', '.join(safety['missed'])}", ""]
+    who = scores["safety_net"]["safety_items_by_who_caught_them"]
+    lines += [
+        "Who flagged the safety items: "
+        + ", ".join(
+            f"{name.replace('_', ' ')} {who[name]}"
+            for name in ("both", "model_only", "net_only", "escalated_before_the_model", "neither")
+            if who.get(name)
+        )
+        + f". The keyword net fired on {scores['safety_net']['items_the_net_fired_on']} items "
+        "in all.",
+        "",
+    ]
     c = esc["confusion"]
     lines += [
         "## Coverage",

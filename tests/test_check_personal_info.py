@@ -239,6 +239,11 @@ def test_first_person_outside_quotes_is_still_flagged() -> None:
     assert labels('The customer writes "my sink leaks". I measured the run.', "README.md") != []
 
 
+def test_a_word_inside_a_hyphenated_item_id_is_not_first_person() -> None:
+    assert labels("- route mistakes (1): is-my-visit-still-on-friday: escalate", "r.md") == []
+    assert labels("- the plan was mine-to-review, then my call.", "r.md") != []
+
+
 def test_invented_business_documents_are_skipped() -> None:
     assert is_excluded("universe/docs/faq.md")
     assert is_excluded("eval/golden/src/safety.json")

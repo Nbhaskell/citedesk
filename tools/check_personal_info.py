@@ -60,7 +60,8 @@ _PERSON_WORDING = re.compile(
 _FIRST_PERSON = re.compile(
     r"(?-i:\bI (?:[a-z]+ed|do|did|will|would|think|know|chose|decided|have|am|can|could|should"
     r"|believe|recommend|found|looked|ran|wrote|made)\b)"
-    r"|\bmy\b|\bmine\b|\bwe (?:chose|decided|will|should|did)\b",
+    # "my" inside a hyphenated item id (is-my-visit-still-on-friday) is a name, not the author.
+    r"|(?<![\w-])(?:my|mine)(?![\w-])|\bwe (?:chose|decided|will|should|did)\b",
     re.IGNORECASE,
 )
 # A user story keeps its first person: "As staff, I ..." is the persona speaking. The persona is

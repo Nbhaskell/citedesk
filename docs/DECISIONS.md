@@ -1158,3 +1158,27 @@ The model read all six as a price, booking or service question. Changes made fro
 - `fernhollow-3`: 129 items, valid; 71 should escalate, 36 `HEALTH_SAFETY`, 19 near misses. Hash `56aa5d9e3d5b761ed503324f49f8a823b714df64b89715b8d62b3bf71196e3c9` (`eval/golden-electrical/fernhollow_sealed_v2.sha256`).
 - Each was written by its own separate session from its brief (D-111). A check of each session's tool calls, by path only, found no file outside what its brief allows: the brief, the labelling rules and schema, `docs/BACKEND_SCHEMA.md`, `tools/golden.py`, its business's facts and documents, and its own folder. Each deleted its generator script and committed nothing.
 - Neither set has been run. The items stay in `data/` and are not read by any test or by the session that works on the system.
+
+### D-113. The electrician's second sealed set run once, and the result (2026-11-09)
+**What was run.** `fernhollow-3` (129 items, 36 with `HEALTH_SAFETY`; D-111, D-112), once, by the system at commit `29cb333` (the electrical terms of D-110), thinking on, rag-project indexed on `universe-electrical/docs` (81 chunks). Three passes were declared in `eval/fernhollow_sealed_v2_ledger.json` before the first item; all three finished with 0 failed items. Nothing was changed afterwards. Reports: `eval/reports/fernhollow-sealed-v2-run.md`, `eval/reports/route-cost-fernhollow-sealed-v2.md`.
+
+**Result** (targets fixed in D-071):
+
+| Measure | Per pass | Target |
+|---|---|---|
+| `HEALTH_SAFETY` escalation recall | 35 of 36 in every pass | no misses: **missed** |
+| Primary-intent accuracy | 66.4%, 67.2%, 66.4% | 85%: missed |
+| Route accuracy, whole pipeline | 79.8%, 82.2%, 80.6% | none set |
+| Escalation precision | 78.6%, 81.0%, 80.5% | none set |
+| Escalation recall | 93.0%, 95.8%, 93.0% | none set |
+| Route cost per 100 (escalate everything: 171) | 188, 152, 183 | none set |
+
+- One safety message was missed in every pass: `shower-faucet-tingle` (routed to a request for details). Neither the model nor the terms flagged it.
+- Who flagged the 36 safety items: the model and the terms 19 or 20, the model only 6, the terms only 9 or 10, neither 1.
+- **What the D-110 terms added** (counts only, against the D-106 terms on the same items): the terms fire on 29 of 36 safety items (D-106: 23) and on 5 of 93 other items (D-106: the same 5, no new ones). In 3 or 4 safety items per pass the message was escalated only because of the D-110 terms (the model did not flag it and the D-106 terms did not fire). Without them the result would have been about 31 or 32 of 36.
+- Route cost is close to escalating everything: 152 to 188 against 171. The break-even cost of a missed escalation is 14.2 to 32.0 (assumed 20).
+- 18 messages were escalated that need not be; 0 of the near misses were flagged as injection; no injection got through.
+
+**Caveats.** The set's items and labels were written by a separate blind session (D-112); the brief was written by the session that knows the earlier results, but named no emergency wording (D-111). Counts per reason are small; 35 of 36 is compatible with a true miss rate of up to about 14%. A fixed seed gives little spread (0 items moved safety between passes).
+
+**Next.** The set is spent. The D-110 terms are now measured on unseen wording; the remaining miss and any change made from it would be development figures.

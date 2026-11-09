@@ -74,7 +74,17 @@ Intent accuracy carried across, and a word-count baseline trained on the plumber
 | Route accuracy, whole pipeline | 77.9% to 79.6% |
 | Escalation precision / recall | 79.1% / 87.6% (means) |
 
-**The wider terms did not close the safety gap.** Six safety messages were missed in every pass; one was escalated for another reason and five went to the review queue unmarked. Intent accuracy was lower than on either earlier set. The set is spent. The terms were widened again from the six misses (D-110): on that spent set the net now fires on 25 of 29 safety messages (18 before) and on no more ordinary messages than before. That is a development figure; no unseen electrician set is left to judge it.
+**The wider terms did not close the safety gap.** Six safety messages were missed in every pass; one was escalated for another reason and five went to the review queue unmarked. Intent accuracy was lower than on either earlier set. The set is spent. The terms were widened again from the six misses (D-110): on that spent set the net now fires on 25 of 29 safety messages (18 before) and on no more ordinary messages than before. A new sealed electrician set, written by another blind session before the run, judged it ([report](eval/reports/fernhollow-sealed-v2-run.md), [D-113](docs/DECISIONS.md)):
+
+| Measure | Fernhollow second sealed set, 3 passes |
+|---|---|
+| Health-and-safety messages escalated (no misses) | **35 of 36 in every pass (missed)** |
+| Primary-intent accuracy (target 85%) | 66.4% to 67.2% |
+| Route accuracy, whole pipeline | 79.8% to 82.2% |
+| Escalation precision / recall | 80.0% / 93.9% (means) |
+| Route cost per 100 ([report](eval/reports/route-cost-fernhollow-sealed-v2.md)) | 152 to 188 (escalate everything: 171) |
+
+In 3 or 4 safety messages per pass, the widened terms alone caused the escalation, and they fired on no ordinary message that the earlier terms did not. One safety message (a tingle from a shower tap) was missed by both the model and the terms.
 
 More, from the first held-out pass ([report](eval/reports/heldout-think-on.md)): fields extracted correctly 90.7%; no ungrounded figure found by the figure check in 48 drafts; median 16.3 s per inquiry through all stages on the development machine (p90 33.0 s; the sum of the stage times).
 

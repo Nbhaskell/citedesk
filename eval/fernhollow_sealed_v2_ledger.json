@@ -1,0 +1,75 @@
+{
+  "format": "sealed-ledger-v1",
+  "note": "Every sealed run of the evaluation, written when the run starts. The sealed set is run once, by one fixed system; see docs/DECISIONS.md D-071.",
+  "evaluations": [
+    {
+      "system_id": "5a43cb504243602e",
+      "identity": {
+        "code_tree": "b4555bf1610474b6e2743f64b6d75756daf95782",
+        "universe_tree": "5e8d3853c5bffb5674446d086542b4da93546020",
+        "model": "qwen3:8b",
+        "prompt_versions": {
+          "understand": "understand-v3",
+          "draft": "draft-v4"
+        },
+        "settings": {
+          "enable_thinking": true,
+          "escalate_on_low_confidence": true,
+          "spam_threshold": 0.8,
+          "duplicate_window_hours": 24,
+          "draft_max_words": 200,
+          "max_body_chars": 10000
+        },
+        "rag": {
+          "chat_model": "qwen3:8b",
+          "embed_model": "embeddinggemma",
+          "thinking": true,
+          "split_search": true,
+          "files": 8,
+          "chunks": 81
+        },
+        "split_sha256": "a64edd83e90543b289a7b14d50884d730735fce31d9439e0f5fe3d0b898d4939"
+      },
+      "passes_declared": 3,
+      "created_at": "2026-11-09T21:14:48+00:00",
+      "runs": [
+        {
+          "run_id": "eval-fernhollow-3-sealed-20261109-211448-p1",
+          "run_file": "eval-fernhollow-3-sealed-20261109-211448-p1.run.json",
+          "pass": 1,
+          "status": "completed",
+          "started_at": "2026-11-09T21:14:48+00:00",
+          "finished_at": "2026-11-09T21:46:28+00:00",
+          "items": 129,
+          "failed": 0,
+          "outside_plan": false,
+          "justification": null
+        },
+        {
+          "run_id": "eval-fernhollow-3-sealed-20261109-214628-p2",
+          "run_file": "eval-fernhollow-3-sealed-20261109-214628-p2.run.json",
+          "pass": 2,
+          "status": "completed",
+          "started_at": "2026-11-09T21:46:28+00:00",
+          "finished_at": "2026-11-09T22:18:18+00:00",
+          "items": 129,
+          "failed": 0,
+          "outside_plan": false,
+          "justification": null
+        },
+        {
+          "run_id": "eval-fernhollow-3-sealed-20261109-221818-p3",
+          "run_file": "eval-fernhollow-3-sealed-20261109-221818-p3.run.json",
+          "pass": 3,
+          "status": "completed",
+          "started_at": "2026-11-09T22:18:18+00:00",
+          "finished_at": "2026-11-09T22:47:57+00:00",
+          "items": 129,
+          "failed": 0,
+          "outside_plan": false,
+          "justification": null
+        }
+      ]
+    }
+  ]
+}

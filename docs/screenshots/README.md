@@ -48,6 +48,9 @@ The footer says so on every screen.
 | **Anywhere** | |
 | The keyboard shortcut list | `shortcut-list` |
 
+**Last taken on 2026-11-09**, after the draft-quality section of Insights (D-095) and the Delete
+section of the inquiry page (D-101) were added (D-103).
+
 ## Two things to know when reading them
 
 - In `settings-checked` the documents service reads "Not working" because the knowledge base

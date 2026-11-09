@@ -1122,3 +1122,20 @@ On the second sealed set the plumbing system costs less than escalating everythi
 - "a little blue flash and a pop" and "a black mark" on a plug, told in the past tense with "no rush".
 
 The model read all six as a price, booking or service question. Changes made from these are development figures: there is no unseen electrician set left to judge them.
+
+### D-110. The electrical emergency terms widened again, from the sealed set's six misses
+**Why.** The sealed electrician set (D-107) missed six safety messages; their wordings are listed in D-109. Neither the model nor the D-106 terms caught them.
+
+**What changed** (`citedesk/safety.py`, electrical trade only):
+- Sparks or smoke: an electrical part that crackles or sizzles, in the same clause (so "no crackling" after a semicolon does not fire); a blue, bright or white flash, and a flash with a pop.
+- Exposed wires: wiring a person "can see", and wires that are "visible" or "showing".
+- Hot fittings: scorch marks, charring, heat damage, burn marks or a black mark on a part that must never be hot, named before or after the part.
+- Fallen line: a wire "from the pole" that is down or lying across something, and a wire pulled, ripped or brought down off the house.
+- Water and electrics: water coming through, into or out of a light or fixture ("water pressure" and "water feature" are not water here).
+
+**Checked.**
+- `tests/test_trade_electrical.py`: 14 new sentences that must fire, written in new words (not the sealed set's), and 9 near misses that must not. The 14 failed first.
+- On the two spent electrician sets, counts only: the first set, 13 of 13 safety items and 0 of 70 others (unchanged); `fernhollow-2`, 25 of 29 safety items (D-106 terms: 18) and 2 of 84 others (unchanged). All six missed messages now fire. The four safety items the net still does not fire on were caught by the model in every pass.
+- The plumber is unchanged: the fingerprint of D-097 is identical to the one after phase B.
+
+**Not known.** These are development figures: the terms were written after reading the misses, and no unseen electrician set is left. Whether they catch other wordings, and how often they fire on ordinary messages, needs a fresh electrician set written by a blind session.

@@ -93,6 +93,13 @@ ELECTRICAL_EMERGENCY_PATTERNS: dict[str, re.Pattern[str]] = {
         + _PARTS
         + r".{0,40}\bsmok(?:e|ed|es|ing)\b(?!\s*(?:alarm|detector)s?\b)"
         + r"|\b(?:on fire|caught fire|flames?)\b"
+        # D-110: a part that crackles or sizzles, in the same clause, and a flash with a bang
+        + r"|"
+        + _PARTS
+        + r"[^.!?;,]{0,30}\b(?:crackl|sizzl)\w*"
+        + r"|\b(?:crackl|sizzl)\w*[^.!?;,]{0,30}"
+        + _PARTS
+        + r"|\b(?:blue|bright|white)\s+flash\b|\bflash\b.{0,15}\bpop\b|\bpop\b.{0,15}\bflash\b"
     ),
     "shock": re.compile(
         # "shocked at the price" is not a shock: a person must get one, or it must be electric
@@ -104,8 +111,10 @@ ELECTRICAL_EMERGENCY_PATTERNS: dict[str, re.Pattern[str]] = {
     ),
     "exposed_wires": re.compile(
         r"\b(?:exposed|bare|live|loose|dangling|hanging)\b.{0,10}\bwir(?:e|es|ing)\b"
-        r"|\bwir(?:e|es|ing)\b.{0,20}\b(?:exposed|hanging|dangling|sticking out|poking out|"
-        r"are live|is live|bare)\b"
+        r"|\bwir(?:e|es|ing)\b.{0,25}\b(?:exposed|hanging|dangling|sticking out|poking out|"
+        r"are live|is live|bare|visible|showing)\b"
+        # D-110: wiring a person can see where a cover should be
+        r"|\b(?:can|could)\s+see\b[^.!?;]{0,25}\bwir(?:e|es|ing)\b"
     ),
     "hot_fitting": re.compile(
         _HOT_PARTS + r".{0,45}"
@@ -114,7 +123,9 @@ ELECTRICAL_EMERGENCY_PATTERNS: dict[str, re.Pattern[str]] = {
         r"(?:(?:really|very|too|so|quite|a bit)\s+)?(?:hot|warm)(?!\s+(?:tub|water|white|light|"
         r"glow|colou?r|tone))"
         r"|hot to the touch|warm to the touch|too hot to\b|melted|melting|scorched|blackened|"
-        r"buzzing)\b"
+        r"buzzing|scorch\w*|charred|heat damage|burn marks?|black marks?)\b"
+        # D-110: the mark named first ("scorch marks on two breakers")
+        r"|\b(?:scorch\w*|charred|heat damage|burn marks?|black marks?)\b[^.!?;]{0,30}" + _HOT_PARTS
     ),
     "downed_line": re.compile(
         r"\b(?:power|electric(?:al)?|utility|service)\s+(?:lines?|wires?|drop|cables?)\b.{0,40}"
@@ -122,11 +133,20 @@ ELECTRICAL_EMERGENCY_PATTERNS: dict[str, re.Pattern[str]] = {
         r"|\bdowned\s+(?:power\s+)?lines?\b"
         r"|\bwire\s+(?:to|into)\s+(?:our|the|my)\s+(?:house|home)\b.{0,40}"
         r"\b(?:down|off|fell|fallen|ground|snapped|lying)\b"
+        # D-110: the wire from the pole, or a wire torn off the house
+        r"|\b(?:wire|line|cable)s?\b.{0,25}\bfrom the pole\b.{0,60}"
+        r"\b(?:down|off|fell|fallen|ground|snapped|lying|across)\b"
+        r"|\b(?:brought down|pulled|ripped|tore|torn|knocked)\b.{0,15}\b(?:wire|line|cable)s?\b"
+        r".{0,40}\b(?:pole|house|home)\b"
     ),
     "water_and_electrics": re.compile(
         r"\bwater\b(?!\s+(?:heater|softener|pump|filter|bill))"
         r".{0,60}\b(?:outlet|socket|panel|breaker|wiring|light fixture)s?\b"
         r"|\b(?:outlet|socket|panel|breaker|wiring)s?\b.{0,30}\b(?:wet|soaked|flooded)\b"
+        # D-110: water coming out of or through a light
+        r"|\bwater\b(?!\s+(?:heater|softener|pump|filter|bill|pressure|feature))[^.!?;]{0,30}"
+        r"\b(?:through|into|out of|from|in)\s+(?:the\s+|a\s+|our\s+|my\s+)?(?:\w+\s+){0,2}"
+        r"(?:lights?|fixtures?|light fittings?|lamps?)\b"
     ),
 }
 

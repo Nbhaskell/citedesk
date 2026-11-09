@@ -1,0 +1,96 @@
+[
+  {
+    "id": "charger-brand",
+    "split": "heldout",
+    "category": "unanswerable",
+    "channel": "web_form",
+    "sender_name": "Elliot Brooks",
+    "sender_email": "elliot.brooks@example.com",
+    "subject": null,
+    "body": "Which EV charger brand do you recommend? Torn between two of the popular ones. Want something reliable.",
+    "labels": {
+      "intents": [
+        "service_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": "ev_charger_installation",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "NOT_IN_KNOWLEDGE_BASE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "The documents say the customer supplies the charger but recommend no brand."
+  },
+  {
+    "id": "surge-protector",
+    "split": "heldout",
+    "category": "unanswerable",
+    "channel": "email",
+    "sender_name": "Fatima Zahir",
+    "sender_email": "fatima.zahir@example.com",
+    "subject": "surge protection",
+    "body": "Do you install whole-home surge protectors at the panel? What do they cost?",
+    "labels": {
+      "intents": [
+        "service_question",
+        "pricing_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": "other",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "NOT_IN_KNOWLEDGE_BASE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Not listed in services or pricing."
+  },
+  {
+    "id": "aluminum-wiring",
+    "split": "heldout",
+    "category": "unanswerable",
+    "channel": "web_form",
+    "sender_name": "Harold Jensen",
+    "sender_email": "harold.jensen@example.com",
+    "subject": null,
+    "body": "our house was built in 1972 and the inspector said it has aluminum branch wiring. do your guys work with that? what's involved",
+    "labels": {
+      "intents": [
+        "service_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "wiring_repair",
+        "start_date": null,
+        "property_type": "house",
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "NOT_IN_KNOWLEDGE_BASE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Aluminum wiring is not mentioned in the documents."
+  }
+]

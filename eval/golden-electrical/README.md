@@ -16,6 +16,42 @@ Labelled inquiries for Fernhollow Electric, the invented electrician in `univers
 
 Every item has `"split": "heldout"`: this set is never used to change the system. It is run once (D-097, phase D).
 
+## Counts (fernhollow_v1)
+
+83 items, all held out, written blind to the system under the brief below. Reference date 2026-10-28.
+
+| Route | Items |
+|---|---|
+| `escalate` | 42 |
+| `draft_reply` | 27 |
+| `request_details` | 10 |
+| `archive` | 4 |
+
+| Escalation reason | Items |
+|---|---|
+| `HEALTH_SAFETY` | 13 (including several buried in an ordinary request or worded without the obvious words) |
+| `COMPLAINT` | 8 |
+| `POLICY_EXCEPTION_REQUEST` | 8 |
+| `NOT_IN_KNOWLEDGE_BASE` | 7 |
+| `REFUND_OR_DISPUTE` | 6 |
+| `INJECTION_SUSPECTED` | 4 |
+| `LEGAL_THREAT` | 3 |
+| `LOW_CONFIDENCE` | 1 (model-dependent; see its `notes`) |
+
+| Category | Items |
+|---|---|
+| `safety` | 12 |
+| `near_miss` | 7 |
+| `policy_exception` | 7 |
+| `dispute_legal` | 6 |
+| `booking_flow`, `edge`, `vague_missing_details` | 5 each |
+| `routine_answerable`, `multi_intent`, `urgent`, `angry_complaint`, `spam`, `out_of_scope`, `injection` | 4 each |
+| `unanswerable` | 3 |
+| `billing`, `follow_up` | 2 each |
+| `partnership_sales` | 1 |
+
+Urgency: 21 low, 33 normal, 16 high, 13 urgent. Answerable from the documents: 61 yes, 22 no. One item contains sensitive data (a standard test card number). `python -m tools.golden report --set fernhollow` prints the full tables.
+
 ## Brief for the session that writes it
 
 This set is written by a session that is **blind to the system**: it sees the labelling rules and the electrician's facts, and nothing that shows how Citedesk reads, routes or drafts. Keep it that way.

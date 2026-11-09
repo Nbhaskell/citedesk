@@ -1,0 +1,176 @@
+[
+  {
+    "id": "book-gfci-bathroom",
+    "split": "heldout",
+    "category": "booking_flow",
+    "channel": "web_form",
+    "sender_name": "Clara Whitlock",
+    "sender_email": "clara.whitlock@example.com",
+    "subject": null,
+    "body": "Please book a GFCI outlet install for our bathroom on Tuesday November 3. House in Millrace.",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "outlet_and_switch",
+        "start_date": "2026-11-03",
+        "property_type": "house",
+        "address_area": "Millrace"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "services.md",
+        "anchor": "To book a visit, please tell us:"
+      }
+    ],
+    "notes": "All four booking fields given; the draft must not confirm the visit."
+  },
+  {
+    "id": "move-appointment-no-ref",
+    "split": "heldout",
+    "category": "booking_flow",
+    "channel": "email",
+    "sender_name": "Dana Pruitt",
+    "sender_email": "dana.pruitt@example.com",
+    "subject": "appointment",
+    "body": "need to move my appointment to friday the 6th of november, something came up at work. thanks, Dana",
+    "labels": {
+      "intents": [
+        "booking_change"
+      ],
+      "primary_intent": "booking_change",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": "2026-11-06",
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "policies.md",
+        "anchor": "You can reschedule or cancel free of charge with at least 24 hours' notice."
+      }
+    ],
+    "notes": "No booking reference; v1 cannot match the sender to a booking, so request_details."
+  },
+  {
+    "id": "cancel-with-ref",
+    "split": "heldout",
+    "category": "booking_flow",
+    "channel": "email",
+    "sender_name": "Ezra Holm",
+    "sender_email": "ezra.holm@example.com",
+    "subject": "Cancel FH-20388",
+    "body": "Please cancel booking FH-20388 for Monday. We found the tripped breaker ourselves, it was the garage freezer. Sorry for the trouble.",
+    "labels": {
+      "intents": [
+        "cancellation"
+      ],
+      "primary_intent": "cancellation",
+      "urgency": "low",
+      "fields": {
+        "service_type": "wiring_repair",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null,
+        "booking_reference": "FH-20388"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "policies.md",
+        "anchor": "You can reschedule or cancel free of charge with at least 24 hours' notice."
+      }
+    ],
+    "notes": "Monday is more than 24 hours away, so no fee. 'Monday' alone is relative, so start_date null."
+  },
+  {
+    "id": "cancel-no-ref",
+    "split": "heldout",
+    "category": "booking_flow",
+    "channel": "web_form",
+    "sender_name": "Nell Garrity",
+    "sender_email": "nell.garrity@example.com",
+    "subject": null,
+    "body": "cancel my appt pls",
+    "labels": {
+      "intents": [
+        "cancellation"
+      ],
+      "primary_intent": "cancellation",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "policies.md",
+        "anchor": "You can reschedule or cancel free of charge with at least 24 hours' notice."
+      }
+    ]
+  },
+  {
+    "id": "book-sunday-fixture",
+    "split": "heldout",
+    "category": "booking_flow",
+    "channel": "web_form",
+    "sender_name": "Iris Calloway",
+    "sender_email": "iris.calloway@example.com",
+    "subject": null,
+    "body": "Can your guy come Sunday November 8 to swap a light fixture in my hallway? I have the new one already. apartment in Millrace",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "lighting_installation",
+        "start_date": "2026-11-08",
+        "property_type": "apartment",
+        "address_area": "Millrace"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "hours.md",
+        "anchor": "The office is closed on Sunday."
+      },
+      {
+        "file": "pricing.md",
+        "anchor": "It is charged for emergency visits, and for any visit outside scheduled-visit hours, on Sundays or on closed dates."
+      }
+    ],
+    "notes": "All fields present, so draft_reply; the documents show scheduled visits do not run on Sunday, which the draft should say."
+  }
+]

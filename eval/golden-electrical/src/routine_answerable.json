@@ -1,0 +1,144 @@
+[
+  {
+    "id": "ev-charger-ten-feet",
+    "split": "heldout",
+    "category": "routine_answerable",
+    "channel": "web_form",
+    "sender_name": "Kwame Ashby",
+    "sender_email": "kwame.ashby@example.com",
+    "subject": "EV charger",
+    "body": "We just picked up an electric car and bought a Level 2 charger. Our panel is in the garage, the charger would go maybe 10 feet away from it. What would the install cost and do we need a permit for it? It's our house.",
+    "labels": {
+      "intents": [
+        "pricing_question",
+        "policy_question"
+      ],
+      "primary_intent": "pricing_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": "ev_charger_installation",
+        "start_date": null,
+        "property_type": "house",
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "pricing.md",
+        "anchor": "Level 2 EV charger installation, up to 25 feet from the panel, customer supplies the charger: $850. Includes the permit."
+      }
+    ]
+  },
+  {
+    "id": "open-saturdays",
+    "split": "heldout",
+    "category": "routine_answerable",
+    "channel": "web_form",
+    "sender_name": "Bea Lindqvist",
+    "sender_email": "bea.lindqvist@example.com",
+    "subject": null,
+    "body": "r u guys open saturdays",
+    "labels": {
+      "intents": [
+        "service_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "hours.md",
+        "anchor": "On Saturday the first arrival is at 9:00 am and the last arrival is at 11:00 am."
+      }
+    ],
+    "notes": "Opening hours are a service_question under the labelling rules."
+  },
+  {
+    "id": "inspection-house-sale",
+    "split": "heldout",
+    "category": "routine_answerable",
+    "channel": "email",
+    "sender_name": "Daniel Okafor",
+    "sender_email": "daniel.okafor@example.com",
+    "subject": "Electrical inspection for sale",
+    "body": "Good afternoon,\n\nWe are selling our house in Millrace and the buyer's agent has asked for an electrical inspection. What does an inspection cost, and how long before we get the written report? We are trying to keep to the closing timeline.\n\nRegards,\nDaniel Okafor",
+    "labels": {
+      "intents": [
+        "pricing_question",
+        "service_question"
+      ],
+      "primary_intent": "pricing_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "inspection",
+        "start_date": null,
+        "property_type": "house",
+        "address_area": "Millrace"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "pricing.md",
+        "anchor": "Whole-home electrical inspection with written summary: $265. About 2 hours. Summary sent within 2 business days."
+      }
+    ],
+    "notes": "A closing timeline is mentioned but no date or 'asap', so urgency stays normal."
+  },
+  {
+    "id": "old-fuse-box",
+    "split": "heldout",
+    "category": "routine_answerable",
+    "channel": "email",
+    "sender_name": "Marguerite Doyle",
+    "sender_email": "marguerite.doyle@example.com",
+    "subject": "fuse box",
+    "body": "We still have an old fuse box in the cellar (house built 1958). Do you replace those, and roughly how much does it run?",
+    "labels": {
+      "intents": [
+        "service_question",
+        "pricing_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": "panel_upgrade",
+        "start_date": null,
+        "property_type": "house",
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "services.md",
+        "anchor": "Replacing an old breaker panel or fuse box"
+      },
+      {
+        "file": "faq.md",
+        "anchor": "Panel upgrades, including from 100 to 200 amps, are priced by quote after a site visit."
+      }
+    ],
+    "notes": "Answerable even though there is no figure: the documents say it is quote only after a site visit."
+  }
+]

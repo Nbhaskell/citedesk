@@ -1,0 +1,130 @@
+[
+  {
+    "id": "no-show-day-off",
+    "split": "heldout",
+    "category": "angry_complaint",
+    "channel": "email",
+    "sender_name": "Howard Blake",
+    "sender_email": "howard.blake@example.com",
+    "subject": "Booking FH-20301 - nobody came",
+    "body": "Your electrician never showed up yesterday. I took the whole day off work for this. Booking FH-20301. Nobody called, nobody emailed. This is ridiculous.",
+    "labels": {
+      "intents": [
+        "complaint"
+      ],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null,
+        "booking_reference": "FH-20301"
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "COMPLAINT"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Angry customer, so urgency high."
+  },
+  {
+    "id": "crooked-fixture",
+    "split": "heldout",
+    "category": "angry_complaint",
+    "channel": "web_form",
+    "sender_name": "Edith Marsh",
+    "sender_email": "edith.marsh@example.com",
+    "subject": null,
+    "body": "The light fixture your electrician put in last week in the dining room is crooked and one of the bulbs doesn't light. Not impressed.",
+    "labels": {
+      "intents": [
+        "complaint"
+      ],
+      "primary_intent": "complaint",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "lighting_installation",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "COMPLAINT"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Unhappy but not angry, so urgency normal."
+  },
+  {
+    "id": "drywall-mess-money-back",
+    "split": "heldout",
+    "category": "angry_complaint",
+    "channel": "email",
+    "sender_name": "Simon Achterberg",
+    "sender_email": "simon.achterberg@example.com",
+    "subject": "Mess left behind",
+    "body": "Your crew left drywall dust all over our bedroom and cut a hole in the ceiling twice the size it needed to be for the fan box. I want part of my money back for the cleanup and patching.",
+    "labels": {
+      "intents": [
+        "complaint",
+        "billing_question"
+      ],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {
+        "service_type": "lighting_installation",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "COMPLAINT",
+        "REFUND_OR_DISPUTE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Complaint plus a request for money back."
+  },
+  {
+    "id": "gfci-trips-again",
+    "split": "heldout",
+    "category": "angry_complaint",
+    "channel": "email",
+    "sender_name": "Ingrid Solheim",
+    "sender_email": "ingrid.solheim@example.com",
+    "subject": "GFCI STILL tripping",
+    "body": "You replaced the GFCI in my bathroom three weeks ago and it trips every single time I use the hair dryer. Come back and fix it properly. I'm not paying for another visit.",
+    "labels": {
+      "intents": [
+        "complaint",
+        "booking_request"
+      ],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {
+        "service_type": "outlet_and_switch",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "COMPLAINT"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Warranty-style complaint. 'Not paying for another visit' asks the business to stand by its work rather than disputing a charge already made, so COMPLAINT only."
+  }
+]

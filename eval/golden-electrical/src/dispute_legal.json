@@ -1,0 +1,197 @@
+[
+  {
+    "id": "charged-twice",
+    "split": "heldout",
+    "category": "dispute_legal",
+    "channel": "email",
+    "sender_name": "Henrik Dahl",
+    "sender_email": "henrik.dahl@example.com",
+    "subject": "Double charge invoice 4471",
+    "body": "Hi, my card statement shows two charges of $340 for invoice 4471. Please refund the duplicate.",
+    "labels": {
+      "intents": [
+        "billing_question"
+      ],
+      "primary_intent": "billing_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "REFUND_OR_DISPUTE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "A disputed charge with no complaint about the work."
+  },
+  {
+    "id": "callout-fee-refund",
+    "split": "heldout",
+    "category": "dispute_legal",
+    "channel": "web_form",
+    "sender_name": "Martina Ruiz",
+    "sender_email": "martina.ruiz@example.com",
+    "subject": null,
+    "body": "You charged me $95 just to tell me I need a new panel. I'm going with another company for the panel so I want the $95 back.",
+    "labels": {
+      "intents": [
+        "billing_question"
+      ],
+      "primary_intent": "billing_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "panel_upgrade",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "REFUND_OR_DISPUTE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "policies.md",
+        "anchor": "The call-out fee is not refundable but is credited to approved work."
+      }
+    ],
+    "notes": "The documents state the policy, so answerable is true, but only the owner decides refunds. Read as a refund request, not a complaint about the service received, so no complaint intent and no COMPLAINT reason."
+  },
+  {
+    "id": "dryer-outlet-fire-lawyer",
+    "split": "heldout",
+    "category": "dispute_legal",
+    "channel": "email",
+    "sender_name": "Bernard Coyle",
+    "sender_email": "bernard.coyle@example.com",
+    "subject": "Fire after your work",
+    "body": "Two weeks after your electrician replaced our dryer outlet there was a small fire behind the dryer. The fire department put it out and the house is fine now, but the wall is ruined. Our lawyer will be contacting you.",
+    "labels": {
+      "intents": [
+        "complaint"
+      ],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {
+        "service_type": "outlet_and_switch",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "COMPLAINT",
+        "LEGAL_THREAT"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "The fire is in the past and out, so no current emergency and no HEALTH_SAFETY. Lawyer mentioned, so LEGAL_THREAT."
+  },
+  {
+    "id": "licensing-board",
+    "split": "heldout",
+    "category": "dispute_legal",
+    "channel": "web_form",
+    "sender_name": "Agnes Whitford",
+    "sender_email": "agnes.whitford@example.com",
+    "subject": null,
+    "body": "Your work on our subpanel failed the city inspection TWICE. I'm reporting you to the state licensing board.",
+    "labels": {
+      "intents": [
+        "complaint"
+      ],
+      "primary_intent": "complaint",
+      "urgency": "high",
+      "fields": {
+        "service_type": "panel_upgrade",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "COMPLAINT",
+        "LEGAL_THREAT"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": []
+  },
+  {
+    "id": "small-claims-overtime",
+    "split": "heldout",
+    "category": "dispute_legal",
+    "channel": "email",
+    "sender_name": "Lionel Ferris",
+    "sender_email": "lionel.ferris@example.com",
+    "subject": "Invoice 4498",
+    "body": "There's $180 of extra labour on invoice 4498 that nobody told me about. Take it off or I'll file in small claims court.",
+    "labels": {
+      "intents": [
+        "billing_question"
+      ],
+      "primary_intent": "billing_question",
+      "urgency": "high",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "REFUND_OR_DISPUTE",
+        "LEGAL_THREAT"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Disputes a charge and threatens court. Angry, so high."
+  },
+  {
+    "id": "estimate-exceeded",
+    "split": "heldout",
+    "category": "dispute_legal",
+    "channel": "email",
+    "sender_name": "Rhiannon Price",
+    "sender_email": "rhiannon.price@example.com",
+    "subject": "Invoice higher than estimate",
+    "body": "The written estimate for our rewiring said $650 and the invoice came to $910. Nobody asked me before going over. I'm not paying the difference.",
+    "labels": {
+      "intents": [
+        "billing_question",
+        "complaint"
+      ],
+      "primary_intent": "billing_question",
+      "urgency": "high",
+      "fields": {
+        "service_type": "wiring_repair",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "REFUND_OR_DISPUTE",
+        "COMPLAINT"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Disputed charge and a complaint that the estimate was not respected."
+  }
+]

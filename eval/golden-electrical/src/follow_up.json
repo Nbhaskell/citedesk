@@ -1,0 +1,64 @@
+[
+  {
+    "id": "visit-still-on",
+    "split": "heldout",
+    "category": "follow_up",
+    "channel": "web_form",
+    "sender_name": "Kelvin Abara",
+    "sender_email": "kelvin.abara@example.com",
+    "subject": null,
+    "body": "is my visit still on for friday? haven't heard anything since I booked",
+    "labels": {
+      "intents": [
+        "other"
+      ],
+      "primary_intent": "other",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "NOT_IN_KNOWLEDGE_BASE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "A question about an existing visit is labelled other. The documents cannot say whether this visit is on, so NOT_IN_KNOWLEDGE_BASE."
+  },
+  {
+    "id": "panel-quote-waiting",
+    "split": "heldout",
+    "category": "follow_up",
+    "channel": "email",
+    "sender_name": "Hannah Sorensen",
+    "sender_email": "hannah.sorensen@example.com",
+    "subject": "Following up - panel quote",
+    "body": "Hi, following up on the panel upgrade quote your lead electrician was going to send after her visit last week. Any update? We'd like to get it scheduled before winter.",
+    "labels": {
+      "intents": [
+        "other"
+      ],
+      "primary_intent": "other",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "panel_upgrade",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "NOT_IN_KNOWLEDGE_BASE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Status of a quote is not in the documents."
+  }
+]

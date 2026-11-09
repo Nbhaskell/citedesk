@@ -1,0 +1,141 @@
+[
+  {
+    "id": "kitchen-breaker-today",
+    "split": "heldout",
+    "category": "urgent",
+    "channel": "web_form",
+    "sender_name": "Gabriel Stone",
+    "sender_email": "gabriel.stone@example.com",
+    "subject": null,
+    "body": "breaker for my kitchen keeps tripping every time i run the toaster and kettle together. can someone come today?? house in Alderbrook Heights",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {
+        "service_type": "wiring_repair",
+        "start_date": null,
+        "property_type": "house",
+        "address_area": "Alderbrook Heights"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "No power to part of the home, a breaker that keeps tripping, and an outlet that has stopped working are booked as the next available visit, same day if requested before noon and there is room."
+      }
+    ],
+    "notes": "A breaker that keeps tripping is urgent but not an emergency: urgency high, no HEALTH_SAFETY. 'Today' is relative, so start_date null and the item asks for details."
+  },
+  {
+    "id": "no-power-upstairs",
+    "split": "heldout",
+    "category": "urgent",
+    "channel": "email",
+    "sender_name": "Yusuf Arslan",
+    "sender_email": "yusuf.arslan@example.com",
+    "subject": "No power upstairs",
+    "body": "No power to the whole upstairs since last night. Breakers all look on. Need someone ASAP, today Wednesday October 28 if at all possible. House, Tamarind Park.",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {
+        "service_type": "wiring_repair",
+        "start_date": "2026-10-28",
+        "property_type": "house",
+        "address_area": "Tamarind Park"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "No power to part of the home, a breaker that keeps tripping, and an outlet that has stopped working are booked as the next available visit, same day if requested before noon and there is room."
+      }
+    ],
+    "notes": "No power to part of the home is urgent but not an emergency. The weekday agrees with the stated date, so start_date is ISO."
+  },
+  {
+    "id": "fridge-outlet-dead",
+    "split": "heldout",
+    "category": "urgent",
+    "channel": "web_form",
+    "sender_name": "Tess Moreau",
+    "sender_email": "tess.moreau@example.com",
+    "subject": null,
+    "body": "the outlet my fridge is plugged into stopped working this morning, fridge is warm. need someone today. saltmarsh, apartment",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {
+        "service_type": "wiring_repair",
+        "start_date": null,
+        "property_type": "apartment",
+        "address_area": "saltmarsh"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "No power to part of the home, a breaker that keeps tripping, and an outlet that has stopped working are booked as the next available visit, same day if requested before noon and there is room."
+      }
+    ],
+    "notes": "A dead outlet is urgent but not an emergency. Could be outlet_and_switch; labelled wiring_repair because the cause is unknown and services.md lists outlets that stopped working under troubleshooting."
+  },
+  {
+    "id": "angry-asap-quote",
+    "split": "heldout",
+    "category": "urgent",
+    "channel": "email",
+    "sender_name": "Brendan Kerr",
+    "sender_email": "brendan.kerr@example.com",
+    "subject": "STILL waiting",
+    "body": "I asked for a price on two outdoor GFCI outlets through your form on Monday and nobody got back to me. I need this answered asap, the deck contractor is waiting on it.",
+    "labels": {
+      "intents": [
+        "pricing_question",
+        "complaint"
+      ],
+      "primary_intent": "pricing_question",
+      "urgency": "high",
+      "fields": {
+        "service_type": "outlet_and_switch",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "COMPLAINT"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "pricing.md",
+        "anchor": "GFCI outlet installation, each: $165. For kitchens, bathrooms, laundry rooms and outdoor outlets."
+      }
+    ],
+    "notes": "Complaint about a slow reply counts as service received, so COMPLAINT. The price question itself is answerable."
+  }
+]

@@ -1152,3 +1152,9 @@ The model read all six as a price, booking or service question. Changes made fro
 **Disclosed.** The briefs were written by the session that knows every earlier result. The electrician's brief names no wording: it asks for emergencies described by what the customer sees, hears, smells or feels, in the writer's own words, so the six wordings of D-109 are not suggested to it. The plumber's brief asks for more spam and multi-intent messages because those were weak in D-108. The writers are the same model family as the one that wrote the system: blind to the prompts and results, not independent of the author.
 
 **Order of use.** Each set is written and sealed before it is run, and run once, by one fixed system, when asked.
+
+### D-112. The two third sealed sets are written and sealed (2026-11-09)
+- `kestrel-3`: 133 items, valid; 65 should escalate, 16 `HEALTH_SAFETY`, 11 near misses. Hash `d0d631c67bbae9d859de6858deca7e35ce1df6a718e71ebba9259ca62c75c56b` (`eval/golden/citedesk_sealed_v3.sha256`).
+- `fernhollow-3`: 129 items, valid; 71 should escalate, 36 `HEALTH_SAFETY`, 19 near misses. Hash `56aa5d9e3d5b761ed503324f49f8a823b714df64b89715b8d62b3bf71196e3c9` (`eval/golden-electrical/fernhollow_sealed_v2.sha256`).
+- Each was written by its own separate session from its brief (D-111). A check of each session's tool calls, by path only, found no file outside what its brief allows: the brief, the labelling rules and schema, `docs/BACKEND_SCHEMA.md`, `tools/golden.py`, its business's facts and documents, and its own folder. Each deleted its generator script and committed nothing.
+- Neither set has been run. The items stay in `data/` and are not read by any test or by the session that works on the system.

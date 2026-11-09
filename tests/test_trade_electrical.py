@@ -114,6 +114,49 @@ def test_wider_wordings_leave_near_misses_alone(text: str) -> None:
     assert hits(text) == [], (text, hits(text))
 
 
+@pytest.mark.parametrize(
+    ("text", "name"),
+    [
+        # D-110: kinds of wording the sealed electrician set showed the net missing, in new words
+        ("The storm brought down the cable running from the pole to our house.", "downed_line"),
+        ("A falling limb ripped the wire off the side of the house.", "downed_line"),
+        ("The inspector noted scorch marks on two breakers.", "hot_fitting"),
+        ("There is heat damage on the main breaker in the panel.", "hot_fitting"),
+        ("The plug of the lamp has scorch marks on the prongs.", "hot_fitting"),
+        ("The kettle plug has a black mark on it now.", "hot_fitting"),
+        ("The outlet in the hallway crackles whenever something is plugged in.", "sparks_or_smoke"),
+        ("The switch sizzles a little when I turn it on.", "sparks_or_smoke"),
+        ("With the plate gone you can see the wiring inside the box.", "exposed_wires"),
+        ("The wires behind the outlet are visible since the cover broke.", "exposed_wires"),
+        ("Water is dripping out of the hallway light.", "water_and_electrics"),
+        ("Water keeps leaking through the kitchen ceiling light.", "water_and_electrics"),
+        ("There was a bright flash from the outlet when I plugged it in.", "sparks_or_smoke"),
+        ("The toaster gave a pop and a flash and stopped.", "sparks_or_smoke"),
+    ],
+)
+def test_the_sealed_set_kinds_of_wording_fire(text: str, name: str) -> None:
+    assert name in hits(text), (text, hits(text))
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        # D-110: near misses the new wordings must leave alone
+        "Can you see the wiring diagram for the fan before you come?",
+        "Please replace the flashing light on the porch.",
+        "The camera flash is broken, but can you fix the outlet by the desk?",
+        "We would like a pendant light over the water feature.",
+        "Can you run a new line from the pole to the garage?",
+        "The breaker trips now and then; no crackling, no smell.",
+        "Can you install lights that pop on when we open the closet?",
+        "The pole barn needs three new outlets.",
+        "Water pressure is low, and can you also add a light in the hall?",
+    ],
+)
+def test_the_sealed_set_wordings_leave_near_misses_alone(text: str) -> None:
+    assert hits(text) == [], (text, hits(text))
+
+
 def test_a_symptom_the_customer_rules_out_does_not_fire() -> None:
     assert hits("Lights flicker in storms. No sparks, no burning smell, nothing hot.") == []
     assert hits("The breaker trips without sparking.") == []

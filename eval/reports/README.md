@@ -16,6 +16,7 @@
 | `intent-baseline.md` | Primary intent from two methods with no model (majority, naive Bayes), trained on the tuned split and scored once on the held-out split, paired with the three saved held-out model passes (D-093) |
 | `route-cost-heldout.md`, `route-cost-tuned.md` | Route errors weighted by an assumed cost in a person's minutes, next to escalating everything and drafting everything, with a break-even figure (D-094) |
 | `fernhollow-run.md` | The invented electrician's set (83 held-out items, written by a separate session): three passes of the final system, scored one by one, then the spread. The run is in `eval/fernhollow_ledger.json` (D-100) |
+| `sealed-v2-run.md` | The plumber's second sealed set `kestrel-2` (136 items, written by a blind session): three passes of the system at `0672de1`. The run is in `eval/sealed_v2_ledger.json` (D-108) |
 | `fernhollow-sealed-run.md` | The sealed electrician set `fernhollow-2` (113 items, written by a blind session before D-106): three passes of the system at `26baa46`. The run is in `eval/fernhollow_sealed_ledger.json` (D-107) |
 | `route-cost-fernhollow.md`, `intent-baseline-fernhollow.md` | The route cost and the intent baseline on the electrician's set; the baseline is trained on the plumbing tuned split (D-100) |
 
@@ -75,6 +76,22 @@ afterwards (D-100).
 - The scorer's fixed caveat "the same author wrote the documents, the prompts and the labels" is
   too strong for this set: its items and labels were written by a separate session blind to the
   code and prompts (D-099). The documents were written by the system's author.
+
+## The plumber's second sealed set (one system, run once, three passes declared up front)
+
+`sealed-v2-run.md`: 136 items (`kestrel-2`), run on 2026-11-09 at commit `0672de1`. Three
+passes, 0 failed items, nothing changed afterwards (D-108).
+
+| Measure (3 passes) | Result |
+|---|---|
+| Primary-intent accuracy (target 85%) | 75.8% in every pass |
+| HEALTH_SAFETY escalation recall (target: no misses) | 16 of 16 in every pass: met |
+| Route accuracy, whole pipeline | mean 83.6% (±1.1) |
+| Escalation precision | mean 80.2% (±0.4) |
+| Escalation recall | mean 96.5% (±2.1) |
+
+- Spam archived: 1 of 7. Injections caught at screening: 4 of 6; near misses flagged: 0 of 14.
+- `NO_COMMITMENT` blocked 3 drafts, which were escalated; no ungrounded figure in 75 drafts.
 
 ## The sealed electrician set (one system, run once, three passes declared up front)
 

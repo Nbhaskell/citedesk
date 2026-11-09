@@ -1,0 +1,75 @@
+{
+  "format": "sealed-ledger-v1",
+  "note": "Every sealed run of the evaluation, written when the run starts. The sealed set is run once, by one fixed system; see docs/DECISIONS.md D-071.",
+  "evaluations": [
+    {
+      "system_id": "d34385dd14a608ed",
+      "identity": {
+        "code_tree": "31022d852d622ab5ad025c94cab9d31bf4694ea6",
+        "universe_tree": "5e8d3853c5bffb5674446d086542b4da93546020",
+        "model": "qwen3:8b",
+        "prompt_versions": {
+          "understand": "understand-v3",
+          "draft": "draft-v4"
+        },
+        "settings": {
+          "enable_thinking": true,
+          "escalate_on_low_confidence": true,
+          "spam_threshold": 0.8,
+          "duplicate_window_hours": 24,
+          "draft_max_words": 200,
+          "max_body_chars": 10000
+        },
+        "rag": {
+          "chat_model": "qwen3:8b",
+          "embed_model": "embeddinggemma",
+          "thinking": true,
+          "split_search": true,
+          "files": 8,
+          "chunks": 83
+        },
+        "split_sha256": "a0bebae4a0d17fe26c11d68fa311150d86fd4f1911aa7dd46ac91823add59499"
+      },
+      "passes_declared": 3,
+      "created_at": "2026-11-09T18:36:29+00:00",
+      "runs": [
+        {
+          "run_id": "eval-kestrel-2-sealed-20261109-183629-p1",
+          "run_file": "eval-kestrel-2-sealed-20261109-183629-p1.run.json",
+          "pass": 1,
+          "status": "completed",
+          "started_at": "2026-11-09T18:36:29+00:00",
+          "finished_at": "2026-11-09T19:14:51+00:00",
+          "items": 136,
+          "failed": 0,
+          "outside_plan": false,
+          "justification": null
+        },
+        {
+          "run_id": "eval-kestrel-2-sealed-20261109-191451-p2",
+          "run_file": "eval-kestrel-2-sealed-20261109-191451-p2.run.json",
+          "pass": 2,
+          "status": "completed",
+          "started_at": "2026-11-09T19:14:51+00:00",
+          "finished_at": "2026-11-09T19:51:37+00:00",
+          "items": 136,
+          "failed": 0,
+          "outside_plan": false,
+          "justification": null
+        },
+        {
+          "run_id": "eval-kestrel-2-sealed-20261109-195137-p3",
+          "run_file": "eval-kestrel-2-sealed-20261109-195137-p3.run.json",
+          "pass": 3,
+          "status": "completed",
+          "started_at": "2026-11-09T19:51:37+00:00",
+          "finished_at": "2026-11-09T20:28:41+00:00",
+          "items": 136,
+          "failed": 0,
+          "outside_plan": false,
+          "justification": null
+        }
+      ]
+    }
+  ]
+}

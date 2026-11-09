@@ -1072,3 +1072,28 @@ The pictures in `docs/screenshots/` predated two screen changes: the "How good t
 **Caveats.** The set's items and labels were written by a separate session that did not see the code, prompts or results (D-104); the documents and the labelling rules were written by the system's author. The scorer's fixed caveat about one author is too strong for the items, as in D-100. Counts per reason are small. A fixed seed gives little spread (0 items moved safety or intent between passes).
 
 **Next.** The set is spent and is not used to change the terms. Its six missed items may now be read to find the kinds of wording the net and the model both missed; any change made from them is a development figure until a fresh set judges it.
+
+### D-108. The plumber's second sealed set run once, and the result (2026-11-09)
+**What was run.** `kestrel-2` (136 items; D-104, D-105), once, by the system at commit `0672de1`, thinking on, rag-project indexed on `universe/docs` (83 chunks). Three passes were declared in `eval/sealed_v2_ledger.json` before the first item; all three finished with 0 failed items. Nothing was changed afterwards. Report: `eval/reports/sealed-v2-run.md`. This is the first unseen measure of the plumbing system since the first sealed run (D-087), so it covers the labelling rule of D-090, the check hardening of D-091 and the changes after them.
+
+**Result** (targets fixed in D-071), beside the first sealed set:
+
+| Measure | kestrel-2, per pass | First sealed set (D-087) | Target |
+|---|---|---|---|
+| Primary-intent accuracy | 75.8% (100 of 132) in every pass | 73.1% | 85%: missed |
+| `HEALTH_SAFETY` escalation recall | 16 of 16 in every pass | 15 of 15 | no misses: met |
+| Route accuracy, whole pipeline | 83.8%, 83.1%, 83.8% | 74.0% | none set |
+| Escalation precision | 80.2%, 80.0%, 80.2% | 78.1% | none set |
+| Escalation recall | 97.0%, 95.5%, 97.0% | 89.6% | none set |
+
+- Two escalations were missed in pass 1 (`is-my-visit-still-on-friday`, `reschedule-add-faucet-and-discount`); 16 messages were escalated that need not be.
+- **Spam is still not archived**: 1 of 7 spam items was archived; the others went to a person. Partnership and sales messages were also escalated (2 of 4 routed right).
+- Policy-exception requests: recall 11 of 12, precision 50% (11 extra flags).
+- Injection: 6 items, 4 caught at screening, 2 not caught (`complaint-with-hidden-archive-command`, `ps-automated-confirm-visit`); neither reached a reviewer as an ordinary reply. 0 of 14 near misses were flagged.
+- Drafts: 75, no ungrounded figure; `NO_COMMITMENT` blocked 3 drafts, which were escalated.
+- Messages with several intents remain weak (2 of 5 routed right).
+- The sets differ in mix, so the rates are not directly comparable with D-087. Intent accuracy is up 2.7 points; whether that is a real change is not shown by one set of this size.
+
+**Caveats.** The items and labels were written by a separate session that did not see the code, prompts or results (D-104); that session read one side-session hand-over note about the first electrician set (D-105). The documents and labelling rules were written by the system's author. Counts per reason are small. A fixed seed gives little spread (1 item moved route between passes). The route cost was not computed: `tools.route_cost` does not accept sealed labels.
+
+**Next.** The set is spent. Any further change to the plumbing system needs a fresh set before it can be claimed.

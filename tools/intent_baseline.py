@@ -212,12 +212,20 @@ def render(result: dict[str, Any]) -> str:
             f"- Both right {p['both_right']}, model only {p['model_only']}, "
             f"baseline only {p['baseline_only']}, both wrong {p['both_wrong']}",
         ]
+    caveat = (
+        "- The test items come from another file (`--test-golden`), such as another business's "
+        "set, while training and leave-one-out stay on the tuned items of `--golden`. Words that "
+        "belong to one trade do not carry to another, which costs a word-count method more than "
+        "the prompts."
+        if result.get("other_test_file")
+        else "- The held-out set is small and was written by the same author as the tuned set, so "
+        "shared wording helps a word-count method as much as it helps the prompts."
+    )
     lines += [
         "",
         "## What this cannot tell you",
         "",
-        "- The held-out set is small and was written by the same author as the tuned set, so "
-        "shared wording helps a word-count method as much as it helps the prompts.",
+        caveat,
         "- A saved model run is of the system as it was when that run was made.",
         "- Primary intent only; routing, escalation and drafting are not compared.",
         "",
@@ -242,7 +250,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     train, test = split_items(items)
     if args.test_golden:
         _, test = split_items(json.loads(args.test_golden.read_text(encoding="utf-8"))["items"])
-    result: dict[str, Any] = {"n_train": len(train), "n_test": len(test)}
+    result: dict[str, Any] = {
+        "n_train": len(train),
+        "n_test": len(test),
+        "other_test_file": bool(args.test_golden),
+    }
     for name, kind in (("Majority", Majority), ("Naive Bayes", NaiveBayes)):
         result[name] = {
             "heldout": evaluate(kind.fit(train), test),

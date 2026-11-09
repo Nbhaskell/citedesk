@@ -147,4 +147,6 @@ def test_the_test_items_can_come_from_another_file(tmp_path: Path) -> None:
     report = tmp_path / "report.md"
     assert ib.main(["--golden", str(train_file), "--test-golden", str(test_file),
                     "--md", str(report)]) == 0  # fmt: skip
-    assert "scored once on the held-out split (1 items)" in report.read_text(encoding="utf-8")
+    text = report.read_text(encoding="utf-8")
+    assert "scored once on the held-out split (1 items)" in text
+    assert "come from another file" in text and "same author" not in text

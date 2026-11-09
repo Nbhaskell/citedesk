@@ -87,6 +87,13 @@ def test_break_even_is_the_missed_escalation_cost_that_matches_escalating_everyt
     assert rc.break_even(everything, everything) is None
 
 
+def test_a_break_even_at_or_below_zero_is_not_printed_as_a_cost() -> None:
+    assert "any cost of a missed escalation" in rc.break_even_text(-10.2)
+    assert "any cost of a missed escalation" in rc.break_even_text(0.0)
+    assert "costs 9.0" in rc.break_even_text(9.0)
+    assert "no missed escalation" in rc.break_even_text(None)
+
+
 def test_items_missing_from_the_run_are_refused() -> None:
     with pytest.raises(ValueError, match="not in the run"):
         rc.cost({"a": labels("draft_reply")}, {})

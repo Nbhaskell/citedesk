@@ -1049,3 +1049,26 @@ The pictures in `docs/screenshots/` predated two screen changes: the "How good t
 - The plumber is unchanged: the fingerprint of D-097 (prompts, schemas, screening, safety net, spam scores and retrieval questions for 211 items) is identical to the one after phase B.
 
 **Not known.** Whether the wider terms catch electrical emergencies in wordings nobody has seen, and how often they fire on ordinary messages, is for the sealed electrician set (`fernhollow-2`, D-104, D-105), which was written and sealed before this change. It has not been run. The model's own reading is unchanged; the net only adds `HEALTH_SAFETY` and urgency.
+
+### D-107. The sealed electrician set run once, and the result (2026-11-09)
+**What was run.** `fernhollow-2` (113 items, 29 with `HEALTH_SAFETY`, 16 near misses; D-105), once, by the system at commit `26baa46` (the wider electrical terms of D-106), thinking on, rag-project indexed on `universe-electrical/docs` (81 chunks). Three passes were declared in `eval/fernhollow_sealed_ledger.json` before the first item; all three finished with 0 failed items. Nothing was changed afterwards. Report: `eval/reports/fernhollow-sealed-run.md`.
+
+**Result** (targets fixed in D-071):
+
+| Measure | Per pass | Target |
+|---|---|---|
+| Primary-intent accuracy | 59.5% (66 of 111) in every pass | 85%: missed |
+| `HEALTH_SAFETY` escalation recall | 23 of 29 (79.3%) in every pass | no misses: **missed** |
+| Route accuracy, whole pipeline | 79.6%, 78.8%, 77.9% | none set |
+| Escalation precision | 80.0%, 79.7%, 77.6% | none set |
+| Escalation recall | 88.1%, 86.4%, 88.1% | none set |
+
+- **Six safety messages were missed in every pass**: `branch-pulled-service-wire`, `home-inspector-scorched-breaker`, `reply-thread-crackling-switch`, `toddler-pried-off-cover`, `toilet-overflow-through-light`, `vacuum-blue-flash-last-sunday`. One of them (`reply-thread-crackling-switch`) was escalated, but for `NOT_IN_KNOWLEDGE_BASE`, not as safety; the other five went to the review queue as an ordinary draft or a request for details. Every message reaches a person, but these five were not marked as safety or urgent for the reviewer.
+- 3 messages were flagged as safety that were not labelled so; 1 of the 16 near misses was flagged (as an injection, not as safety).
+- The D-106 terms are therefore not shown to close the gap: on unseen wording, safety recall is lower than on the first electrician set (11 to 12 of 13), on a set with more than twice as many safety items. The run records the route and reasons but not which code terms fired, so how many of the 23 catches came from the terms and how many from the model is not known from the run.
+- Primary-intent accuracy (59.5%) is lower than on the first electrician set (70.7%) and the plumber's sealed set (73.1%). The sets differ in mix, so the rates are not directly comparable.
+- Injection: 4 items, 3 caught at screening, 1 not caught (it did not reach a reviewer as a reply).
+
+**Caveats.** The set's items and labels were written by a separate session that did not see the code, prompts or results (D-104); the documents and the labelling rules were written by the system's author. The scorer's fixed caveat about one author is too strong for the items, as in D-100. Counts per reason are small. A fixed seed gives little spread (0 items moved safety or intent between passes).
+
+**Next.** The set is spent and is not used to change the terms. Its six missed items may now be read to find the kinds of wording the net and the model both missed; any change made from them is a development figure until a fresh set judges it.

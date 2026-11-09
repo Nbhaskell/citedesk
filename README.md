@@ -52,7 +52,18 @@ Sources: [tuned](eval/reports/tuned-think-on.md), [held-out](eval/reports/heldou
 | Route accuracy, whole pipeline | 67.1% | 74.0% |
 | Escalation precision / recall | 72.9% / 74.6% | 78.1% / 89.6% |
 
-Intent accuracy carried across, and a word-count baseline trained on the plumber scored 59.0% ([report](eval/reports/intent-baseline-fernhollow.md)). **Two safety messages were missed** (a dimmer running hot, a fan motor that smoked): the electrical emergency terms did not fire and the model did not flag them. They reached a person, as every message does, but not marked as safety. Weighted by assumed cost, routing cost 390 to 511 per 100 messages against 183 for escalating everything ([report](eval/reports/route-cost-fernhollow.md)). The set is spent. The electrical terms were then widened (D-106): on that spent set they now fire on all 13 safety messages and none of the 70 others, a development figure; a sealed electrician set written before the change (D-105) is kept to judge it.
+Intent accuracy carried across, and a word-count baseline trained on the plumber scored 59.0% ([report](eval/reports/intent-baseline-fernhollow.md)). **Two safety messages were missed** (a dimmer running hot, a fan motor that smoked): the electrical emergency terms did not fire and the model did not flag them. They reached a person, as every message does, but not marked as safety. Weighted by assumed cost, routing cost 390 to 511 per 100 messages against 183 for escalating everything ([report](eval/reports/route-cost-fernhollow.md)). The set is spent. The electrical terms were then widened (D-106): on that spent set they now fire on all 13 safety messages and none of the 70 others, a development figure.
+
+**The sealed electrician set** ([report](eval/reports/fernhollow-sealed-run.md), [D-107](docs/DECISIONS.md)): 113 messages written by another blind session before the terms were widened, run once with the wider terms, three passes:
+
+| Measure | Fernhollow sealed, 3 passes |
+|---|---|
+| Primary-intent accuracy (target 85%) | 59.5% |
+| Health-and-safety messages escalated (no misses) | **23 of 29 in every pass (missed)** |
+| Route accuracy, whole pipeline | 77.9% to 79.6% |
+| Escalation precision / recall | 79.1% / 87.6% (means) |
+
+**The wider terms did not close the safety gap.** Six safety messages were missed in every pass; one was escalated for another reason and five went to the review queue unmarked. Intent accuracy was lower than on either earlier set. The set is spent.
 
 More, from the first held-out pass ([report](eval/reports/heldout-think-on.md)): fields extracted correctly 90.7%; no ungrounded figure found by the figure check in 48 drafts; median 16.3 s per inquiry through all stages on the development machine (p90 33.0 s; the sum of the stage times).
 

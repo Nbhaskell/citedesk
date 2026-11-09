@@ -5,6 +5,8 @@ Run:
     python -m tools.golden validate   check the committed file: schema, rules, docs, anchors
     python -m tools.golden report     counts per intent, category, route and reason
     python -m tools.golden schema     write eval/golden/golden.schema.json
+    build, validate and report take --set kestrel (the default) or --set fernhollow, the
+    invented electrician's set in eval/golden-electrical/ (D-099)
     python -m tools.golden build-sealed | validate-sealed | seal | verify-sealed
                                       the sealed set in data/sealed/ (D-071); prints counts only
 
@@ -18,6 +20,7 @@ import json
 import re
 import sys
 from collections import Counter
+from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 from typing import Annotated, Any, Literal
@@ -26,6 +29,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_valida
 
 from citedesk import models
 from citedesk.routing import missing_fields
+from citedesk.trade import ELECTRICAL, PLUMBING, Trade
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 GOLDEN_DIR = REPO_ROOT / "eval/golden"
@@ -71,6 +75,51 @@ CATEGORIES = (
     "near_miss",
     "edge",
 )
+
+
+@dataclass(frozen=True)
+class GoldenSet:
+    """One labelled set: where its items and documents are, which splits it may hold, and
+    the trade whose service types its labels may use (D-099)."""
+
+    key: str
+    name: str
+    src_dir: Path
+    golden_file: Path
+    docs_dir: Path
+    written_by: str
+    splits: tuple[str, ...]
+    trade: Trade
+
+
+ELECTRICAL_DIR = REPO_ROOT / "eval/golden-electrical"
+SETS: dict[str, GoldenSet] = {
+    "kestrel": GoldenSet(
+        key="kestrel",
+        name=NAME,
+        src_dir=SRC_DIR,
+        golden_file=GOLDEN_FILE,
+        docs_dir=DOCS_DIR,
+        written_by=WRITTEN_BY,
+        splits=MAIN_SPLITS,
+        trade=PLUMBING,
+    ),
+    # The invented electrician's set is a test of the unchanged system on another trade. It is
+    # never used for tuning, so it holds held-out items only.
+    "fernhollow": GoldenSet(
+        key="fernhollow",
+        name="fernhollow_v1",
+        src_dir=ELECTRICAL_DIR / "src",
+        golden_file=ELECTRICAL_DIR / "fernhollow_v1.json",
+        docs_dir=REPO_ROOT / "universe-electrical/docs",
+        written_by=(
+            "An AI model (Claude), in a session that was given the labelling rules and the "
+            "electrician's fact sheet and documents, and not the prompts, code or results."
+        ),
+        splits=("heldout",),
+        trade=ELECTRICAL,
+    ),
+}
 
 NOT_IN_KB = "NOT_IN_KNOWLEDGE_BASE"
 EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
@@ -241,7 +290,7 @@ def synthetic_problems(item: Item) -> list[str]:
     return found
 
 
-def validate_item(raw: dict[str, Any], docs: dict[str, str]) -> list[str]:
+def validate_item(raw: dict[str, Any], docs: dict[str, str], trade: Trade = PLUMBING) -> list[str]:
     item_id = str(raw.get("id", "?")) if isinstance(raw, dict) else "?"
     try:
         item = Item.model_validate(raw)
@@ -255,6 +304,9 @@ def validate_item(raw: dict[str, Any], docs: dict[str, str]) -> list[str]:
 
     if lab.primary_intent not in intents:
         found.append("primary_intent must be one of intents")
+    service = fields.get("service_type")
+    if service is not None and service not in {m.value for m in trade.service_types}:
+        found.append(f"service_type {service!r} is not a service type of the {trade.key} trade")
 
     derived = derive_route(intents, lab.primary_intent, reasons, fields)
     if lab.expected_route != derived:
@@ -293,7 +345,10 @@ def validate_item(raw: dict[str, Any], docs: dict[str, str]) -> list[str]:
 
 
 def validate_data(
-    data: dict[str, Any], docs: dict[str, str], allowed_splits: tuple[str, ...] = MAIN_SPLITS
+    data: dict[str, Any],
+    docs: dict[str, str],
+    allowed_splits: tuple[str, ...] = MAIN_SPLITS,
+    trade: Trade = PLUMBING,
 ) -> list[str]:
     found: list[str] = []
     if not isinstance(data, dict) or "header" not in data or "items" not in data:
@@ -322,7 +377,7 @@ def validate_data(
                 f"{raw.get('id', '?')}: split {raw.get('split')!r} is not allowed in this file "
                 f"(it takes only: {', '.join(allowed_splits)})"
             )
-        found += validate_item(raw, docs)
+        found += validate_item(raw, docs, trade)
     return found
 
 
@@ -353,6 +408,25 @@ def build_golden(
             "counts": {"items": len(items), "by_split": dict(sorted(splits.items()))},
         },
         "items": items,
+    }
+
+
+def build_golden_items(
+    items: list[dict[str, Any]], docs: dict[str, str], target: GoldenSet
+) -> dict[str, Any]:
+    """A golden file for a named set, from items already read."""
+    ordered = sorted(items, key=lambda i: str(i.get("id")))
+    splits = Counter(str(i.get("split")) for i in ordered)
+    return {
+        "header": {
+            "name": target.name,
+            "version": VERSION,
+            "reference_date": REFERENCE_DATE,
+            "written_by": target.written_by,
+            "docs_sha256": docs_sha256(docs),
+            "counts": {"items": len(ordered), "by_split": dict(sorted(splits.items()))},
+        },
+        "items": ordered,
     }
 
 
@@ -455,24 +529,27 @@ def write_json(path: Path, data: Any) -> None:
     path.write_bytes((json.dumps(data, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
 
 
-def cmd_build() -> int:
-    docs = load_docs()
-    data = build_golden(SRC_DIR, docs, name=NAME, version=VERSION, written_by=WRITTEN_BY)
-    problems = validate_data(data, docs)
+def cmd_build(target: GoldenSet) -> int:
+    docs = load_docs(target.docs_dir)
+    items: list[dict[str, Any]] = []
+    for path in sorted(target.src_dir.glob("*.json")):
+        items += json.loads(path.read_text("utf-8"))
+    data = build_golden_items(items, docs, target)
+    problems = validate_data(data, docs, target.splits, target.trade)
     if problems:
         print(f"Not writing: {len(problems)} problem(s):")
         for p in problems:
             print(f"  - {p}")
         return 1
-    write_json(GOLDEN_FILE, data)
-    print(f"Wrote {GOLDEN_FILE.relative_to(REPO_ROOT)}: {len(data['items'])} items")
+    write_json(target.golden_file, data)
+    print(f"Wrote {target.golden_file.name}: {len(data['items'])} items")
     return 0
 
 
-def cmd_validate() -> int:
-    docs = load_docs()
-    data = json.loads(GOLDEN_FILE.read_text("utf-8"))
-    problems = validate_data(data, docs)
+def cmd_validate(target: GoldenSet) -> int:
+    docs = load_docs(target.docs_dir)
+    data = json.loads(target.golden_file.read_text("utf-8"))
+    problems = validate_data(data, docs, target.splits, target.trade)
     if problems:
         print(f"{len(problems)} problem(s):")
         for p in problems:
@@ -522,12 +599,17 @@ def main(argv: list[str]) -> int:
         ok = verify_sealed(SEALED_FILE, SEALED_HASH_FILE)
         print("The sealed file matches the committed hash." if ok else "MISMATCH or missing file.")
         return 0 if ok else 1
-    if command == "build":
-        return cmd_build()
-    if command == "validate":
-        return cmd_validate()
-    if command == "report":
-        print(report(json.loads(GOLDEN_FILE.read_text("utf-8"))))
+    key = argv[argv.index("--set") + 1] if "--set" in argv[2:-1] else "kestrel"
+    target = SETS.get(key)
+    if command in ("build", "validate", "report") and target is None:
+        print(f"Unknown set {key!r}; known: {', '.join(sorted(SETS))}")
+        return 2
+    if command == "build" and target is not None:
+        return cmd_build(target)
+    if command == "validate" and target is not None:
+        return cmd_validate(target)
+    if command == "report" and target is not None:
+        print(report(json.loads(target.golden_file.read_text("utf-8"))))
         return 0
     if command == "schema":
         write_json(SCHEMA_FILE, GoldenFile.model_json_schema())

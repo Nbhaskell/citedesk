@@ -165,7 +165,8 @@
           "route_decided",
           "check_failed",
           "review_recorded",
-          "status_changed"
+          "status_changed",
+          "inquiry_deleted"
         ],
         "title": "AuditEventType",
         "type": "string"
@@ -2782,6 +2783,37 @@
       }
     },
     "/api/inquiries/{inquiry_id}": {
+      "delete": {
+        "description": "Delete an inquiry and everything stored about it (D-101). Not while it is processed.",
+        "operationId": "delete_inquiry_api_inquiries__inquiry_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "inquiry_id",
+            "required": true,
+            "schema": {
+              "title": "Inquiry Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Inquiry"
+      },
       "get": {
         "operationId": "inquiry_detail_api_inquiries__inquiry_id__get",
         "parameters": [

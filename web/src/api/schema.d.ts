@@ -119,7 +119,11 @@ export interface paths {
         get: operations["inquiry_detail_api_inquiries__inquiry_id__get"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Delete Inquiry
+         * @description Delete an inquiry and everything stored about it (D-101). Not while it is processed.
+         */
+        delete: operations["delete_inquiry_api_inquiries__inquiry_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -298,7 +302,7 @@ export interface components {
          * @description Documented in a comment on audit_events.event_type; the column has no CHECK.
          * @enum {string}
          */
-        AuditEventType: "stage_started" | "stage_finished" | "stage_failed" | "route_decided" | "check_failed" | "review_recorded" | "status_changed";
+        AuditEventType: "stage_started" | "stage_finished" | "stage_failed" | "route_decided" | "check_failed" | "review_recorded" | "status_changed" | "inquiry_deleted";
         /** BusinessOut */
         BusinessOut: {
             /** Email */
@@ -1227,6 +1231,35 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["InquiryDetail"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_inquiry_api_inquiries__inquiry_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                inquiry_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

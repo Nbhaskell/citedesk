@@ -38,7 +38,17 @@ from pydantic import BaseModel, ConfigDict
 from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from citedesk import __version__, events, health, insights, intake, pipeline, repo, review
+from citedesk import (
+    __version__,
+    events,
+    health,
+    insights,
+    intake,
+    pipeline,
+    repo,
+    retention,
+    review,
+)
 from citedesk.business import Business, load_business
 from citedesk.config import Settings
 from citedesk.db import connect, migrate, utc_now
@@ -817,6 +827,14 @@ def create_app(
             detail = detail_of(conn, inquiry_id)
         wake_worker()
         return detail
+
+    @app.delete("/api/inquiries/{inquiry_id}", status_code=204, response_class=Response)
+    def delete_inquiry(inquiry_id: int, request: Request) -> Response:
+        """Delete an inquiry and everything stored about it (D-101). Not while it is processed."""
+        with db() as conn:
+            retention.delete_inquiry(conn, inquiry_id, request_id=request_id_of(request))
+            retention.checkpoint(conn)
+        return Response(status_code=204)
 
     @app.get("/api/drafts/{draft_id}/export", response_model=ExportText)
     def read_export(draft_id: int) -> ExportText:

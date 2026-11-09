@@ -8,6 +8,7 @@ import { modalOpen } from "../../hooks/modal";
 import { isTypingTarget, shortcutKey } from "../../hooks/shortcuts";
 import { useResource } from "../../hooks/useResource";
 import { markViewed } from "../queue/returnFocus";
+import { DeleteInquiry } from "./DeleteInquiry";
 import { neighbours, readQueueState, type QueueState } from "./neighbours";
 import { HistoryPanel, OriginalMessage, SourcesPanel, UnderstoodAs } from "./parts";
 import { ReviewPanel } from "./ReviewPanel";
@@ -269,6 +270,7 @@ export function DetailScreen() {
         </div>
       </div>
       <HistoryPanel detail={detail} />
+      {variant !== "processing" ? <DeleteInquiry inquiryId={detail.inquiry.id} /> : null}
     </section>
   );
 }

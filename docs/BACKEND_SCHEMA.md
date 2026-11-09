@@ -222,6 +222,8 @@ CREATE TABLE settings (
 ALTER TABLE classifications ADD COLUMN focused_signals TEXT NOT NULL DEFAULT '[]';
 ```
 
+**Event types added later.** `audit_events.event_type` has no `CHECK`, so a new type needs no migration; the comment in `0001_init.sql` stays as applied and later types are listed here: `inquiry_deleted` (D-101: written when an inquiry is deleted, with `inquiry_id` empty, `from_status` its last status, and a payload of `{"deleted_inquiry_id": <id>, "cause": "reviewer" | "retention"}`).
+
 ## 4. JSON shapes
 
 **`classifications.intents`**

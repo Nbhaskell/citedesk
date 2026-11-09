@@ -162,6 +162,7 @@ Base `http://127.0.0.1:8100`. All JSON. Request and response models are Pydantic
 | `POST /api/drafts/{id}/redraft` | Body: `guidance`; writes the next draft version in the request and checks it (D-051) |
 | `POST /api/inquiries/{id}/escalate` | Manual escalation with note |
 | `POST /api/inquiries/{id}/resolve` | Close an escalated item handled outside the tool |
+| `DELETE /api/inquiries/{id}` | Delete the inquiry and everything stored about it; 204, or 409 while the worker may be processing it (D-101) |
 | `GET /api/drafts/{id}/export` | Returns approved text for copying |
 | `GET /api/insights` | Aggregates |
 | `POST /api/status/check` | Ask the model server and the knowledge base now; the result is remembered and shown by `GET /api/status` (D-053) |

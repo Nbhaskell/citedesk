@@ -191,6 +191,7 @@ class AuditEventType(StrEnum):
     check_failed = "check_failed"
     review_recorded = "review_recorded"
     status_changed = "status_changed"
+    inquiry_deleted = "inquiry_deleted"
 
 
 # --- JSON shapes (BACKEND_SCHEMA.md section 4) -----------------------------------------------

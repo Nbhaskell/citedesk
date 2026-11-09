@@ -7,6 +7,8 @@ Run:
     python -m tools.golden schema     write eval/golden/golden.schema.json
     build, validate and report take --set kestrel (the default) or --set fernhollow, the
     invented electrician's set in eval/golden-electrical/ (D-099)
+    build, validate, report, seal and verify-sealed take --set kestrel-2 or --set fernhollow-2,
+    the second sealed sets (D-104): kept in data/, only their hashes committed; counts only
     python -m tools.golden build-sealed | validate-sealed | seal | verify-sealed
                                       the sealed set in data/sealed/ (D-071); prints counts only
 
@@ -90,9 +92,20 @@ class GoldenSet:
     written_by: str
     splits: tuple[str, ...]
     trade: Trade
+    # Set for a sealed set (D-071, D-104): its items stay in a git-ignored folder under data/
+    # and only the SHA-256 of its built file is committed, here.
+    hash_file: Path | None = None
+
+    @property
+    def sealed(self) -> bool:
+        return self.hash_file is not None
 
 
 ELECTRICAL_DIR = REPO_ROOT / "eval/golden-electrical"
+BLIND_WRITER = (
+    "An AI model (Claude), in a separate session that was given the labelling rules and the "
+    "business's fact sheet and documents, and not the prompts, code, other items or results."
+)
 SETS: dict[str, GoldenSet] = {
     "kestrel": GoldenSet(
         key="kestrel",
@@ -118,6 +131,31 @@ SETS: dict[str, GoldenSet] = {
         ),
         splits=("heldout",),
         trade=ELECTRICAL,
+    ),
+    # Second sealed sets (D-104), each written by a separate session that is blind to the system,
+    # and run once each by a fixed system. The plumber's replaces the spent first sealed set; the
+    # electrician's measures any change made after the first electrician's set (D-100).
+    "kestrel-2": GoldenSet(
+        key="kestrel-2",
+        name="citedesk_sealed_v2",
+        src_dir=REPO_ROOT / "data/sealed-2/src",
+        golden_file=REPO_ROOT / "data/sealed-2/citedesk_sealed_v2.json",
+        docs_dir=DOCS_DIR,
+        written_by=BLIND_WRITER,
+        splits=("sealed",),
+        trade=PLUMBING,
+        hash_file=GOLDEN_DIR / "citedesk_sealed_v2.sha256",
+    ),
+    "fernhollow-2": GoldenSet(
+        key="fernhollow-2",
+        name="fernhollow_sealed_v1",
+        src_dir=REPO_ROOT / "data/sealed-electrical/src",
+        golden_file=REPO_ROOT / "data/sealed-electrical/fernhollow_sealed_v1.json",
+        docs_dir=REPO_ROOT / "universe-electrical/docs",
+        written_by=BLIND_WRITER,
+        splits=("sealed",),
+        trade=ELECTRICAL,
+        hash_file=ELECTRICAL_DIR / "fernhollow_sealed.sha256",
     ),
 }
 
@@ -530,6 +568,9 @@ def write_json(path: Path, data: Any) -> None:
 
 
 def cmd_build(target: GoldenSet) -> int:
+    if target.sealed and target.hash_file is not None and target.hash_file.exists():
+        print(f"Not writing: the {target.key} set is sealed ({target.hash_file.name} exists)")
+        return 1
     docs = load_docs(target.docs_dir)
     items: list[dict[str, Any]] = []
     for path in sorted(target.src_dir.glob("*.json")):
@@ -541,8 +582,11 @@ def cmd_build(target: GoldenSet) -> int:
         for p in problems:
             print(f"  - {p}")
         return 1
+    target.golden_file.parent.mkdir(parents=True, exist_ok=True)
     write_json(target.golden_file, data)
     print(f"Wrote {target.golden_file.name}: {len(data['items'])} items")
+    if target.sealed:
+        print("\n" + sealed_summary(data))
     return 0
 
 
@@ -556,7 +600,7 @@ def cmd_validate(target: GoldenSet) -> int:
             print(f"  - {p}")
         return 1
     print(f"OK: {len(data['items'])} items are valid\n")
-    print(report(data))
+    print(sealed_summary(data) if target.sealed else report(data))
     return 0
 
 
@@ -586,21 +630,36 @@ def cmd_validate_sealed() -> int:
     return 0
 
 
+def cmd_seal_named(command: str, target: GoldenSet | None, key: str) -> int:
+    """`seal` or `verify-sealed` for a named sealed set (D-104)."""
+    if target is None or target.hash_file is None:
+        print(f"The {key!r} set is not a sealed set")
+        return 2
+    if command == "seal":
+        print(f"Sealed: {seal(target.golden_file, target.hash_file)}")
+        return 0
+    ok = verify_sealed(target.golden_file, target.hash_file)
+    print("The sealed file matches the committed hash." if ok else "MISMATCH or missing file.")
+    return 0 if ok else 1
+
+
 def main(argv: list[str]) -> int:
     command = argv[1] if len(argv) > 1 else ""
     if command == "build-sealed":
         return cmd_build_sealed()
     if command == "validate-sealed":
         return cmd_validate_sealed()
-    if command == "seal":
+    if command == "seal" and "--set" not in argv:
         print(f"Sealed: {seal(SEALED_FILE, SEALED_HASH_FILE)}")
         return 0
-    if command == "verify-sealed":
+    if command == "verify-sealed" and "--set" not in argv:
         ok = verify_sealed(SEALED_FILE, SEALED_HASH_FILE)
         print("The sealed file matches the committed hash." if ok else "MISMATCH or missing file.")
         return 0 if ok else 1
     key = argv[argv.index("--set") + 1] if "--set" in argv[2:-1] else "kestrel"
     target = SETS.get(key)
+    if command in ("seal", "verify-sealed") and key != "kestrel":
+        return cmd_seal_named(command, target, key)
     if command in ("build", "validate", "report") and target is None:
         print(f"Unknown set {key!r}; known: {', '.join(sorted(SETS))}")
         return 2
@@ -609,7 +668,8 @@ def main(argv: list[str]) -> int:
     if command == "validate" and target is not None:
         return cmd_validate(target)
     if command == "report" and target is not None:
-        print(report(json.loads(target.golden_file.read_text("utf-8"))))
+        data = json.loads(target.golden_file.read_text("utf-8"))
+        print(sealed_summary(data) if target.sealed else report(data))
         return 0
     if command == "schema":
         write_json(SCHEMA_FILE, GoldenFile.model_json_schema())

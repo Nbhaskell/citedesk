@@ -17,7 +17,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 from citedesk.providers.ollama import LOOPBACK_HOSTS
-from tools.golden import GOLDEN_FILE, REPO_ROOT, SEALED_FILE, SETS
+from tools.golden import GOLDEN_FILE, REPO_ROOT, SEALED_FILE, SEALED_HASH_FILE, SETS
 
 RUNS_DIR = REPO_ROOT / "eval/runs"
 REPORTS_DIR = REPO_ROOT / "eval/reports"
@@ -25,6 +25,12 @@ LEDGER_FILE = REPO_ROOT / "eval/heldout_ledger.json"
 SEALED_LEDGER_FILE = REPO_ROOT / "eval/sealed_ledger.json"
 # The invented electrician's set (D-099, D-100) is a locked held-out set with its own ledger.
 FERNHOLLOW_LEDGER_FILE = REPO_ROOT / "eval/fernhollow_ledger.json"
+# Each sealed set has its own ledger (D-071, D-104).
+SEALED_LEDGERS = {
+    "kestrel": SEALED_LEDGER_FILE,
+    "kestrel-2": REPO_ROOT / "eval/sealed_v2_ledger.json",
+    "fernhollow-2": REPO_ROOT / "eval/fernhollow_sealed_ledger.json",
+}
 GOLDEN_SETS = tuple(SETS)
 SPLITS = ("tuned", "heldout", "sealed")
 LOCKED_SPLITS = ("heldout", "sealed")
@@ -34,6 +40,8 @@ IGNORED_FOR_DIRTY = (
     "eval/heldout_ledger.json",
     "eval/sealed_ledger.json",
     "eval/fernhollow_ledger.json",
+    "eval/sealed_v2_ledger.json",
+    "eval/fernhollow_sealed_ledger.json",
     "eval/runs/",
     "eval/reports/",
 )
@@ -59,9 +67,26 @@ def golden_file_for(split: str, golden_set: str = "kestrel") -> Path:
     if golden_set != "kestrel":
         target = SETS[golden_set]
         if split not in target.splits:
-            raise ValueError(f"the {golden_set} set has only held-out items, not {split!r}")
+            raise ValueError(
+                f"the {golden_set} set holds only {', '.join(target.splits)} items, not {split!r}"
+            )
         return target.golden_file
     return SEALED_FILE if split == "sealed" else GOLDEN_FILE
+
+
+def sealed_ledger_file_for(golden_set: str) -> Path | None:
+    """The ledger of a set's sealed run, or None if the set has no sealed split."""
+    return SEALED_LEDGERS.get(golden_set)
+
+
+def sealed_files_for(golden_set: str) -> tuple[Path, Path] | None:
+    """The sealed file and its committed hash file, or None if the set has none."""
+    if golden_set == "kestrel":
+        return SEALED_FILE, SEALED_HASH_FILE
+    target = SETS.get(golden_set)
+    if target is None or target.hash_file is None:
+        return None
+    return target.golden_file, target.hash_file
 
 
 def ledger_file_for(golden_set: str) -> Path:

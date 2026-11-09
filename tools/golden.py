@@ -7,8 +7,9 @@ Run:
     python -m tools.golden schema     write eval/golden/golden.schema.json
     build, validate and report take --set kestrel (the default) or --set fernhollow, the
     invented electrician's set in eval/golden-electrical/ (D-099)
-    build, validate, report, seal and verify-sealed take --set kestrel-2 or --set fernhollow-2,
-    the second sealed sets (D-104): kept in data/, only their hashes committed; counts only
+    build, validate, report, seal and verify-sealed take --set kestrel-2, fernhollow-2 (the
+    second sealed sets, D-104), kestrel-3 or fernhollow-3 (the third, D-111): kept in data/,
+    only their hashes committed; counts only
     python -m tools.golden build-sealed | validate-sealed | seal | verify-sealed
                                       the sealed set in data/sealed/ (D-071); prints counts only
 
@@ -156,6 +157,30 @@ SETS: dict[str, GoldenSet] = {
         splits=("sealed",),
         trade=ELECTRICAL,
         hash_file=ELECTRICAL_DIR / "fernhollow_sealed.sha256",
+    ),
+    # Third sealed sets (D-111): the second sets are spent (D-107, D-108). The plumber's judges
+    # any change after D-108; the electrician's judges the terms of D-110.
+    "kestrel-3": GoldenSet(
+        key="kestrel-3",
+        name="citedesk_sealed_v3",
+        src_dir=REPO_ROOT / "data/sealed-3/src",
+        golden_file=REPO_ROOT / "data/sealed-3/citedesk_sealed_v3.json",
+        docs_dir=DOCS_DIR,
+        written_by=BLIND_WRITER,
+        splits=("sealed",),
+        trade=PLUMBING,
+        hash_file=GOLDEN_DIR / "citedesk_sealed_v3.sha256",
+    ),
+    "fernhollow-3": GoldenSet(
+        key="fernhollow-3",
+        name="fernhollow_sealed_v2",
+        src_dir=REPO_ROOT / "data/sealed-electrical-2/src",
+        golden_file=REPO_ROOT / "data/sealed-electrical-2/fernhollow_sealed_v2.json",
+        docs_dir=REPO_ROOT / "universe-electrical/docs",
+        written_by=BLIND_WRITER,
+        splits=("sealed",),
+        trade=ELECTRICAL,
+        hash_file=ELECTRICAL_DIR / "fernhollow_sealed_v2.sha256",
     ),
 }
 

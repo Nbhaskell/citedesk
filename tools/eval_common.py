@@ -30,6 +30,8 @@ SEALED_LEDGERS = {
     "kestrel": SEALED_LEDGER_FILE,
     "kestrel-2": REPO_ROOT / "eval/sealed_v2_ledger.json",
     "fernhollow-2": REPO_ROOT / "eval/fernhollow_sealed_ledger.json",
+    "kestrel-3": REPO_ROOT / "eval/sealed_v3_ledger.json",
+    "fernhollow-3": REPO_ROOT / "eval/fernhollow_sealed_v2_ledger.json",
 }
 GOLDEN_SETS = tuple(SETS)
 SPLITS = ("tuned", "heldout", "sealed")
@@ -42,6 +44,8 @@ IGNORED_FOR_DIRTY = (
     "eval/fernhollow_ledger.json",
     "eval/sealed_v2_ledger.json",
     "eval/fernhollow_sealed_ledger.json",
+    "eval/sealed_v3_ledger.json",
+    "eval/fernhollow_sealed_v2_ledger.json",
     "eval/runs/",
     "eval/reports/",
 )

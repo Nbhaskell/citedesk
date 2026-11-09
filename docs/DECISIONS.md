@@ -1139,3 +1139,16 @@ The model read all six as a price, booking or service question. Changes made fro
 - The plumber is unchanged: the fingerprint of D-097 is identical to the one after phase B.
 
 **Not known.** These are development figures: the terms were written after reading the misses, and no unseen electrician set is left. Whether they catch other wordings, and how often they fire on ordinary messages, needs a fresh electrician set written by a blind session.
+
+### D-111. Two third sealed sets, prepared for blind writers
+**Why.** All sealed sets are spent (D-087, D-107, D-108). Two changes need messages nobody working on the system has seen: the electrical terms of D-110, which were written after reading the misses of the electrician's sealed set, and any plumbing change after D-108.
+
+**What was built.**
+- `tools/golden.py`: two sealed sets with `sealed` as their only split, as in D-104: `kestrel-3` (the plumber, items in `data/sealed-3/`, hash `eval/golden/citedesk_sealed_v3.sha256`) and `fernhollow-3` (the electrician, items in `data/sealed-electrical-2/`, hash `eval/golden-electrical/fernhollow_sealed_v2.sha256`). `data/` is git-ignored.
+- `tools/eval_common.py`: their own ledgers (`eval/sealed_v3_ledger.json`, `eval/fernhollow_sealed_v2_ledger.json`), which a run may write on a clean tree. `tools/route_cost.py` accepts both once their one run is finished (D-109).
+- Briefs: `eval/golden/SEALED_V3_BRIEF.md` (about 120 items, at least 15 safety, 8 spam and 6 messages with two or more intents) and `eval/golden-electrical/SEALED_V2_BRIEF.md` (about 110 items, at least 30 safety, at least 15 near misses). Each writer may read the labelling rules, the schema names and its business's facts and documents only; the briefs also forbid the earlier briefs, the ledgers, and notes or transcripts of other sessions (one writer of D-105 read such a note).
+- Tests: `tests/test_sealed_sets.py` covers the four newer sets (sealed, git-ignored, own files, hash and ledger, matching trade and documents) and checks the third sets' briefs exist. No test reads a sealed item.
+
+**Disclosed.** The briefs were written by the session that knows every earlier result. The electrician's brief names no wording: it asks for emergencies described by what the customer sees, hears, smells or feels, in the writer's own words, so the six wordings of D-109 are not suggested to it. The plumber's brief asks for more spam and multi-intent messages because those were weak in D-108. The writers are the same model family as the one that wrote the system: blind to the prompts and results, not independent of the author.
+
+**Order of use.** Each set is written and sealed before it is run, and run once, by one fixed system, when asked.

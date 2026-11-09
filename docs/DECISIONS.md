@@ -1029,3 +1029,23 @@ The pictures in `docs/screenshots/` predated two screen changes: the "How good t
 - Each was written by a separate session from its brief (D-104). Both builds are valid, `verify-sealed --set` matches for both, and a second `seal` is refused. The counts above come from the tools' count summaries; no item has been opened outside the writing sessions.
 - **What the writing sessions opened**, checked from their raw tool calls by a script that lists file paths and never item text: the brief, the labelling rules, the schema, `docs/BACKEND_SCHEMA.md`, `tools/golden.py`, and their business's facts and documents. Neither read the code, tests, prompts, any earlier item, any report or run, or the first sealed set. One exception, disclosed: the plumber's session read a hand-over note, kept outside the repository, from the writer of the electrician's first set. It holds that set's counts and six labelling choices, and nothing about the system or its results; the brief had asked the session not to open the electrician's first set.
 - **Not checked.** Label quality is unreviewed beyond the validator. Neither set has been run. Each is run once, by a fixed system, when asked (D-104).
+
+### D-106. The electrical emergency terms widened, after the electrician's first set
+**Why.** On the electrician's first set (D-100) two safety messages were missed: a dimmer running too hot to touch, and a ceiling fan motor that put out a puff of smoke. Looking at every safety item of that set (it is spent, so it may now be read) showed the code net fired on only 4 of 13; the model caught most of the others. The terms of D-098 named each kind of emergency but with too few words for it.
+
+**What changed** (`citedesk/safety.py`, electrical trade only):
+- The parts of an electrical system are named once (`_PARTS`: outlets, switches, dimmers, plugs, cords, panels, breakers, fuse boxes, meters, fixtures, lights, fans, motors, wiring, chargers, appliances, heaters, walls, ceilings), and smoke is looked for on either side of a part. A smoke alarm or detector is not smoke, and "smoky" (a style of glass) is not either.
+- A burning smell includes "burnt", "hot plastic", and a fishy smell next to an electrical part.
+- A shock includes "zapped", "jolted" and a tingle someone felt.
+- Exposed wires include wires "hanging", "sticking out" or "live" after the word.
+- Hot fittings use only the parts the business's emergency document says must never be hot (`_HOT_PARTS`: no heaters, bulbs or light fittings, which get hot in use), with "getting warm", "running hot" and "too hot to ..."; "warm white" and "hot tub" are excluded.
+- A fallen line includes a service line, and "the wire to our house" pulled off or lying down; a wire "pulled through" an attic is ordinary work.
+- Water reaching the electrics allows a longer clause, and "water heater", "water softener" and the like do not count as water.
+- A symptom the customer rules out does not fire: the word right before it, in its clause, is "no", "without" or "never" ("no sparks, nothing hot"). Only the electrical symptoms are discounted this way.
+
+**Checked.**
+- `tests/test_trade_electrical.py`: 18 new sentences that must fire, 16 near misses that must not, and 2 tests of the negation rule (one shows it does not reach the plumbing net). The new sentences were written to fail first, and did.
+- On the spent electrician set, with the terms built while looking at it: the net fires on 13 of 13 safety items and on 0 of the 70 others (before: 4 of 13, and one near miss, "no smell, no sparks", fired). These are development figures, not a result.
+- The plumber is unchanged: the fingerprint of D-097 (prompts, schemas, screening, safety net, spam scores and retrieval questions for 211 items) is identical to the one after phase B.
+
+**Not known.** Whether the wider terms catch electrical emergencies in wordings nobody has seen, and how often they fire on ordinary messages, is for the sealed electrician set (`fernhollow-2`, D-104, D-105), which was written and sealed before this change. It has not been run. The model's own reading is unchanged; the net only adds `HEALTH_SAFETY` and urgency.

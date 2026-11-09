@@ -49,6 +49,23 @@ EMERGENCY_PATTERNS: dict[str, re.Pattern[str]] = {
     ),
 }
 
+# The parts of an electrical system a customer names (D-106). Used on both sides of a symptom,
+# so "the dimmer gets hot" and "smoke came out of the fan motor" are both found.
+_PARTS = (
+    r"\b(?:outlets?|sockets?|receptacles?|(?:light |dimmer )?switch(?:es)?|switch plates?|dimmers?|"
+    r"plugs?|cords?|panels?|breakers?(?: box)?|fuse ?box(?:es)?|fuses?|meters?|fixtures?|"
+    r"lights?|lamps?|bulbs?|fans?|motors?|wires?|wiring|chargers?|appliances?|"
+    r"heaters?|walls?|ceilings?)\b"
+)
+
+# The parts that must never be hot to the touch (universe-electrical/docs/emergencies.md).
+# Heaters, bulbs and light fittings get hot in normal use, so they are left out here.
+_HOT_PARTS = (
+    r"\b(?:outlets?|sockets?|receptacles?|(?:light |dimmer )?switch(?:es)?|switch plates?|"
+    r"dimmers?|plugs?|cords?|panels?|breakers?(?: box)?|fuse ?box(?:es)?|fuses?|meters?|"
+    r"wires?|wiring|chargers?)\b"
+)
+
 # The electrical trade (D-098). Gas and carbon monoxide are kept: any customer may report them.
 # A breaker panel or a fuse box named on its own is not an emergency here, because an electrician
 # is asked about panels every day; what makes one an emergency is a sign of heat, fire or shock.
@@ -56,36 +73,59 @@ ELECTRICAL_EMERGENCY_PATTERNS: dict[str, re.Pattern[str]] = {
     "gas_smell": EMERGENCY_PATTERNS["gas_smell"],
     "carbon_monoxide": EMERGENCY_PATTERNS["carbon_monoxide"],
     "burning_smell": re.compile(
-        r"\b(?:burning|melting|scorched?|singed)\b.{0,15}\b(?:smell|smells|odou?r|plastic)\b"
-        r"|\b(?:smell|smells|smelled|odou?r)\b.{0,15}\b(?:burning|melting|scorched?)\b"
+        r"\b(?:burning|burnt|burned|melting|scorched?|singed|hot plastic)\b.{0,20}"
+        r"\b(?:smell|smells|smelled|smelling|odou?r)\b"
+        r"|\b(?:smell|smells|smelled|smelling|odou?r)\b.{0,25}"
+        r"\b(?:burning|burnt|burned|melting|scorched?|hot plastic)\b"
+        # a fishy smell is a classic sign of overheating, but only next to an electrical part
+        r"|\bfishy\b.{0,20}\b(?:smell|smells|odou?r)\b.{0,30}"
+        + _PARTS
+        + r"|"
+        + _PARTS
+        + r".{0,30}\bfishy\b.{0,10}\b(?:smell|smells|odou?r)\b"
     ),
     "sparks_or_smoke": re.compile(
         r"\bspark(?:s|ed|ing|y)?\b|\barc(?:ing|ed)\b"
-        r"|\bsmoke\b.{0,20}\b(?:from|out of|coming)\b.{0,25}"
-        r"\b(?:outlet|socket|switch|panel|breaker|wall|light|fixture|plug|wire|wiring)s?\b"
-        r"|\b(?:on fire|caught fire|flames?)\b"
+        # smoke near an electrical part; a smoke alarm or detector is not smoke
+        r"|\bsmok(?:e|ed|es|ing)\b(?!\s*(?:alarm|detector)s?\b).{0,40}"
+        + _PARTS
+        + r"|"
+        + _PARTS
+        + r".{0,40}\bsmok(?:e|ed|es|ing)\b(?!\s*(?:alarm|detector)s?\b)"
+        + r"|\b(?:on fire|caught fire|flames?)\b"
     ),
     "shock": re.compile(
         # "shocked at the price" is not a shock: a person must get one, or it must be electric
         r"\belectric(?:al)?\s+shocks?\b"
         r"|\b(?:got|get|gets|getting|gave me|giving|felt)\s+(?:a\s+)?(?:\w+\s+)?shocks?\b"
         r"|\bshocks?\s+(?:from|when|off)\b|\belectrocut\w*\b|\bgot a (?:jolt|zap)\b"
+        r"|\b(?:got|get|gets|getting|was|were)\s+(?:\w+\s+)?(?:zapped|jolted)\b"
+        r"|\b(?:felt|feel|feels|feeling)\s+(?:a\s+)?(?:\w+\s+)?tingl(?:e|es|ing)\b"
     ),
     "exposed_wires": re.compile(
         r"\b(?:exposed|bare|live|loose|dangling|hanging)\b.{0,10}\bwir(?:e|es|ing)\b"
+        r"|\bwir(?:e|es|ing)\b.{0,20}\b(?:exposed|hanging|dangling|sticking out|poking out|"
+        r"are live|is live|bare)\b"
     ),
     "hot_fitting": re.compile(
-        r"\b(?:outlet|socket|switch|plug|panel|breaker)s?\b.{0,25}"
-        # "the breaker for the hot tub" is not a hot breaker
-        r"\b(?:(?:is|are|feels?|getting|gets|too|very|really)\s+hot|hot to the touch|warm to the "
-        r"touch|melted|melting|scorched|blackened|buzzing)\b"
+        _HOT_PARTS + r".{0,45}"
+        # "the breaker for the hot tub" is not a hot breaker, "warm white" is a colour
+        r"\b(?:(?:is|are|feels?|felt|getting|gets|got|running|runs|too|very|really|so)\s+"
+        r"(?:(?:really|very|too|so|quite|a bit)\s+)?(?:hot|warm)(?!\s+(?:tub|water|white|light|"
+        r"glow|colou?r|tone))"
+        r"|hot to the touch|warm to the touch|too hot to\b|melted|melting|scorched|blackened|"
+        r"buzzing)\b"
     ),
     "downed_line": re.compile(
-        r"\b(?:power|electric(?:al)?|utility)\s+lines?\b.{0,20}\b(?:down|fell|fallen|ground)\b"
+        r"\b(?:power|electric(?:al)?|utility|service)\s+(?:lines?|wires?|drop|cables?)\b.{0,40}"
+        r"\b(?:down|fell|fallen|ground|snapped|lying|(?:pulled|ripped|torn) (?:down|off))\b"
         r"|\bdowned\s+(?:power\s+)?lines?\b"
+        r"|\bwire\s+(?:to|into)\s+(?:our|the|my)\s+(?:house|home)\b.{0,40}"
+        r"\b(?:down|off|fell|fallen|ground|snapped|lying)\b"
     ),
     "water_and_electrics": re.compile(
-        r"\bwater\b.{0,30}\b(?:outlet|socket|panel|breaker|wiring|light fixture)s?\b"
+        r"\bwater\b(?!\s+(?:heater|softener|pump|filter|bill))"
+        r".{0,60}\b(?:outlet|socket|panel|breaker|wiring|light fixture)s?\b"
         r"|\b(?:outlet|socket|panel|breaker|wiring)s?\b.{0,30}\b(?:wet|soaked|flooded)\b"
     ),
 }
@@ -130,6 +170,18 @@ def _is_imagined(text: str, match: re.Match[str], breaks: list[tuple[int, int]])
     )
 
 
+# A symptom the customer rules out ("no smell, no sparks, nothing hot", D-106). Only the word
+# right before the symptom counts, in its own clause, and only for the electrical symptoms: the
+# plumbing net is unchanged, and its "no water" is itself an emergency.
+NEGATION = re.compile(r"\b(?:no|without|never)\s+$")
+NEGATABLE = frozenset({"burning_smell", "sparks_or_smoke", "shock", "exposed_wires", "hot_fitting"})
+
+
+def _is_negated(text: str, match: re.Match[str], breaks: list[tuple[int, int]]) -> bool:
+    start = max((end for begin, end in breaks if end <= match.start()), default=0)
+    return bool(NEGATION.search(text[start : match.start()]))
+
+
 def _fires(
     name: str,
     pattern: re.Pattern[str],
@@ -137,12 +189,14 @@ def _fires(
     breaks: list[tuple[int, int]],
     imaginable: frozenset[str] = IMAGINABLE,
 ) -> bool:
-    """True if any match of the pattern, overlapping ones included, is neither past history nor
-    (for water events) imagined."""
+    """True if any match of the pattern, overlapping ones included, is not past history, not
+    (for water events) imagined, and not (for electrical symptoms) ruled out."""
     position = 0
     while (match := pattern.search(text, position)) is not None:
-        if not _is_history(text, match, breaks) and not (
-            name in imaginable and _is_imagined(text, match, breaks)
+        if (
+            not _is_history(text, match, breaks)
+            and not (name in imaginable and _is_imagined(text, match, breaks))
+            and not (name in NEGATABLE and _is_negated(text, match, breaks))
         ):
             return True
         position = match.start() + 1

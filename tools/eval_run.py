@@ -7,6 +7,7 @@
     python -m tools.eval_run --resume RUN_ID                  carry on an interrupted run
     python -m tools.eval_run --split heldout --allow-heldout --heldout-passes 3   see below
     python -m tools.eval_run --split sealed --confirm-sealed-once --sealed-passes 3   see below
+    python -m tools.eval_run --set fernhollow --split heldout --allow-heldout --heldout-passes 3
 
 Needs Ollama with the model and rag-project indexed on Citedesk's documents (README). This asks
 the system and saves raw outputs; it does not score them. `python -m tools.eval_score` does that
@@ -33,6 +34,14 @@ and two more: the run needs `--confirm-sealed-once`, and the sealed file
 (`data/sealed/citedesk_sealed_v1.json`, git-ignored) must match the hash committed in
 `eval/golden/citedesk_sealed.sha256`, or nothing is read. The first run declares its passes with
 `--sealed-passes N`. Its labels come from the sealed file, not `citedesk_v1.json`.
+
+**The electrician's set** (`--set fernhollow`, D-099, D-100). The invented electrician's labelled
+set is held-out only and follows the held-out rules above, with its own committed ledger
+`eval/fernhollow_ledger.json`. The run uses the electrician's fact sheet
+(`universe-electrical/facts.json`) whatever `BUSINESS_FACTS_PATH` says, and before anything is
+written it asks the knowledge base for the business's contact details and refuses unless the
+passages that come back are the electrician's: rag-project must be indexed on
+`universe-electrical/docs`.
 """
 
 import argparse
@@ -55,6 +64,7 @@ from citedesk.providers import LLMProvider
 from tools import eval_common as ec
 from tools import eval_ledger as ledger_mod
 from tools import score_understanding as su
+from tools.golden import SETS
 
 FORMAT = "eval-run-v1"
 STAGES = ["screen", "understand", "route", "retrieve", "draft", "check"]
@@ -255,6 +265,9 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0] if __doc__ else None)
     parser.add_argument("--split", choices=ec.SPLITS, default="tuned")
     parser.add_argument(
+        "--set", choices=ec.GOLDEN_SETS, default="kestrel", help="the labelled set (D-100)"
+    )
+    parser.add_argument(
         "--limit", type=int, help="run only the first N items (a check, not a result)"
     )
     parser.add_argument("--passes", type=int, default=1, help="passes to make, one file each")
@@ -289,9 +302,16 @@ def _say(message: str) -> None:
     print(message, file=sys.stderr)
 
 
-def _run_id(split: str, label: str | None, pass_number: int, stamp: datetime) -> str:
+def _run_id(
+    split: str,
+    label: str | None,
+    pass_number: int,
+    stamp: datetime,
+    golden_set: str = "kestrel",
+) -> str:
     parts = [
         "eval",
+        *([golden_set] if golden_set != "kestrel" else []),
         split,
         *([label] if label else []),
         f"{stamp:%Y%m%d-%H%M%S}",
@@ -320,6 +340,7 @@ def run_command(
 ) -> int:
     """Everything `main` does once its inputs exist, so a test can supply scripted ones."""
     split: str = args.split
+    golden_set: str = args.set
     resumed: dict[str, Any] | None = None
     if args.resume:
         path = Path(args.resume)
@@ -329,7 +350,9 @@ def run_command(
             return 2
         resumed = json.loads(path.read_text("utf-8"))["header"]
         split = resumed["split"]
-    problems = ledger_mod.heldout_problems(
+        golden_set = str(resumed.get("golden_set") or "kestrel")
+    problems = set_problems(golden_set, split)
+    problems += ledger_mod.heldout_problems(
         allow_heldout=args.allow_heldout,
         limit=args.limit if resumed is None else resumed.get("limit"),
         dirty=bool(git.get("dirty")),
@@ -382,7 +405,11 @@ def run_command(
     for pass_number in pass_range:
         now = datetime.now(UTC)
         justification = None
-        run_id = resumed["run_id"] if resumed else _run_id(split, args.label, pass_number, now)
+        run_id = (
+            resumed["run_id"]
+            if resumed
+            else _run_id(split, args.label, pass_number, now, golden_set)
+        )
         label = resumed.get("label") if resumed else args.label
         header = build_header(
             split=split,
@@ -401,6 +428,10 @@ def run_command(
             pass_number=pass_number,
             passes_planned=args.passes,
         )
+        if golden_set != "kestrel":
+            # Not part of the system identity: the split hash already tells the sets apart.
+            header["golden_set"] = golden_set
+            header["business"] = {"name": business.name, "trade": business.trade.key}
         if ledger is not None:
             try:
                 auth = ledger_mod.authorize(
@@ -415,7 +446,7 @@ def run_command(
                 return 2
             pass_number = auth.pass_number
             if not resumed:
-                run_id = _run_id(split, args.label, pass_number, now)
+                run_id = _run_id(split, args.label, pass_number, now, golden_set)
                 header["run_id"], header["pass_number"] = run_id, pass_number
             justification = auth.justification
             ledger_mod.record_start(
@@ -474,6 +505,46 @@ def _preflight(settings: Settings) -> str | None:
     return None
 
 
+def set_problems(golden_set: str, split: str) -> list[str]:
+    """Reasons a set and split cannot be run together."""
+    if golden_set not in SETS:
+        return [f"there is no golden set {golden_set!r}"]
+    # The plumber's set has its tuned, held-out and sealed splits, each with its own rules.
+    if golden_set != "kestrel" and split not in SETS[golden_set].splits:
+        return [
+            f"the {golden_set} set has held-out items only and is never used for tuning: "
+            "use --split heldout"
+        ]
+    return []
+
+
+def facts_for_set(golden_set: str) -> Path | None:
+    """The fact sheet a set must be run with, or None to keep the settings' own."""
+    if golden_set == "kestrel":
+        return None
+    return SETS[golden_set].docs_dir.parent / "facts.json"
+
+
+KB_CHECK_QUESTION = "What is the office phone number and email address?"
+
+
+def kb_serves(kb: KnowledgeBase, business: Business) -> str | None:
+    """None if the knowledge base's passages are this business's (its phone or email appears in
+    them), otherwise why not. Two invented businesses have documents with the same file names, so
+    the names alone cannot tell which one is indexed."""
+    try:
+        result = kb.ask(KB_CHECK_QUESTION)
+    except Exception as error:  # noqa: BLE001 (any failure means the check did not pass)
+        return f"the knowledge base could not be asked ({type(error).__name__})"
+    text = "\n".join(source.text for source in result.sources)
+    if business.phone in text or business.email in text:
+        return None
+    return (
+        f"the knowledge base's passages are not {business.name}'s: index rag-project on that "
+        "business's documents first"
+    )
+
+
 def _split_to_run(args: argparse.Namespace) -> str:
     """The split this invocation will run: a resumed run keeps the split it started with."""
     if args.resume:
@@ -482,6 +553,17 @@ def _split_to_run(args: argparse.Namespace) -> str:
         if path.exists():
             return str(json.loads(path.read_text("utf-8"))["header"]["split"])
     return str(args.split)
+
+
+def _set_to_run(args: argparse.Namespace) -> str:
+    """The set this invocation will run: a resumed run keeps the set it started with."""
+    if args.resume:
+        path = Path(args.resume)
+        path = path if path.suffix else ec.RUNS_DIR / f"{args.resume}.run.json"
+        if path.exists():
+            header = json.loads(path.read_text("utf-8"))["header"]
+            return str(header.get("golden_set") or "kestrel")
+    return str(args.set)
 
 
 def main(argv: list[str]) -> int:
@@ -510,6 +592,15 @@ def main(argv: list[str]) -> int:
 
     settings = Settings()
     split = _split_to_run(args)
+    golden_set = _set_to_run(args)
+    early_set = set_problems(golden_set, split)
+    if early_set:
+        for problem in early_set:
+            _say(f"Refused: {problem}")
+        return 2
+    facts = facts_for_set(golden_set)
+    if facts is not None:
+        settings = settings.model_copy(update={"business_facts_path": facts})
     git = ec.git_state()
     if split == "sealed":
         # Refused here, before the file is opened: a request that will be turned down must not
@@ -526,24 +617,33 @@ def main(argv: list[str]) -> int:
             for problem in refused:
                 _say(f"Refused: {problem}")
             return 2
-    golden_path = ec.golden_file_for(split)
+    golden_path = ec.golden_file_for(split, golden_set)
     if not golden_path.is_file():
         _say(f"Refused: {golden_path.name} does not exist")
         return 2
     golden = json.loads(golden_path.read_text("utf-8"))
+    business = load_business(settings.business_facts_path)
+    kb = RagProjectKB(settings.rag_url)
+
+    def preflight() -> str | None:
+        problem = _preflight(settings)
+        if problem is None and golden_set != "kestrel":
+            problem = kb_serves(kb, business)
+        return problem
+
     return run_command(
         args,
         golden=golden,
         golden_sha256=ec.file_sha256(golden_path),
         settings=settings,
         llm=OllamaProvider.from_settings(settings),
-        kb=RagProjectKB(settings.rag_url),
-        business=load_business(settings.business_facts_path),
+        kb=kb,
+        business=business,
         git=git,
         rag=ec.rag_status(settings.rag_url),
         runs_dir=ec.RUNS_DIR,
-        ledger_path=ec.LEDGER_FILE,
-        preflight=lambda: _preflight(settings),
+        ledger_path=ec.ledger_file_for(golden_set),
+        preflight=preflight,
         sealed_ledger_path=ec.SEALED_LEDGER_FILE,
         sealed_hash_matches=lambda: verify_sealed(SEALED_FILE, SEALED_HASH_FILE),
     )

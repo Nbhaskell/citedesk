@@ -106,6 +106,22 @@ def break_even(result: Mapping[str, Any], escalate_all: Mapping[str, Any]) -> fl
     return (escalate_all["total"] - rest) / missed
 
 
+def break_even_text(value: float | None) -> str:
+    """The break-even as a sentence. At zero or below, the run's other errors alone cost more than
+    escalating everything, so no cost of a missed escalation makes the run the cheaper one."""
+    if value is None:
+        return "no missed escalation, so it is cheaper whenever its other errors are"
+    if value <= 0:
+        return (
+            "escalating everything is cheaper at any cost of a missed escalation: the run's other "
+            "errors alone cost more"
+        )
+    return (
+        f"the two cost the same when one missed escalation costs {value:.1f} (the assumed cost is "
+        f"{COSTS['missed_escalation']}); above that, escalating everything is cheaper"
+    )
+
+
 def policy(gold: Mapping[str, Any], route: str) -> dict[str, str | None]:
     return {item_id: route for item_id in gold}
 
@@ -150,13 +166,7 @@ def render(split: str, runs: Sequence[tuple[str, dict[str, Any]]], gold: Mapping
     everything = cost(gold, policy(gold, "escalate"))
     lines += ["", "## Break-even with escalating everything", ""]
     for name, result in runs:
-        value = break_even(result, everything)
-        lines.append(
-            f"- `{name}`: no missed escalation, so it is cheaper whenever its other errors are"
-            if value is None
-            else f"- `{name}`: the two cost the same when one missed escalation costs {value:.1f} "
-            "(the assumed cost is 20); above that, escalating everything is cheaper"
-        )
+        lines.append(f"- `{name}`: {break_even_text(break_even(result, everything))}")
     for name, result in runs:
         listed = {k: v for k, v in result["errors"].items() if v}
         if listed:

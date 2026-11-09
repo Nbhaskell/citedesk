@@ -1,0 +1,75 @@
+{
+  "format": "heldout-ledger-v1",
+  "note": "Every held-out run of the evaluation, written when the run starts. The held-out set is run once, by one fixed system; see docs/DECISIONS.md D-061 and D-062.",
+  "evaluations": [
+    {
+      "system_id": "a62b6404da1c4516",
+      "identity": {
+        "code_tree": "85f082ba8cdf9a6a49b8107b5f8c9b00a8a33e0a",
+        "universe_tree": "5e8d3853c5bffb5674446d086542b4da93546020",
+        "model": "qwen3:8b",
+        "prompt_versions": {
+          "understand": "understand-v3",
+          "draft": "draft-v4"
+        },
+        "settings": {
+          "enable_thinking": true,
+          "escalate_on_low_confidence": true,
+          "spam_threshold": 0.8,
+          "duplicate_window_hours": 24,
+          "draft_max_words": 200,
+          "max_body_chars": 10000
+        },
+        "rag": {
+          "chat_model": "qwen3:8b",
+          "embed_model": "embeddinggemma",
+          "thinking": true,
+          "split_search": true,
+          "files": 8,
+          "chunks": 81
+        },
+        "split_sha256": "ec4051d749ac0addf2221ca819de851e8c2fc886a454bb53ec8d3d201aedc925"
+      },
+      "passes_declared": 3,
+      "created_at": "2026-11-09T01:07:43+00:00",
+      "runs": [
+        {
+          "run_id": "eval-fernhollow-heldout-20261109-010743-p1",
+          "run_file": "eval-fernhollow-heldout-20261109-010743-p1.run.json",
+          "pass": 1,
+          "status": "completed",
+          "started_at": "2026-11-09T01:07:43+00:00",
+          "finished_at": "2026-11-09T01:30:50+00:00",
+          "items": 83,
+          "failed": 0,
+          "outside_plan": false,
+          "justification": null
+        },
+        {
+          "run_id": "eval-fernhollow-heldout-20261109-013050-p2",
+          "run_file": "eval-fernhollow-heldout-20261109-013050-p2.run.json",
+          "pass": 2,
+          "status": "completed",
+          "started_at": "2026-11-09T01:30:50+00:00",
+          "finished_at": "2026-11-09T01:53:55+00:00",
+          "items": 83,
+          "failed": 0,
+          "outside_plan": false,
+          "justification": null
+        },
+        {
+          "run_id": "eval-fernhollow-heldout-20261109-015355-p3",
+          "run_file": "eval-fernhollow-heldout-20261109-015355-p3.run.json",
+          "pass": 3,
+          "status": "completed",
+          "started_at": "2026-11-09T01:53:55+00:00",
+          "finished_at": "2026-11-09T02:16:29+00:00",
+          "items": 83,
+          "failed": 0,
+          "outside_plan": false,
+          "justification": null
+        }
+      ]
+    }
+  ]
+}

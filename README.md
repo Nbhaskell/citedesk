@@ -43,6 +43,17 @@ Sources: [tuned](eval/reports/tuned-think-on.md), [held-out](eval/reports/heldou
 
 **Against a method with no model** ([report](eval/reports/intent-baseline.md), [D-093](docs/DECISIONS.md)): a naive Bayes classifier on word counts, trained on the tuned split, got 39 of 76 held-out primary intents right (51.3%); on the same 75 items the model got 52 or 53 (about 70%). The model adds about 18 points on this step. Those are the held-out runs of the system before the later fixes; the sealed set cannot be used for a baseline.
 
+**A second business in another trade** ([report](eval/reports/fernhollow-run.md), [D-097 to D-100](docs/DECISIONS.md)): the trade is a profile named in the fact sheet, and an invented electrician, Fernhollow Electric, has its own fact sheet, documents and emergency terms. A separate session that saw the labelling rules and the electrician's documents, but not the code, prompts or results, wrote 83 labelled messages. The final system ran them once, three passes, unchanged:
+
+| Measure | Fernhollow Electric, 3 passes | Kestrel sealed, same system |
+|---|---|---|
+| Primary-intent accuracy (target 85%) | 70.7% | 73.1% |
+| Health-and-safety messages escalated (no misses) | **11, 11 and 12 of 13 (missed)** | 15 of 15 |
+| Route accuracy, whole pipeline | 67.1% | 74.0% |
+| Escalation precision / recall | 72.9% / 74.6% | 78.1% / 89.6% |
+
+Intent accuracy carried across, and a word-count baseline trained on the plumber scored 59.0% ([report](eval/reports/intent-baseline-fernhollow.md)). **Two safety messages were missed** (a dimmer running hot, a fan motor that smoked): the electrical emergency terms did not fire and the model did not flag them. They reached a person, as every message does, but not marked as safety. Weighted by assumed cost, routing cost 390 to 511 per 100 messages against 183 for escalating everything ([report](eval/reports/route-cost-fernhollow.md)). The set is spent, so the electrical terms are not changed from it.
+
 More, from the first held-out pass ([report](eval/reports/heldout-think-on.md)): fields extracted correctly 90.7%; no ungrounded figure found by the figure check in 48 drafts; median 16.3 s per inquiry through all stages on the development machine (p90 33.0 s; the sum of the stage times).
 
 **Design decisions that the numbers shaped**

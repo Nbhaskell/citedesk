@@ -15,6 +15,8 @@
 | `intent-label-agreement.md` | A second labeller against the existing intent labels on a 60-item blind sample (tuned and held-out items), with a comparison against a saved model run. Labels in `eval/labels/intent_agreement.labels.json` (D-088, D-089) |
 | `intent-baseline.md` | Primary intent from two methods with no model (majority, naive Bayes), trained on the tuned split and scored once on the held-out split, paired with the three saved held-out model passes (D-093) |
 | `route-cost-heldout.md`, `route-cost-tuned.md` | Route errors weighted by an assumed cost in a person's minutes, next to escalating everything and drafting everything, with a break-even figure (D-094) |
+| `fernhollow-run.md` | The invented electrician's set (83 held-out items, written by a separate session): three passes of the final system, scored one by one, then the spread. The run is in `eval/fernhollow_ledger.json` (D-100) |
+| `route-cost-fernhollow.md`, `intent-baseline-fernhollow.md` | The route cost and the intent baseline on the electrician's set; the baseline is trained on the plumbing tuned split (D-100) |
 
 Produced by `tools.eval_run`, `tools.eval_score` and `tools.eval_compare` (D-062). The tuned files
 come from six saved runs on 2026-10-29: code at commit `2d959c4`, model `qwen3:8b`, `understand-v1` and `draft-v1`
@@ -52,6 +54,26 @@ made because of it would spend it (D-061).
   checks compare values and phrases, not meaning, and no judge has read the drafts.
 - **Counts are small.** Twelve safety items with no misses are compatible with a true miss rate
   near one in four; each other reason has between 4 and 13 items.
+
+## The electrician's set (one system, run once, three passes declared up front)
+
+`fernhollow-run.md`: 83 items for Fernhollow Electric, run on 2026-11-09 at commit `e859f6a` with
+rag-project indexed on `universe-electrical/docs`. Three passes, 0 failed items, nothing changed
+afterwards (D-100).
+
+| Measure (3 passes) | Result |
+|---|---|
+| Primary-intent accuracy (target 85%) | 70.7% in every pass |
+| HEALTH_SAFETY escalation recall (target: no misses) | **11, 11 and 12 of 13: missed** (`dimmer-too-hot`, `fan-motor-smoke`) |
+| Route accuracy, whole pipeline | mean 67.1% (±1.7) |
+| Escalation precision | mean 72.9% (±2.2) |
+| Escalation recall | mean 74.6% (±3.4) |
+
+- The electrical emergency terms did not fire on either missed safety item. The set is spent, so
+  they are not changed from it.
+- The scorer's fixed caveat "the same author wrote the documents, the prompts and the labels" is
+  too strong for this set: its items and labels were written by a separate session blind to the
+  code and prompts (D-099). The documents were written by the system's author.
 
 ## Tuned results (means over three passes)
 

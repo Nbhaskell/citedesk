@@ -19,9 +19,11 @@ The costs are ASSUMPTIONS, in rough minutes of a person's time, fixed before any
 The counts per kind are reported as well, so other costs can be applied by hand.
 
     python -m tools.route_cost [--split tuned|heldout] [--md PATH] RUN.run.json [RUN ...]
+    python -m tools.route_cost --sealed-set kestrel-2 [--md PATH] RUN.run.json [RUN ...]
 
-The sealed split is refused: its labels stay unopened (D-071). Reports hold ids, routes and
-counts only: no message text.
+A sealed set is refused until it is spent: its ledger must show its one run finished, every
+declared pass completed, and the file must match its committed hash (D-109). Before that its labels
+stay unopened (D-071). Reports hold ids, routes and counts only: no message text.
 """
 
 import argparse
@@ -32,7 +34,8 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from tools.golden import GOLDEN_FILE
+from tools.eval_common import sealed_files_for, sealed_ledger_file_for
+from tools.golden import GOLDEN_FILE, verify_sealed
 
 HEALTH_SAFETY = "HEALTH_SAFETY"
 KINDS = (
@@ -126,10 +129,38 @@ def policy(gold: Mapping[str, Any], route: str) -> dict[str, str | None]:
     return {item_id: route for item_id in gold}
 
 
-def labels_for(items: Sequence[dict[str, Any]], split: str) -> dict[str, dict[str, Any]]:
-    if split == "sealed" or any(i.get("split") == "sealed" for i in items):
-        raise ValueError("the sealed split is never used here")
+def labels_for(
+    items: Sequence[dict[str, Any]], split: str, *, spent: bool = False
+) -> dict[str, dict[str, Any]]:
+    """The labels of one split. Sealed labels only once the set is spent (D-109)."""
+    if not spent and (split == "sealed" or any(i.get("split") == "sealed" for i in items)):
+        raise ValueError("the sealed split is never used here before its one run is finished")
     return {i["id"]: i["labels"] for i in items if i.get("split") == split}
+
+
+def is_spent(ledger: Mapping[str, Any]) -> bool:
+    """True if the ledger records a sealed run whose declared passes all completed."""
+    for evaluation in ledger.get("evaluations", []):
+        declared = evaluation.get("passes_declared")
+        done = [r for r in evaluation.get("runs", []) if r.get("status") == "completed"]
+        if declared and len(done) >= declared:
+            return True
+    return False
+
+
+def spent_sealed_labels(name: str) -> dict[str, dict[str, Any]]:
+    """The labels of a sealed set whose one run is finished, or a ValueError saying why not."""
+    files = sealed_files_for(name)
+    ledger_file = sealed_ledger_file_for(name)
+    if files is None or ledger_file is None:
+        raise ValueError(f"{name} is not a sealed set")
+    if not ledger_file.exists() or not is_spent(json.loads(ledger_file.read_text("utf-8"))):
+        raise ValueError(f"{name} has not finished its one sealed run, so its labels stay unopened")
+    sealed_file, hash_file = files
+    if not verify_sealed(sealed_file, hash_file):
+        raise ValueError(f"{name}: the sealed file is missing or does not match its hash")
+    items = json.loads(sealed_file.read_text(encoding="utf-8"))["items"]
+    return labels_for(items, "sealed", spent=True)
 
 
 def routes_of(run: Mapping[str, Any]) -> dict[str, str | None]:
@@ -192,15 +223,30 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--split", choices=("tuned", "heldout"), default="tuned")
     parser.add_argument("--golden", type=Path, default=GOLDEN_FILE)
     parser.add_argument("--md", type=Path)
+    parser.add_argument(
+        "--sealed-set",
+        choices=("kestrel", "kestrel-2", "fernhollow-2"),
+        help="cost a sealed set, only after its one run is finished (D-109)",
+    )
     args = parser.parse_args(argv)
 
-    gold = labels_for(json.loads(args.golden.read_text(encoding="utf-8"))["items"], args.split)
+    if args.sealed_set:
+        try:
+            gold = spent_sealed_labels(args.sealed_set)
+        except ValueError as error:
+            print(f"Refused: {error}", file=sys.stderr)
+            return 2
+        split = f"sealed ({args.sealed_set}, spent)"
+    else:
+        items = json.loads(args.golden.read_text(encoding="utf-8"))["items"]
+        gold = labels_for(items, args.split)
+        split = args.split
     runs = []
     for path in args.runs:
         run = json.loads(path.read_text(encoding="utf-8"))
         name = path.name.removesuffix(".run.json").removesuffix(".drafts.json")
         runs.append((name, cost(gold, routes_of(run))))
-    text = render(args.split, runs, gold)
+    text = render(split, runs, gold)
     if args.md:
         args.md.parent.mkdir(parents=True, exist_ok=True)
         args.md.write_text(text, encoding="utf-8", newline="\n")

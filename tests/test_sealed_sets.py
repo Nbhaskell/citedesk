@@ -1,4 +1,5 @@
-"""The second sealed sets (D-104): one for the invented plumber, one for the invented electrician.
+"""The second and third sealed sets (D-104, D-111): each pair has one set for the invented plumber
+and one for the invented electrician.
 Each is kept out of git, sealed by a committed hash, and run once under its own ledger. No test
 reads any sealed item: the files used here are invented in the test."""
 
@@ -13,7 +14,9 @@ from tools import eval_run as er
 from tools import golden
 from tools.golden import SETS
 
-NEW = ("kestrel-2", "fernhollow-2")
+NEW = ("kestrel-2", "fernhollow-2", "kestrel-3", "fernhollow-3")
+PLUMBER = ("kestrel-2", "kestrel-3")
+ELECTRICIAN = ("fernhollow-2", "fernhollow-3")
 
 
 def test_the_new_sets_are_sealed_and_kept_out_of_git() -> None:
@@ -37,7 +40,7 @@ def test_each_set_has_its_own_files_hash_and_ledger() -> None:
     files = {golden.SEALED_FILE} | {SETS[k].golden_file for k in NEW}
     hashes = {golden.SEALED_HASH_FILE} | {SETS[k].hash_file for k in NEW}
     ledgers = {ec.sealed_ledger_file_for(k) for k in ("kestrel", *NEW)}
-    assert len(files) == len(hashes) == len(ledgers) == 3
+    assert len(files) == len(hashes) == len(ledgers) == 1 + len(NEW)
     assert ec.LEDGER_FILE not in ledgers and ec.FERNHOLLOW_LEDGER_FILE not in ledgers
     for key in NEW:
         ledger = ec.sealed_ledger_file_for(key)
@@ -46,12 +49,21 @@ def test_each_set_has_its_own_files_hash_and_ledger() -> None:
 
 
 def test_the_trades_and_documents_match_the_businesses() -> None:
-    assert SETS["kestrel-2"].trade.key == "plumbing"
-    assert SETS["kestrel-2"].docs_dir == golden.DOCS_DIR
-    assert SETS["fernhollow-2"].trade.key == "electrical"
-    assert SETS["fernhollow-2"].docs_dir == golden.REPO_ROOT / "universe-electrical/docs"
-    assert er.facts_for_set("fernhollow-2") == golden.REPO_ROOT / "universe-electrical/facts.json"
-    assert er.facts_for_set("kestrel-2") == golden.REPO_ROOT / "universe/facts.json"
+    for key in PLUMBER:
+        assert SETS[key].trade.key == "plumbing"
+        assert SETS[key].docs_dir == golden.DOCS_DIR
+        assert er.facts_for_set(key) == golden.REPO_ROOT / "universe/facts.json"
+    for key in ELECTRICIAN:
+        assert SETS[key].trade.key == "electrical"
+        assert SETS[key].docs_dir == golden.REPO_ROOT / "universe-electrical/docs"
+        assert er.facts_for_set(key) == golden.REPO_ROOT / "universe-electrical/facts.json"
+
+
+def test_the_third_sets_have_a_brief_and_a_ledger() -> None:
+    assert (golden.GOLDEN_DIR / "SEALED_V3_BRIEF.md").is_file()
+    assert (golden.ELECTRICAL_DIR / "SEALED_V2_BRIEF.md").is_file()
+    for key in ("kestrel-3", "fernhollow-3"):
+        assert ec.sealed_ledger_file_for(key) is not None
 
 
 def test_a_new_set_runs_only_as_a_sealed_split() -> None:

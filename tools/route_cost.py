@@ -225,7 +225,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--md", type=Path)
     parser.add_argument(
         "--sealed-set",
-        choices=("kestrel", "kestrel-2", "fernhollow-2"),
+        choices=("kestrel", "kestrel-2", "fernhollow-2", "kestrel-3", "fernhollow-3"),
         help="cost a sealed set, only after its one run is finished (D-109)",
     )
     args = parser.parse_args(argv)

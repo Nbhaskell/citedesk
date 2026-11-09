@@ -16,6 +16,7 @@
 | `intent-baseline.md` | Primary intent from two methods with no model (majority, naive Bayes), trained on the tuned split and scored once on the held-out split, paired with the three saved held-out model passes (D-093) |
 | `route-cost-heldout.md`, `route-cost-tuned.md` | Route errors weighted by an assumed cost in a person's minutes, next to escalating everything and drafting everything, with a break-even figure (D-094) |
 | `fernhollow-run.md` | The invented electrician's set (83 held-out items, written by a separate session): three passes of the final system, scored one by one, then the spread. The run is in `eval/fernhollow_ledger.json` (D-100) |
+| `fernhollow-sealed-run.md` | The sealed electrician set `fernhollow-2` (113 items, written by a blind session before D-106): three passes of the system at `26baa46`. The run is in `eval/fernhollow_sealed_ledger.json` (D-107) |
 | `route-cost-fernhollow.md`, `intent-baseline-fernhollow.md` | The route cost and the intent baseline on the electrician's set; the baseline is trained on the plumbing tuned split (D-100) |
 
 Produced by `tools.eval_run`, `tools.eval_score` and `tools.eval_compare` (D-062). The tuned files
@@ -74,6 +75,26 @@ afterwards (D-100).
 - The scorer's fixed caveat "the same author wrote the documents, the prompts and the labels" is
   too strong for this set: its items and labels were written by a separate session blind to the
   code and prompts (D-099). The documents were written by the system's author.
+
+## The sealed electrician set (one system, run once, three passes declared up front)
+
+`fernhollow-sealed-run.md`: 113 items (`fernhollow-2`), written and sealed before the wider
+electrical terms of D-106, run on 2026-11-09 at commit `26baa46`. Three passes, 0 failed items,
+nothing changed afterwards (D-107).
+
+| Measure (3 passes) | Result |
+|---|---|
+| Primary-intent accuracy (target 85%) | 59.5% in every pass |
+| HEALTH_SAFETY escalation recall (target: no misses) | **23 of 29 in every pass: missed** |
+| Route accuracy, whole pipeline | mean 78.8% (±2.2) |
+| Escalation precision | mean 79.1% (±3.2) |
+| Escalation recall | mean 87.6% (±2.4) |
+
+- Missed in every pass: `branch-pulled-service-wire`, `home-inspector-scorched-breaker`,
+  `reply-thread-crackling-switch` (escalated, but for `NOT_IN_KNOWLEDGE_BASE`),
+  `toddler-pried-off-cover`, `toilet-overflow-through-light`, `vacuum-blue-flash-last-sunday`.
+- The run does not record which code terms fired, so the share of catches owed to the D-106
+  terms is not known from it.
 
 ## Tuned results (means over three passes)
 

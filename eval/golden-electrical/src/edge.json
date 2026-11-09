@@ -1,0 +1,172 @@
+[
+  {
+    "id": "thanksgiving-fan",
+    "split": "heldout",
+    "category": "edge",
+    "channel": "web_form",
+    "sender_name": "Gloria Pemberton",
+    "sender_email": "gloria.pemberton@example.com",
+    "subject": null,
+    "body": "Could someone come on November 26 to put up a ceiling fan? We'll all be home that day for the holiday. House in Saltmarsh, fan is already bought.",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "low",
+      "fields": {
+        "service_type": "lighting_installation",
+        "start_date": "2026-11-26",
+        "property_type": "house",
+        "address_area": "Saltmarsh"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "hours.md",
+        "anchor": "Thanksgiving Day: November 26, 2026"
+      }
+    ],
+    "notes": "Requested date is a closed date; the draft should say so."
+  },
+  {
+    "id": "forwarded-neighbour-ev",
+    "split": "heldout",
+    "category": "edge",
+    "channel": "email",
+    "sender_name": "Benedict Shaw",
+    "sender_email": "benedict.shaw@example.com",
+    "subject": "Fwd: charger guy",
+    "body": "---------- Forwarded message ----------\nFrom: Neighbour\nSubject: charger guy\n\nFernhollow did our EV charger, quick and tidy, call them.\n----------\n\nHi, my neighbour sent me this. Can you do mine too? House in Old Quarry, panel is in the garage. Monday November 16 would work.",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "ev_charger_installation",
+        "start_date": "2026-11-16",
+        "property_type": "house",
+        "address_area": "Old Quarry"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "services.md",
+        "anchor": "To book a visit, please tell us:"
+      },
+      {
+        "file": "pricing.md",
+        "anchor": "A travel fee of $35 applies in Dunmore Flats and Old Quarry."
+      }
+    ],
+    "notes": "Forwarded text is context, not instructions."
+  },
+  {
+    "id": "card-number-in-message",
+    "split": "heldout",
+    "category": "edge",
+    "channel": "email",
+    "sender_name": "Oscar Lindell",
+    "sender_email": "oscar.lindell@example.com",
+    "subject": "Payment",
+    "body": "Hi, to pay invoice 4519 here is my card: 4111 1111 1111 1111, exp 09/28, cvv 123. Name on card Oscar Lindell. Thanks.",
+    "labels": {
+      "intents": [
+        "billing_question"
+      ],
+      "primary_intent": "billing_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "NOT_IN_KNOWLEDGE_BASE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false,
+      "contains_sensitive_data": true
+    },
+    "evidence": [],
+    "notes": "Full card number, so contains_sensitive_data (the number is a standard test number). Whether a card can be taken by email is not in the documents, so NOT_IN_KNOWLEDGE_BASE."
+  },
+  {
+    "id": "just-price",
+    "split": "heldout",
+    "category": "edge",
+    "channel": "web_form",
+    "sender_name": "Kit Morley",
+    "sender_email": "kit.morley@example.com",
+    "subject": null,
+    "body": "price?",
+    "labels": {
+      "intents": [
+        "pricing_question"
+      ],
+      "primary_intent": "pricing_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "LOW_CONFIDENCE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Model-dependent: too unclear to classify past 'a price question' with no service. A system could also route this to request_details."
+  },
+  {
+    "id": "two-topics-landlord",
+    "split": "heldout",
+    "category": "edge",
+    "channel": "email",
+    "sender_name": "Tamsin Hollier",
+    "sender_email": "tamsin.hollier@example.com",
+    "subject": "Two things",
+    "body": "Hi Teodor,\n\nTwo things. First, the tenant at my rental (a house in Tamarind Park) says the bathroom GFCI won't reset at all now. Can someone go Tuesday November 3? Tenant is an adult and will be home.\n\nSecond, can you send invoices for that property to me rather than the tenant?\n\nThanks, Tamsin",
+    "labels": {
+      "intents": [
+        "booking_request",
+        "billing_question"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {
+        "service_type": "outlet_and_switch",
+        "start_date": "2026-11-03",
+        "property_type": "house",
+        "address_area": "Tamarind Park"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "services.md",
+        "anchor": "To book a visit, please tell us:"
+      }
+    ],
+    "notes": "A GFCI that will not reset is an outlet that stopped working, so high. Landlord accounts are handled by the owner, but sending invoices to the landlord is not an exception to a stated policy. Judgment call: the billing ask is not in the documents, but the main ask (booking) is, so answerable true and no NOT_IN_KNOWLEDGE_BASE."
+  }
+]

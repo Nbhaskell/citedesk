@@ -1,0 +1,249 @@
+[
+  {
+    "id": "senior-discount",
+    "split": "heldout",
+    "category": "policy_exception",
+    "channel": "web_form",
+    "sender_name": "Mabel Hargreave",
+    "sender_email": "mabel.hargreave@example.com",
+    "subject": null,
+    "body": "do you do a senior discount? I'm 78 and on a fixed income. need a couple of outlets replaced",
+    "labels": {
+      "intents": [
+        "pricing_question"
+      ],
+      "primary_intent": "pricing_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "outlet_and_switch",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "POLICY_EXCEPTION_REQUEST"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "pricing.md",
+        "anchor": "We do not offer discounts. That includes senior, military, repeat-customer and price-match discounts."
+      }
+    ],
+    "notes": "Asking for a discount is an exception request even though the documents answer it."
+  },
+  {
+    "id": "price-match-ev",
+    "split": "heldout",
+    "category": "policy_exception",
+    "channel": "email",
+    "sender_name": "Dmitri Volkov",
+    "sender_email": "dmitri.volkov@example.com",
+    "subject": "EV charger price",
+    "body": "Another electrician quoted me $700 for the same Level 2 install. Will you match that?",
+    "labels": {
+      "intents": [
+        "pricing_question"
+      ],
+      "primary_intent": "pricing_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "ev_charger_installation",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "POLICY_EXCEPTION_REQUEST"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "pricing.md",
+        "anchor": "We do not offer discounts. That includes senior, military, repeat-customer and price-match discounts."
+      }
+    ]
+  },
+  {
+    "id": "cash-no-invoice",
+    "split": "heldout",
+    "category": "policy_exception",
+    "channel": "web_form",
+    "sender_name": "Rocco Bellini",
+    "sender_email": "rocco.bellini@example.com",
+    "subject": null,
+    "body": "if I pay cash can we skip the paperwork and you knock a bit off? just a couple of light fixtures",
+    "labels": {
+      "intents": [
+        "pricing_question"
+      ],
+      "primary_intent": "pricing_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "lighting_installation",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "POLICY_EXCEPTION_REQUEST"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Cash with no invoice plus a discount. The documents do not address skipping the invoice, so answerable false."
+  },
+  {
+    "id": "cafe-outlets",
+    "split": "heldout",
+    "category": "policy_exception",
+    "channel": "email",
+    "sender_name": "Yara Nasser",
+    "sender_email": "yara.nasser@example.com",
+    "subject": "Outlets for my cafe",
+    "body": "Hi! I own a small cafe on the main street in Millrace and need four new outlets behind the counter for a new espresso machine and grinders. Could you come on Monday November 2?",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "outlet_and_switch",
+        "start_date": "2026-11-02",
+        "property_type": "commercial",
+        "address_area": "Millrace"
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "POLICY_EXCEPTION_REQUEST"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "service-area.md",
+        "anchor": "We do not work on commercial or industrial buildings."
+      }
+    ],
+    "notes": "Commercial property, so POLICY_EXCEPTION_REQUEST (D-039)."
+  },
+  {
+    "id": "waive-late-cancel-fee",
+    "split": "heldout",
+    "category": "policy_exception",
+    "channel": "email",
+    "sender_name": "Celeste Fontaine",
+    "sender_email": "celeste.fontaine@example.com",
+    "subject": "Late cancellation fee",
+    "body": "I was charged a $50 late cancellation fee last week but I was in the hospital that morning. Can you please waive it?",
+    "labels": {
+      "intents": [
+        "billing_question"
+      ],
+      "primary_intent": "billing_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "POLICY_EXCEPTION_REQUEST",
+        "REFUND_OR_DISPUTE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "policies.md",
+        "anchor": "With less notice, a fee of $50 applies."
+      }
+    ],
+    "notes": "Waiving a fee already charged is both an exception and a request for money back."
+  },
+  {
+    "id": "teen-lets-in",
+    "split": "heldout",
+    "category": "policy_exception",
+    "channel": "web_form",
+    "sender_name": "Owen Castillo",
+    "sender_email": "owen.castillo@example.com",
+    "subject": null,
+    "body": "My 16 year old will be home to let your electrician in on Thursday, I'll be at work. Is that ok?",
+    "labels": {
+      "intents": [
+        "policy_question"
+      ],
+      "primary_intent": "policy_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "POLICY_EXCEPTION_REQUEST"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "policies.md",
+        "anchor": "An adult aged 18 or over must be present during the visit."
+      }
+    ],
+    "notes": "Judgment call: asking whether a minor can let the electrician in is a request for an exception to the access rule, which only the owner can grant."
+  },
+  {
+    "id": "six-unit-hallways",
+    "split": "heldout",
+    "category": "policy_exception",
+    "channel": "email",
+    "sender_name": "Lorraine Abbott",
+    "sender_email": "lorraine.abbott@example.com",
+    "subject": "Hallway lighting",
+    "body": "I manage a 6-unit apartment building in Wren Common. The hallway light fixtures on all three floors need replacing. Could you quote it?",
+    "labels": {
+      "intents": [
+        "pricing_question"
+      ],
+      "primary_intent": "pricing_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "lighting_installation",
+        "start_date": null,
+        "property_type": "apartment",
+        "address_area": "Wren Common"
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "POLICY_EXCEPTION_REQUEST"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "service-area.md",
+        "anchor": "We serve homes and small residential buildings of up to 4 units."
+      }
+    ],
+    "notes": "Residential but larger than the 4-unit limit, so only the owner can make an exception. Not commercial, so property_type apartment."
+  }
+]

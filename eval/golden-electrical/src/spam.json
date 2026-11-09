@@ -1,0 +1,115 @@
+[
+  {
+    "id": "seo-ranking",
+    "split": "heldout",
+    "category": "spam",
+    "channel": "email",
+    "sender_name": "Brandon Ace",
+    "sender_email": "brandon.ace@example.com",
+    "subject": "Rank #1 on Google for electrician near me",
+    "body": "Hi Fernhollow team! We help local electricians get to page 1 on Google in 30 days, guaranteed. Reply YES for a free audit.",
+    "labels": {
+      "intents": [
+        "spam"
+      ],
+      "primary_intent": "spam",
+      "urgency": "low",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "archive",
+      "answerable_from_docs": false
+    },
+    "evidence": []
+  },
+  {
+    "id": "homeowner-leads",
+    "split": "heldout",
+    "category": "spam",
+    "channel": "email",
+    "sender_name": "Lead Pros",
+    "sender_email": "offers@example.com",
+    "subject": "50 exclusive leads for $199",
+    "body": "Exclusive homeowner leads for electrical contractors in your zip code. 50 verified leads for just $199. Limited time.",
+    "labels": {
+      "intents": [
+        "spam"
+      ],
+      "primary_intent": "spam",
+      "urgency": "low",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "archive",
+      "answerable_from_docs": false
+    },
+    "evidence": []
+  },
+  {
+    "id": "business-funding",
+    "split": "heldout",
+    "category": "spam",
+    "channel": "email",
+    "sender_name": "Capital Desk",
+    "sender_email": "funding@example.com",
+    "subject": "You're pre-approved",
+    "body": "Congratulations! Your business is PRE-APPROVED for up to $250,000 in working capital. No credit check. Click to claim.",
+    "labels": {
+      "intents": [
+        "spam"
+      ],
+      "primary_intent": "spam",
+      "urgency": "low",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "archive",
+      "answerable_from_docs": false
+    },
+    "evidence": []
+  },
+  {
+    "id": "domain-renewal",
+    "split": "heldout",
+    "category": "spam",
+    "channel": "email",
+    "sender_name": "Domain Services",
+    "sender_email": "renewals@example.com",
+    "subject": "FINAL NOTICE: domain listing expires",
+    "body": "Your business directory listing for Fernhollow Electric expires in 48 hours. Renew now for $89/year to keep receiving customers.",
+    "labels": {
+      "intents": [
+        "spam"
+      ],
+      "primary_intent": "spam",
+      "urgency": "low",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "archive",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Bulk directory offer dressed as an invoice; still spam."
+  }
+]

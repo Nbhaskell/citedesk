@@ -1,0 +1,36 @@
+[
+  {
+    "id": "wholesale-supplier",
+    "split": "heldout",
+    "category": "partnership_sales",
+    "channel": "email",
+    "sender_name": "Jonah Whitaker",
+    "sender_email": "jonah.whitaker@example.com",
+    "subject": "Supplier account for Fernhollow Electric",
+    "body": "Hello, we're a regional wholesale supplier of breakers, wire and fittings. We'd love to set up a trade account with Fernhollow Electric with net-30 terms and contractor pricing. Who should I talk to?",
+    "labels": {
+      "intents": [
+        "partnership_or_sales"
+      ],
+      "primary_intent": "partnership_or_sales",
+      "urgency": "low",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "about.md",
+        "anchor": "supplier and partnership offers"
+      }
+    ],
+    "notes": "A specific, genuine supplier offer, not bulk marketing, so not spam. The documents say who handles it."
+  }
+]

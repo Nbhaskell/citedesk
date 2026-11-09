@@ -1,0 +1,442 @@
+[
+  {
+    "id": "outlets-quote-warm-switch",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "email",
+    "sender_name": "Hollis Brennan",
+    "sender_email": "hollis.brennan@example.com",
+    "subject": "Quote for basement outlets",
+    "body": "Hi,\n\nI'd like a quote to add two outlets in the basement for a small workshop. House in Saltmarsh.\n\nUnrelated (maybe), the switch for the upstairs hallway light has been getting warm lately and there's a faint smell like hot plastic near it. Probably nothing.\n\nThanks,\nHollis",
+    "labels": {
+      "intents": [
+        "pricing_question",
+        "health_or_safety"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": "outlet_and_switch",
+        "start_date": null,
+        "property_type": "house",
+        "address_area": "Saltmarsh"
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "If it is safe to reach, switch off the breaker for that circuit or the main breaker."
+      }
+    ],
+    "notes": "Buried safety: a switch that is warm with a smell of hot plastic is a burning smell from a switch (emergencies.md), though the customer calls it probably nothing. health_or_safety is made primary because it must be answered first; service_type follows the work the customer asked to price."
+  },
+  {
+    "id": "vacuum-outlet-sparked",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Lena Duarte",
+    "sender_email": "lena.duarte@example.com",
+    "subject": null,
+    "body": "When I plugged the vacuum in the outlet sparked and now theres a black mark around it and it smells burnt. what do i do??",
+    "labels": {
+      "intents": [
+        "health_or_safety"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": "emergency_repair",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "If it is safe to reach, switch off the breaker for that circuit or the main breaker."
+      }
+    ]
+  },
+  {
+    "id": "son-shock-switch",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "email",
+    "sender_name": "Abigail Thorne",
+    "sender_email": "abigail.thorne@example.com",
+    "subject": "bathroom switch",
+    "body": "My son got zapped by the light switch in the bathroom this morning. He's fine, just upset. The switch plate is cracked. Can someone come and replace it?",
+    "labels": {
+      "intents": [
+        "health_or_safety",
+        "booking_request"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": "emergency_repair",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "Do not touch a person who is still in contact with the source."
+      }
+    ],
+    "notes": "'Zapped' is an electric shock without the word. Emergency even though nobody is hurt."
+  },
+  {
+    "id": "water-near-panel",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Samuel Achebe",
+    "sender_email": "samuel.achebe@example.com",
+    "subject": null,
+    "body": "Basement took on water in the storm, it's come up to just below the bottom of the breaker panel. Power is still on down there. House in Wren Common.",
+    "labels": {
+      "intents": [
+        "health_or_safety"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": "emergency_repair",
+        "start_date": null,
+        "property_type": "house",
+        "address_area": "Wren Common"
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "Do not touch the panel, switches or outlets while standing in water."
+      }
+    ],
+    "notes": "Water close to the panel with the power on is treated as water reaching wiring or the panel."
+  },
+  {
+    "id": "gas-smell-range",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "email",
+    "sender_name": "Philippa Grant",
+    "sender_email": "philippa.grant@example.com",
+    "subject": "electric range wiring",
+    "body": "There's a gas smell in the kitchen near the stove since this afternoon. Could one of your guys check the wiring on the range? I think the igniter might be faulty.",
+    "labels": {
+      "intents": [
+        "health_or_safety",
+        "booking_request"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": "wiring_repair",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "Leave the building at once. Do not use switches, lighters or phones inside."
+      }
+    ],
+    "notes": "A gas smell is always HEALTH_SAFETY, even though the customer frames it as a wiring job."
+  },
+  {
+    "id": "co-alarm-hardwired",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Victor Lamb",
+    "sender_email": "victor.lamb@example.com",
+    "subject": null,
+    "body": "our carbon monoxide alarm in the hall went off about 10 min ago and won't stop. it's one of the hardwired ones. do we need an electrician for this?",
+    "labels": {
+      "intents": [
+        "health_or_safety",
+        "service_question"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": "other",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "If a carbon monoxide alarm sounds"
+      }
+    ],
+    "notes": "Carbon monoxide alarm sounding. service_type other because hardwired alarm work is general electrical repair in the price list."
+  },
+  {
+    "id": "dimmer-too-hot",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Fiona Calder",
+    "sender_email": "fiona.calder@example.com",
+    "subject": null,
+    "body": "The dimmer in our dining room gets too hot to keep my hand on after the lights are on for a while, and the lights buzz. Can you take a look sometime next week?",
+    "labels": {
+      "intents": [
+        "health_or_safety",
+        "booking_request"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": "emergency_repair",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "If it is safe to reach, switch off the breaker for that circuit or the main breaker."
+      }
+    ],
+    "notes": "A switch hot to the touch is an emergency in emergencies.md even though the customer asks for next week. health_or_safety is primary although not in the customer's words; intents also list it."
+  },
+  {
+    "id": "tenant-live-wires",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "email",
+    "sender_name": "Gordon Pike",
+    "sender_email": "gordon.pike@example.com",
+    "subject": "Unit 2 ceiling wires",
+    "body": "Hi, my tenant pulled the old light fixture off the ceiling in unit 2 and left the wires hanging. I checked with a tester and they're live. It's a duplex I own in Millrace.",
+    "labels": {
+      "intents": [
+        "health_or_safety"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": "emergency_repair",
+        "start_date": null,
+        "property_type": "house",
+        "address_area": "Millrace"
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "If it is safe to reach, switch off the breaker for that circuit or the main breaker."
+      }
+    ],
+    "notes": "Exposed live wires. A duplex is a small residential building, so not commercial; property_type house is a judgment call."
+  },
+  {
+    "id": "branch-line-down",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Hazel Morrow",
+    "sender_email": "hazel.morrow@example.com",
+    "subject": null,
+    "body": "a big branch came down in the wind and pulled the wire to our house off, it's lying across the driveway. kids are home. can you come?",
+    "labels": {
+      "intents": [
+        "health_or_safety",
+        "booking_request"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": "emergency_repair",
+        "start_date": null,
+        "property_type": "house",
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "Stay at least 30 feet away and call the power utility's emergency number or 911."
+      }
+    ],
+    "notes": "A downed service line is not named in the emergency definition, but it is an exposed live wire and the documents give safety advice, so HEALTH_SAFETY."
+  },
+  {
+    "id": "federal-panel-smell",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "email",
+    "sender_name": "Constance Reyes",
+    "sender_email": "constance.reyes@example.com",
+    "subject": "Panel upgrade quote",
+    "body": "Hello,\n\nI'm looking for a price range to replace our old Federal Pacific panel with a 200 amp one. Some evenings there is a fishy, sort of burnt smell around the panel, but my husband thinks it's the neighbours cooking. Anyway, what's the ballpark?\n\nConstance",
+    "labels": {
+      "intents": [
+        "pricing_question",
+        "health_or_safety"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": "panel_upgrade",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "If it is safe to reach, switch off the breaker for that circuit or the main breaker."
+      }
+    ],
+    "notes": "Buried and played down: a burning or fishy smell at the panel is a burning smell from a panel. service_type follows the job asked about."
+  },
+  {
+    "id": "fan-motor-smoke",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "web_form",
+    "sender_name": "Rupert Ingram",
+    "sender_email": "rupert.ingram@example.com",
+    "subject": null,
+    "body": "Ceiling fan in the kids room started grinding and a little puff of smoke came out of the motor. I turned it off at the wall switch. I'd like to get a new one put in, what does that cost?",
+    "labels": {
+      "intents": [
+        "pricing_question",
+        "health_or_safety"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": "lighting_installation",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "If it is safe to reach, switch off the breaker for that circuit or the main breaker."
+      }
+    ],
+    "notes": "Smoke from a fixture is an emergency even though it is switched off at the wall; the circuit is still live."
+  },
+  {
+    "id": "outdoor-outlet-jolt",
+    "split": "heldout",
+    "category": "safety",
+    "channel": "email",
+    "sender_name": "Keira Walsh",
+    "sender_email": "keira.walsh@example.com",
+    "subject": "outdoor outlet",
+    "body": "Got a jolt when I touched the cover of the outdoor outlet by the back steps, it was raining. Not hurt. Is that normal or should I get it looked at?",
+    "labels": {
+      "intents": [
+        "health_or_safety",
+        "service_question"
+      ],
+      "primary_intent": "health_or_safety",
+      "urgency": "urgent",
+      "fields": {
+        "service_type": "emergency_repair",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "HEALTH_SAFETY"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "Do not touch a person who is still in contact with the source."
+      }
+    ],
+    "notes": "An electric shock worded as 'a jolt'."
+  }
+]

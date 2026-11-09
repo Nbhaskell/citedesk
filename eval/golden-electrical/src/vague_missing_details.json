@@ -1,0 +1,172 @@
+[
+  {
+    "id": "need-an-electrician",
+    "split": "heldout",
+    "category": "vague_missing_details",
+    "channel": "web_form",
+    "sender_name": "Corey Lund",
+    "sender_email": "corey.lund@example.com",
+    "subject": null,
+    "body": "need an electrician. when can someone come out",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "service-area.md",
+        "anchor": "What we need to book a visit"
+      }
+    ],
+    "notes": "'When can someone come out' asks for a visit, so booking_request. The work is not stated, so service_type null."
+  },
+  {
+    "id": "bedroom-outlets-dead",
+    "split": "heldout",
+    "category": "vague_missing_details",
+    "channel": "web_form",
+    "sender_name": "Jasmine Ortiz",
+    "sender_email": "jasmine.ortiz@example.com",
+    "subject": null,
+    "body": "half the outlets in my bedroom just stopped working. can u send someone",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "high",
+      "fields": {
+        "service_type": "wiring_repair",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "service-area.md",
+        "anchor": "What we need to book a visit"
+      }
+    ],
+    "notes": "Outlets that stopped working are urgent but not an emergency, so urgency high. Troubleshooting dead outlets is wiring repair in services.md."
+  },
+  {
+    "id": "lights-put-in",
+    "split": "heldout",
+    "category": "vague_missing_details",
+    "channel": "email",
+    "sender_name": "Wendell Price",
+    "sender_email": "wendell.price@example.com",
+    "subject": "lights",
+    "body": "Looking to have some lights put in. Let me know.",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "low",
+      "fields": {
+        "service_type": "lighting_installation",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "service-area.md",
+        "anchor": "What we need to book a visit"
+      }
+    ],
+    "notes": "Read as a request for the work, not a price question. No time pressure."
+  },
+  {
+    "id": "ev-tamarind-next-step",
+    "split": "heldout",
+    "category": "vague_missing_details",
+    "channel": "web_form",
+    "sender_name": "Mei Tanaka",
+    "sender_email": "mei.tanaka@example.com",
+    "subject": null,
+    "body": "We'd like an EV charger installed at our house in Tamarind Park. What's the next step?",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "ev_charger_installation",
+        "start_date": null,
+        "property_type": "house",
+        "address_area": "Tamarind Park"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "service-area.md",
+        "anchor": "What we need to book a visit"
+      }
+    ],
+    "notes": "Only the preferred date is missing."
+  },
+  {
+    "id": "free-next-tuesday",
+    "split": "heldout",
+    "category": "vague_missing_details",
+    "channel": "web_form",
+    "sender_name": "Ali Hassan",
+    "sender_email": "ali.hassan@example.com",
+    "subject": null,
+    "body": "are you free next tuesday?",
+    "labels": {
+      "intents": [
+        "availability_question"
+      ],
+      "primary_intent": "availability_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "request_details",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "hours.md",
+        "anchor": "Standard appointments are usually 3 to 5 business days out; staff confirm the exact day."
+      }
+    ],
+    "notes": "'Next tuesday' is relative, so start_date null; service_type also unknown."
+  }
+]

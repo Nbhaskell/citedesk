@@ -1,0 +1,136 @@
+[
+  {
+    "id": "clogged-sink",
+    "split": "heldout",
+    "category": "out_of_scope",
+    "channel": "web_form",
+    "sender_name": "Lorna Beckett",
+    "sender_email": "lorna.beckett@example.com",
+    "subject": null,
+    "body": "kitchen sink is clogged and draining super slow, do you guys do that or just electrical",
+    "labels": {
+      "intents": [
+        "service_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "other",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "policies.md",
+        "anchor": "We do not do plumbing work."
+      }
+    ],
+    "notes": "Plumbing is not in the electrical subset, so service_type other."
+  },
+  {
+    "id": "solar-on-roof",
+    "split": "heldout",
+    "category": "out_of_scope",
+    "channel": "email",
+    "sender_name": "Arjun Rao",
+    "sender_email": "arjun.rao@example.com",
+    "subject": "solar",
+    "body": "Can you install solar panels on our roof? House in Saltmarsh, south facing.",
+    "labels": {
+      "intents": [
+        "service_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": "other",
+        "start_date": null,
+        "property_type": "house",
+        "address_area": "Saltmarsh"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "policies.md",
+        "anchor": "We do not install solar panels."
+      }
+    ]
+  },
+  {
+    "id": "cameras-and-wifi",
+    "split": "heldout",
+    "category": "out_of_scope",
+    "channel": "web_form",
+    "sender_name": "Delphine Morel",
+    "sender_email": "delphine.morel@example.com",
+    "subject": null,
+    "body": "want 4 security cameras around the house and a wifi mesh system. is that something u do?",
+    "labels": {
+      "intents": [
+        "service_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": "other",
+        "start_date": null,
+        "property_type": "house",
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "policies.md",
+        "anchor": "We do not install security cameras or home networks."
+      }
+    ]
+  },
+  {
+    "id": "outside-area",
+    "split": "heldout",
+    "category": "out_of_scope",
+    "channel": "web_form",
+    "sender_name": "Nora Quinlan",
+    "sender_email": "nora.quinlan@example.com",
+    "subject": null,
+    "body": "Do you service Brightwater? Need a panel looked at.",
+    "labels": {
+      "intents": [
+        "service_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "panel_upgrade",
+        "start_date": null,
+        "property_type": null,
+        "address_area": "Brightwater"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "service-area.md",
+        "anchor": "We do not serve anywhere else."
+      }
+    ],
+    "notes": "Brightwater is not a served area. 'A panel looked at' read as panel work."
+  }
+]

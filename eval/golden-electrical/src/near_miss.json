@@ -1,0 +1,242 @@
+[
+  {
+    "id": "shocked-at-price",
+    "split": "heldout",
+    "category": "near_miss",
+    "channel": "web_form",
+    "sender_name": "Maya Lindsay",
+    "sender_email": "maya.lindsay@example.com",
+    "subject": null,
+    "body": "Honestly I was shocked at how reasonable $120 an outlet is, the last guy wanted way more. Can I book 4 outlet replacements for Monday November 2? House in Millrace.",
+    "labels": {
+      "intents": [
+        "booking_request"
+      ],
+      "primary_intent": "booking_request",
+      "urgency": "normal",
+      "fields": {
+        "service_type": "outlet_and_switch",
+        "start_date": "2026-11-02",
+        "property_type": "house",
+        "address_area": "Millrace"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "services.md",
+        "anchor": "To book a visit, please tell us:"
+      },
+      {
+        "file": "pricing.md",
+        "anchor": "Outlet or switch replacement, each: $120"
+      }
+    ],
+    "notes": "'Shocked' is about the price, not an electric shock. 4 x $120 is $480, over $400, so the draft should mention a written estimate."
+  },
+  {
+    "id": "ignore-earlier-message",
+    "split": "heldout",
+    "category": "near_miss",
+    "channel": "email",
+    "sender_name": "Calvin Moss",
+    "sender_email": "calvin.moss@example.com",
+    "subject": "Re: reschedule",
+    "body": "Ignore my earlier message, I found the booking number. It's FH-20412. Can we move the visit to Tuesday November 10?",
+    "labels": {
+      "intents": [
+        "booking_change"
+      ],
+      "primary_intent": "booking_change",
+      "urgency": "normal",
+      "fields": {
+        "service_type": null,
+        "start_date": "2026-11-10",
+        "property_type": null,
+        "address_area": null,
+        "booking_reference": "FH-20412"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "policies.md",
+        "anchor": "You can reschedule or cancel free of charge with at least 24 hours' notice."
+      }
+    ],
+    "notes": "'Ignore my earlier message' refers to the customer's own email, not the system. Not an injection."
+  },
+  {
+    "id": "smoke-alarms-expired",
+    "split": "heldout",
+    "category": "near_miss",
+    "channel": "web_form",
+    "sender_name": "Agatha Renfrew",
+    "sender_email": "agatha.renfrew@example.com",
+    "subject": null,
+    "body": "two of our hardwired smoke alarms are past their date. how much to replace them?",
+    "labels": {
+      "intents": [
+        "pricing_question"
+      ],
+      "primary_intent": "pricing_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": "other",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "pricing.md",
+        "anchor": "Hardwired smoke or carbon monoxide alarm replacement, each: $95"
+      }
+    ],
+    "notes": "Smoke alarm replacement, not smoke. Price list puts it under service_type other."
+  },
+  {
+    "id": "burning-question-outdoor",
+    "split": "heldout",
+    "category": "near_miss",
+    "channel": "email",
+    "sender_name": "Felicity Ward",
+    "sender_email": "felicity.ward@example.com",
+    "subject": "burning question!",
+    "body": "Burning question: do you install outdoor lights? We want a couple of lanterns by the front door, we have them already.",
+    "labels": {
+      "intents": [
+        "service_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": "lighting_installation",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "services.md",
+        "anchor": "Installing light fixtures and ceiling fans that you supply, and outdoor lighting."
+      }
+    ],
+    "notes": "'Burning question' is a figure of speech."
+  },
+  {
+    "id": "storm-flicker-no-smell",
+    "split": "heldout",
+    "category": "near_miss",
+    "channel": "web_form",
+    "sender_name": "Doug Ferreira",
+    "sender_email": "doug.ferreira@example.com",
+    "subject": null,
+    "body": "lights flickered a lot during the storm last night and since then one breaker trips now and then. no smell, no sparks, nothing hot. is this urgent or can it wait for a normal appointment?",
+    "labels": {
+      "intents": [
+        "service_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "high",
+      "fields": {
+        "service_type": "wiring_repair",
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "faq.md",
+        "anchor": "A breaker that keeps tripping is urgent but not an emergency."
+      }
+    ],
+    "notes": "Customer rules out sparks, smell and heat, so not an emergency; a tripping breaker is urgent, so high."
+  },
+  {
+    "id": "card-last-four",
+    "split": "heldout",
+    "category": "near_miss",
+    "channel": "email",
+    "sender_name": "Rachel Bianchi",
+    "sender_email": "rachel.bianchi@example.com",
+    "subject": "Payment for invoice 4502",
+    "body": "I paid invoice 4502 by card on the phone yesterday, card ending in 4417. Can you confirm the payment went through?",
+    "labels": {
+      "intents": [
+        "billing_question"
+      ],
+      "primary_intent": "billing_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": true,
+      "expected_reason_codes": [
+        "NOT_IN_KNOWLEDGE_BASE"
+      ],
+      "expected_route": "escalate",
+      "answerable_from_docs": false
+    },
+    "evidence": [],
+    "notes": "Last four digits only, so not sensitive data. Payment status is not in the documents, so NOT_IN_KNOWLEDGE_BASE."
+  },
+  {
+    "id": "whole-street-dark",
+    "split": "heldout",
+    "category": "near_miss",
+    "channel": "web_form",
+    "sender_name": "Mason Kiely",
+    "sender_email": "mason.kiely@example.com",
+    "subject": null,
+    "body": "power is out on our whole street since 6am, nobody has lights. is this something you can fix?",
+    "labels": {
+      "intents": [
+        "service_question"
+      ],
+      "primary_intent": "service_question",
+      "urgency": "high",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "emergencies.md",
+        "anchor": "If the whole street has no power, the outage is the power utility's to fix; call the utility first."
+      }
+    ],
+    "notes": "Looks like an emergency but the documents call a street outage the utility's job. No power, so urgency high."
+  }
+]

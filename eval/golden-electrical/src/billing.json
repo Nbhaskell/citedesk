@@ -1,0 +1,71 @@
+[
+  {
+    "id": "resend-invoice",
+    "split": "heldout",
+    "category": "billing",
+    "channel": "email",
+    "sender_name": "Patrick Nolan",
+    "sender_email": "patrick.nolan@example.com",
+    "subject": "Invoice not received",
+    "body": "Hi, I never got the invoice emailed after Tuesday's visit. Booking FH-20355. Can you resend it? Thanks.",
+    "labels": {
+      "intents": [
+        "billing_question"
+      ],
+      "primary_intent": "billing_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null,
+        "booking_reference": "FH-20355"
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "pricing.md",
+        "anchor": "The invoice is emailed the same day."
+      }
+    ],
+    "notes": "Resending is a staff action; the documents say the invoice is emailed the same day, which the draft can use."
+  },
+  {
+    "id": "late-payment-question",
+    "split": "heldout",
+    "category": "billing",
+    "channel": "web_form",
+    "sender_name": "Gwen Hartley",
+    "sender_email": "gwen.hartley@example.com",
+    "subject": null,
+    "body": "what happens if I pay the invoice a few weeks late? money is tight this month",
+    "labels": {
+      "intents": [
+        "billing_question"
+      ],
+      "primary_intent": "billing_question",
+      "urgency": "low",
+      "fields": {
+        "service_type": null,
+        "start_date": null,
+        "property_type": null,
+        "address_area": null
+      },
+      "should_escalate": false,
+      "expected_reason_codes": [],
+      "expected_route": "draft_reply",
+      "answerable_from_docs": true
+    },
+    "evidence": [
+      {
+        "file": "pricing.md",
+        "anchor": "A late fee of 1.5% per month applies to invoices unpaid after 30 days."
+      }
+    ],
+    "notes": "Asks what happens, not for a waiver or a payment plan, so no exception."
+  }
+]

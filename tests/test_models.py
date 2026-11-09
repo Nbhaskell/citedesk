@@ -147,6 +147,10 @@ def test_audit_event_types_match_the_documented_list() -> None:
     sql = (REPO_ROOT / "db/migrations/0001_init.sql").read_text("utf-8")
     line = next(ln for ln in sql.splitlines() if ln.strip().startswith("event_type"))
     documented = re.split(r",\s*", line.split("--", 1)[1].strip())
+    # Types added after 0001 was applied are listed in the schema document (D-101).
+    schema = (REPO_ROOT / "docs/BACKEND_SCHEMA.md").read_text("utf-8")
+    later = next(ln for ln in schema.splitlines() if ln.startswith("**Event types added later.**"))
+    documented += re.findall(r"`([a-z_]+)` \(D-\d+", later)
     assert [m.value for m in models.AuditEventType] == documented
 
 

@@ -289,6 +289,7 @@ export function fakeClient(over: Partial<ApiClient> = {}): ApiClient {
     escalate: unexpected("escalate"),
     resolve: unexpected("resolve"),
     reprocess: unexpected("reprocess"),
+    deleteInquiry: unexpected("deleteInquiry"),
     exportText: unexpected("exportText"),
     recordExport: unexpected("recordExport"),
     insights: async () => insightsFixture(),

@@ -1,6 +1,8 @@
 """SQLite connection and the migration runner.
 
     python -m citedesk.db migrate     apply pending migrations from db/migrations/
+    python -m citedesk.db purge --older-than DAYS [--dry-run]
+                                      delete closed inquiries not changed for DAYS days (D-101)
 
 Migrations are numbered, append-only SQL files (0001_init.sql, 0002_....sql). Each runs in its own
 transaction together with the row that records it, so a failure leaves nothing half applied.
@@ -40,6 +42,7 @@ def connect(path: str | Path) -> sqlite3.Connection:
     conn = sqlite3.connect(str(path), timeout=BUSY_TIMEOUT_SECONDS, isolation_level=None)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
+    conn.execute("PRAGMA secure_delete = ON")  # deleted text is overwritten in the file (D-101)
     if str(path) != ":memory:":
         conn.execute("PRAGMA journal_mode = WAL")
     return conn
@@ -124,10 +127,49 @@ def migrate(conn: sqlite3.Connection, directory: Path = MIGRATIONS_DIR) -> list[
     return done
 
 
+USAGE = "usage: python -m citedesk.db migrate | purge --older-than DAYS [--dry-run]"
+
+
+def purge_command(args: list[str]) -> int:
+    """Delete closed inquiries not changed for DAYS days (D-101). Prints counts and ids only."""
+    from citedesk import retention  # imported here: retention imports this module
+
+    dry_run = "--dry-run" in args
+    rest = [a for a in args if a != "--dry-run"]
+    if len(rest) != 2 or rest[0] != "--older-than" or not rest[1].isdigit():
+        print(USAGE, file=sys.stderr)
+        return 2
+    days = int(rest[1])
+    if days < retention.MIN_RETENTION_DAYS:
+        print(f"error: DAYS must be at least {retention.MIN_RETENTION_DAYS}", file=sys.stderr)
+        return 2
+    path = Settings().db_path
+    if not path.exists():
+        print(f"error: no database at {path}", file=sys.stderr)
+        return 1
+    conn = connect(path)
+    try:
+        if applied_versions(conn) != sorted(discover(MIGRATIONS_DIR)):
+            print("error: the database is not migrated; run migrate first", file=sys.stderr)
+            return 1
+        if dry_run:
+            ids = retention.expired(conn, days)
+            print(f"Would delete {len(ids)} closed inquiries older than {days} days: {ids}")
+            return 0
+        done = retention.purge(conn, days)
+    finally:
+        conn.close()
+    ids = [d.inquiry_id for d in done]
+    print(f"Deleted {len(done)} closed inquiries older than {days} days: {ids}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = sys.argv[1:] if argv is None else argv
+    if args[:1] == ["purge"]:
+        return purge_command(args[1:])
     if args != ["migrate"]:
-        print("usage: python -m citedesk.db migrate", file=sys.stderr)
+        print(USAGE, file=sys.stderr)
         return 2
     path = Settings().db_path
     path.parent.mkdir(parents=True, exist_ok=True)

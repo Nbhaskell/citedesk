@@ -66,6 +66,8 @@ export interface ApiClient {
   escalate(inquiryId: number, body: { note: string }): Promise<InquiryDetail>;
   resolve(inquiryId: number, body: { note?: string }): Promise<InquiryDetail>;
   reprocess(inquiryId: number): Promise<InquiryDetail>;
+  /** Delete the inquiry and everything stored about it, for good (D-101). */
+  deleteInquiry(inquiryId: number): Promise<void>;
   /** The approved text; changes nothing. */
   exportText(draftId: number, signal?: AbortSignal): Promise<ExportText>;
   /** Record that the approved text was copied; the inquiry becomes "exported". */
@@ -108,7 +110,7 @@ interface RequestOptions {
 
 export function createHttpClient(fetchFn: FetchFn = fetch, base = ""): ApiClient {
   async function request<T>(
-    method: "GET" | "POST",
+    method: "GET" | "POST" | "DELETE",
     path: string,
     { signal, body }: RequestOptions = {},
   ): Promise<T> {
@@ -122,7 +124,7 @@ export function createHttpClient(fetchFn: FetchFn = fetch, base = ""): ApiClient
         body: body === undefined ? undefined : JSON.stringify(body),
         signal,
         // A decision sent as the page is being left must still arrive.
-        keepalive: method === "POST",
+        keepalive: method !== "GET",
       });
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") throw error;
@@ -162,6 +164,9 @@ export function createHttpClient(fetchFn: FetchFn = fetch, base = ""): ApiClient
     escalate: (id, body) => request<InquiryDetail>("POST", `${inquiry(id)}/escalate`, { body }),
     resolve: (id, body) => request<InquiryDetail>("POST", `${inquiry(id)}/resolve`, { body }),
     reprocess: (id) => request<InquiryDetail>("POST", `${inquiry(id)}/reprocess`),
+    deleteInquiry: async (id) => {
+      await request<null>("DELETE", inquiry(id));
+    },
     exportText: (id, signal) => request<ExportText>("GET", `${draft(id)}/export`, { signal }),
     recordExport: (id) => request<ExportText>("POST", `${draft(id)}/export`),
     insights: (signal) => request<Insights>("GET", "/api/insights", { signal }),

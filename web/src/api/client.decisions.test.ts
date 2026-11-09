@@ -70,6 +70,19 @@ describe("ApiClient calls", () => {
     expect([last().url, last().init.method]).toEqual(["/api/drafts/5/export", "POST"]);
   });
 
+  it("deletes an inquiry with DELETE and no body, and accepts an empty 204", async () => {
+    const fetchFn = vi.fn(async () => new Response(null, { status: 204 }));
+    const client = createHttpClient(fetchFn as unknown as typeof fetch);
+    await expect(client.deleteInquiry(7)).resolves.toBeUndefined();
+    const [url, init] = fetchFn.mock.calls[0] as unknown as [string, RequestInit];
+    expect([url, init.method, init.body, init.keepalive]).toEqual([
+      "/api/inquiries/7",
+      "DELETE",
+      undefined,
+      true,
+    ]);
+  });
+
   it("reads the inquiry, the approved text and the settings with GET", async () => {
     const { client, last } = recorder();
     await client.inquiry(7);

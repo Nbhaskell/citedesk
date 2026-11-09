@@ -431,6 +431,18 @@ export const detail = {
     exported: "The reply was copied. Nothing was sent from Citedesk.",
     archived: "This inquiry was archived.",
   },
+  // Deleting is permanent, so the button opens a confirmation that names what goes (D-101).
+  remove: {
+    title: "Delete this inquiry",
+    hint: "Removes the message, its drafts, the review record and the history from Citedesk.",
+    button: "Delete inquiry…",
+    confirm:
+      "Delete this inquiry for good? The message, drafts, review record and history are removed. This cannot be undone.",
+    confirmButton: "Delete for good",
+    cancel: "Keep it",
+    busy: "Deleting…",
+    done: (id: number): string => `Inquiry ${id} was deleted.`,
+  },
 } as const;
 
 // What a reviewer did. The API sends these as plain codes, so a code with no words here is shown

@@ -18,6 +18,7 @@
 | `fernhollow-run.md` | The invented electrician's set (83 held-out items, written by a separate session): three passes of the final system, scored one by one, then the spread. The run is in `eval/fernhollow_ledger.json` (D-100) |
 | `sealed-v2-run.md` | The plumber's second sealed set `kestrel-2` (136 items, written by a blind session): three passes of the system at `0672de1`. The run is in `eval/sealed_v2_ledger.json` (D-108) |
 | `route-cost-sealed.md`, `route-cost-sealed-v2.md`, `route-cost-fernhollow-sealed.md` | The route cost of the three spent sealed sets, against escalating and drafting everything (D-109) |
+| `fernhollow-sealed-v2-run.md`, `route-cost-fernhollow-sealed-v2.md` | The electrician's second sealed set `fernhollow-3` (129 items, 36 safety): three passes of the system at `29cb333`, and its route cost. The run is in `eval/fernhollow_sealed_v2_ledger.json` (D-113) |
 | `fernhollow-sealed-run.md` | The sealed electrician set `fernhollow-2` (113 items, written by a blind session before D-106): three passes of the system at `26baa46`. The run is in `eval/fernhollow_sealed_ledger.json` (D-107) |
 | `route-cost-fernhollow.md`, `intent-baseline-fernhollow.md` | The route cost and the intent baseline on the electrician's set; the baseline is trained on the plumbing tuned split (D-100) |
 
@@ -93,6 +94,25 @@ passes, 0 failed items, nothing changed afterwards (D-108).
 
 - Spam archived: 1 of 7. Injections caught at screening: 4 of 6; near misses flagged: 0 of 14.
 - `NO_COMMITMENT` blocked 3 drafts, which were escalated; no ungrounded figure in 75 drafts.
+
+## The electrician's second sealed set (one system, run once, three passes declared up front)
+
+`fernhollow-sealed-v2-run.md`: 129 items (`fernhollow-3`), written and sealed before the run,
+run on 2026-11-09 at commit `29cb333` with the electrical terms of D-110. Three passes, 0 failed
+items, nothing changed afterwards (D-113).
+
+| Measure (3 passes) | Result |
+|---|---|
+| HEALTH_SAFETY escalation recall (target: no misses) | **35 of 36 in every pass: missed** (`shower-faucet-tingle`) |
+| Primary-intent accuracy (target 85%) | mean 66.7% (±1.1) |
+| Route accuracy, whole pipeline | mean 80.9% (±2.9) |
+| Escalation precision | mean 80.0% (±3.1) |
+| Escalation recall | mean 93.9% (±4.0) |
+| Route cost per 100 (`route-cost-fernhollow-sealed-v2.md`) | 152 to 188; escalate everything 171 |
+
+- Who flagged the safety items: model and terms 19 or 20, model only 6, terms only 9 or 10,
+  neither 1. The D-110 terms alone caused 3 or 4 of the escalations per pass and fired on no
+  ordinary message that the D-106 terms did not.
 
 ## The sealed electrician set (one system, run once, three passes declared up front)
 

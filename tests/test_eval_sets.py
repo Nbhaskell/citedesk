@@ -34,7 +34,7 @@ def test_each_set_has_its_labels_and_its_ledger() -> None:
 
 
 def test_the_electricians_set_has_only_a_held_out_split() -> None:
-    with pytest.raises(ValueError, match="held-out"):
+    with pytest.raises(ValueError, match="holds only heldout items"):
         ec.golden_file_for("tuned", "fernhollow")
     assert er.set_problems("fernhollow", "tuned")
     assert er.set_problems("fernhollow", "heldout") == []

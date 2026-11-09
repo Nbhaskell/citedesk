@@ -272,6 +272,7 @@ def sealed_problems(
     dirty: bool,
     git_known: bool,
     hash_matches: bool,
+    hash_name: str | None = None,
 ) -> list[str]:
     """Reasons a sealed-set request is refused before the ledger or any item is touched (D-071)."""
     if split != "sealed":
@@ -294,6 +295,7 @@ def sealed_problems(
     if not hash_matches:
         problems.append(
             "the sealed file is missing or does not match the committed hash "
-            "(eval/golden/citedesk_sealed.sha256): it may have been changed since it was sealed"
+            f"({hash_name or 'citedesk_sealed.sha256'}): it may have been changed since it was "
+            "sealed"
         )
     return problems

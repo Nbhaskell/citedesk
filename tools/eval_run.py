@@ -510,10 +510,11 @@ def set_problems(golden_set: str, split: str) -> list[str]:
     if golden_set not in SETS:
         return [f"there is no golden set {golden_set!r}"]
     # The plumber's set has its tuned, held-out and sealed splits, each with its own rules.
-    if golden_set != "kestrel" and split not in SETS[golden_set].splits:
+    allowed = SETS[golden_set].splits
+    if golden_set != "kestrel" and split not in allowed:
         return [
-            f"the {golden_set} set has held-out items only and is never used for tuning: "
-            "use --split heldout"
+            f"the {golden_set} set holds only {', '.join(allowed)} items and is never used for "
+            f"tuning: use --split {allowed[0]}"
         ]
     return []
 
@@ -588,7 +589,7 @@ def main(argv: list[str]) -> int:
         return 2
 
     from citedesk.providers.ollama import OllamaProvider
-    from tools.golden import SEALED_FILE, SEALED_HASH_FILE, verify_sealed
+    from tools.golden import verify_sealed
 
     settings = Settings()
     split = _split_to_run(args)
@@ -602,6 +603,11 @@ def main(argv: list[str]) -> int:
     if facts is not None:
         settings = settings.model_copy(update={"business_facts_path": facts})
     git = ec.git_state()
+    sealed_files = ec.sealed_files_for(golden_set)
+
+    def sealed_hash_matches() -> bool:
+        return sealed_files is not None and verify_sealed(*sealed_files)
+
     if split == "sealed":
         # Refused here, before the file is opened: a request that will be turned down must not
         # read the sealed set at all.
@@ -611,7 +617,8 @@ def main(argv: list[str]) -> int:
             limit=args.limit,
             dirty=bool(git.get("dirty")),
             git_known=git.get("commit") is not None and git.get("dirty") is not None,
-            hash_matches=verify_sealed(SEALED_FILE, SEALED_HASH_FILE),
+            hash_matches=sealed_hash_matches(),
+            hash_name=None if sealed_files is None else sealed_files[1].name,
         )
         if refused:
             for problem in refused:
@@ -644,8 +651,8 @@ def main(argv: list[str]) -> int:
         runs_dir=ec.RUNS_DIR,
         ledger_path=ec.ledger_file_for(golden_set),
         preflight=preflight,
-        sealed_ledger_path=ec.SEALED_LEDGER_FILE,
-        sealed_hash_matches=lambda: verify_sealed(SEALED_FILE, SEALED_HASH_FILE),
+        sealed_ledger_path=ec.sealed_ledger_file_for(golden_set),
+        sealed_hash_matches=sealed_hash_matches,
     )
 
 

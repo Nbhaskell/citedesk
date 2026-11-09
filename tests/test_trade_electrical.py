@@ -60,6 +60,71 @@ def test_an_ordinary_electrical_question_does_not_fire(text: str) -> None:
     assert hits(text) == [], (text, hits(text))
 
 
+@pytest.mark.parametrize(
+    ("text", "name"),
+    [
+        # D-106: kinds of wording the first electrician's set showed the net missing
+        ("The dimmer in the hall gets too hot to hold my finger on.", "hot_fitting"),
+        ("Our living room dimmer is running really hot lately.", "hot_fitting"),
+        ("The light switch by the stairs has been getting warm.", "hot_fitting"),
+        ("The plug on the space heater feels warm and looks melted.", "hot_fitting"),
+        ("A puff of smoke came out of the fan motor.", "sparks_or_smoke"),
+        ("The bathroom extractor fan was smoking this morning.", "sparks_or_smoke"),
+        ("Smoke came from behind the dimmer when I turned it up.", "sparks_or_smoke"),
+        ("There's a burnt smell near the breaker box.", "burning_smell"),
+        ("A smell like hot plastic near the switch, faint but there.", "burning_smell"),
+        ("A fishy smell around the panel in the evenings.", "burning_smell"),
+        ("Smells like something is burning near the top breaker.", "burning_smell"),
+        ("My daughter got zapped by the outlet in her room.", "shock"),
+        ("I felt a tingle when I touched the metal lamp.", "shock"),
+        ("The old fixture is down and the wires are hanging out of the ceiling.", "exposed_wires"),
+        ("There are wires sticking out of the wall where the outlet was.", "exposed_wires"),
+        ("A tree pulled the wire to our house down and it is lying in the yard.", "downed_line"),
+        ("The service line to the house snapped in the storm.", "downed_line"),
+        ("The basement water has come up to just below the breaker panel.", "water_and_electrics"),
+    ],
+)
+def test_wider_wordings_of_an_electrical_emergency_fire(text: str, name: str) -> None:
+    assert name in hits(text), (text, hits(text))
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        # D-106: near misses the wider wordings must still leave alone
+        "We would like warm white bulbs in the hallway lights.",
+        "The smoke alarm near the switch keeps chirping; can you replace it?",
+        "Can you install hard-wired smoke detectors in every bedroom?",
+        "The outlet for the water heater stopped working.",
+        "Honestly the quote from the last company smelled fishy.",
+        "The ceiling fan is noisy but works fine; can you look at it?",
+        "Can you move the dimmer switch to the other side of the door?",
+        "The power was down on the whole street for an hour last night.",
+        "My son was shocked by how quickly you answered, thank you.",
+        "Can you run a new line to the shed for lights?",
+        "Can you hang a new fixture in the dining room?",
+        "We need an outlet near the hot tub.",
+        "We picked a smoky glass light fixture for the entry.",
+        "The baseboard heater gets very hot; is a thermostat worth adding?",
+        "The old bulbs get really hot, so we want LED fixtures.",
+        "The electrical wires were pulled through the attic last week.",
+    ],
+)
+def test_wider_wordings_leave_near_misses_alone(text: str) -> None:
+    assert hits(text) == [], (text, hits(text))
+
+
+def test_a_symptom_the_customer_rules_out_does_not_fire() -> None:
+    assert hits("Lights flicker in storms. No sparks, no burning smell, nothing hot.") == []
+    assert hits("The breaker trips without sparking.") == []
+    assert hits("No sparks before, but tonight the outlet sparked.") == ["sparks_or_smoke"]
+    assert hits("No, it is sparking right now!") == ["sparks_or_smoke"]
+
+
+def test_the_plumbing_net_ignores_the_negation_rule() -> None:
+    assert "electrical" in emergency_hits("No sparks so far but water is near the fuse box.")
+
+
 def test_a_spark_in_the_past_does_not_fire_but_one_today_does() -> None:
     assert hits("An outlet sparked last year and was replaced.") == []
     assert hits("An outlet sparked last year and it sparked again today.") != []

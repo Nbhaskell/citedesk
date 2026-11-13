@@ -1201,3 +1201,12 @@ The model read all six as a price, booking or service question. Changes made fro
 **Why the ruleset has no pull request or status-check requirement.** The project is finished, and later small changes may go directly to `main`; a required pull request or check would block such a push. CI still runs on every push and pull request. The ruleset protects history (no rewrite, no deletion) and does not gate changes.
 
 **Added.** `SECURITY.md`, with the reporting path and the protections in scope; it points to the README for the known limits.
+
+### D-115. CodeQL findings: one regular expression fixed, four alerts not applicable (2026-11-13)
+**Why.** CodeQL default setup (D-114) reported five open alerts on its first run. Each was read against the code and the input that reaches it.
+
+**Fixed: `py/polynomial-redos` (high), `citedesk/drafting.py`, `_DATA_TAG`.** The pattern `<\s*/?\s*(?:sources|inquiry|guidance)\s*>` has two adjacent `\s*` separated only by an optional `/`, so a `<` followed by many spaces can be split between them in many ways and matching takes quadratic time. The pattern is applied to untrusted text: each retrieved passage and the staff guidance given for a redraft. It is now `<\s*(?:/\s*)?(?:sources|inquiry|guidance)\s*>`, which matches the same strings (checked by a test over spaced, tabbed, upper-case and closing forms) and has no ambiguous repetition. A test runs 50,000-character adversarial strings through it and requires under 0.5 s; before the change that test took 43 s.
+
+**Not applicable: `py/incomplete-url-substring-sanitization`, `tests/test_golden.py` lines 292 and 297.** The assertions check that a validation message from the golden-set checker mentions `example.com`. The text is an error message, not a URL, and nothing is sanitized or trusted on the result. The rule is written for host checks in production code.
+
+**Not applicable: `js/bad-code-sanitization`, `web/scripts/capture.mjs` lines 171 and 172.** The development-only screenshot script builds a snippet for the page it controls through headless Edge. The two interpolated values (a CSS selector and a link text) are passed through `JSON.stringify`, which yields a valid JavaScript string literal, and come from literals in the script itself. No inquiry text, model output or other external input reaches them, and the script is not part of the application or its build.

@@ -1182,3 +1182,22 @@ The model read all six as a price, booking or service question. Changes made fro
 **Caveats.** The set's items and labels were written by a separate blind session (D-112); the brief was written by the session that knows the earlier results, but named no emergency wording (D-111). Counts per reason are small; 35 of 36 is compatible with a true miss rate of up to about 14%. A fixed seed gives little spread (0 items moved safety between passes).
 
 **Next.** The set is spent. The D-110 terms are now measured on unseen wording; the remaining miss and any change made from it would be development figures.
+
+### D-114. Repository settings for the public repository (2026-11-13)
+**Why.** The repository is public. Its protections on GitHub are recorded here so the state is known and can be checked.
+
+**Settings on.**
+- Secret scanning with push protection.
+- Dependabot alerts.
+- Private vulnerability reporting (the path named in `SECURITY.md`).
+- Automatic deletion of merged branches.
+- CodeQL default setup, for Python, TypeScript and the GitHub Actions workflows.
+- A ruleset "Protect main history" on the default branch that blocks force pushes and deletion.
+
+**Settings off.**
+- The Projects tab.
+- Dependabot security update PRs. Alerts are enough for a finished project; an alert is read and handled by hand, as in D-096.
+
+**Why the ruleset has no pull request or status-check requirement.** The project is finished, and later small changes may go directly to `main`; a required pull request or check would block such a push. CI still runs on every push and pull request. The ruleset protects history (no rewrite, no deletion) and does not gate changes.
+
+**Added.** `SECURITY.md`, with the reporting path and the protections in scope; it points to the README for the known limits.

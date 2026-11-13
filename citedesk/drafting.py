@@ -407,7 +407,8 @@ Reply with one JSON object and nothing else:
 {{"text": the fact in a few words, "source_index": the number of the passage it came from}}."""
 
 
-_DATA_TAG = re.compile(r"<\s*/?\s*(?:sources|inquiry|guidance)\s*>", re.IGNORECASE)
+# No two adjacent parts match the same whitespace, so matching is linear (D-115).
+_DATA_TAG = re.compile(r"<\s*(?:/\s*)?(?:sources|inquiry|guidance)\s*>", re.IGNORECASE)
 
 
 def build_user_message(

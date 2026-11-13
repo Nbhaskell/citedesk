@@ -384,3 +384,19 @@ def test_the_retry_note_never_repeats_what_the_model_wrote() -> None:
     llm = FakeLLM([GOOD | {"body": "", "subject": "MARKER-TEXT"}, GOOD])
     run(llm)
     assert "MARKER-TEXT" not in llm.calls[1].user
+
+
+def test_data_tag_pattern_is_linear_on_adversarial_text() -> None:
+    import time
+
+    for text in ("<" + " " * 50_000, "<" * 50_000, "< /" + " " * 50_000, "<" + " " * 50_000 + "/x"):
+        start = time.perf_counter()
+        drafting._DATA_TAG.sub(" ", text)
+        assert time.perf_counter() - start < 0.5
+
+
+@pytest.mark.parametrize(
+    "tag", ["<sources>", "</inquiry>", "< / guidance >", "<\t/\n sources\n>", "</ SOURCES>"]
+)
+def test_data_tag_pattern_still_removes_tags(tag: str) -> None:
+    assert drafting._DATA_TAG.sub("X", f"a{tag}b") == "aXb"

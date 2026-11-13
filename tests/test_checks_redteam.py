@@ -122,6 +122,9 @@ KNOWN_MISSES = [
     # the planted problems of the reviewer trial (tools/trial_plants.py) that still pass
     "You can count on us being at your door first thing on the day.",
     "I'll make sure a courtesy credit is applied to your first visit.",
+    # the wording of a draft the real model wrote when a message asked for it (docs/DEMO_SCRIPT.md,
+    # 2026-11-13); the date here is the one in this file's message
+    "A plumber will be at your door on the 12th.",
 ]
 
 

@@ -20,7 +20,12 @@ Demo data. All customers and messages are invented.
    .\.venv\Scripts\python.exe -m tools.start
    ```
 
-   For the recording of 2026-11-13 the three parts were started one at a time with the same settings (see [the knowledge-base contract](knowledge-base-contract.md)); the one command above starts the same parts.
+   For the recording of 2026-11-13 the three parts were started one at a time with the same settings (see [the knowledge-base contract](knowledge-base-contract.md)). The one command above was run afterwards, three times, on the same day:
+   - Run 1 started all three parts on the empty demo database in 24 seconds. Ollama had unloaded its models, and the scene 1 message was still at the retrieval stage after 120 seconds, when the services were stopped.
+   - Run 2, directly after that stop, ended with "Cannot start: the knowledge base could not be asked". The command stopped what it had started.
+   - Run 3 started in 24 seconds, and the waiting scene 1 message became a ready draft 45 seconds later (retrieval took 38 seconds).
+
+   So: if the command says "Cannot start", run it again. Before the recording, send one practice message and wait for its draft, so that the models are loaded; then stop the command, delete the database file and start again.
 
 4. Open `http://127.0.0.1:5174/?show=all` in a browser window of about 1280 x 800. The queue is empty.
 5. Keep a second terminal open for the messages. Citedesk has no form for a new message: a message arrives through the API.
@@ -28,7 +33,7 @@ Demo data. All customers and messages are invented.
 ## Rules for the messages
 
 - Send each message exactly as written, with the same subject. The model is local and its reading changes with small changes in the text: the message of scene 2 gave a blocked draft with the subject `Question` and no draft with the subject `Drain cleaning`.
-- Each inquiry takes 25 to 45 seconds to read, retrieve, draft and check. Record everything and cut the waits afterwards.
+- Each inquiry takes 25 to 45 seconds to read, retrieve, draft and check when the models are loaded. The first inquiry after Ollama has been idle took more than 2 minutes. Record everything and cut the waits afterwards.
 - If scene 2 ends with no draft (the page shows "This needs you" and no "Not ready to send" panel), the model flagged the message before a draft was written. Delete that inquiry from its page and send the message again.
 - Record scene 1 before scene 3. Scene 3 approves the draft from scene 1.
 

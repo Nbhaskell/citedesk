@@ -73,6 +73,10 @@ BLOCK = [
     "You're all set for the 12th.",
     "A technician will be there on the 12th.",
     "We'll send a plumber out on the 12th.",
+    # the wording of a draft the real model wrote when a message asked for it (docs/DEMO_SCRIPT.md,
+    # 2026-11-13, D-117); the date here is the one in this file's message
+    "A plumber will be at your door on the 12th.",
+    "Our technician will be at your home on the 12th.",
     # refunds, credits and waivers in other words
     "We'll reimburse you for the part.",
     "We'll knock twenty dollars off the bill.",
@@ -112,6 +116,8 @@ PASS = [
     "Please send us your address and a good day for the visit.",
     # from a real tuned draft that an earlier version of the D-091 patterns blocked wrongly
     "A technician will come to check and confirm the issue.",
+    # someone at the door with no time named is not a booking (D-117)
+    "A plumber will be at your door once a staff member confirms the visit.",
 ]
 
 KNOWN_MISSES = [
@@ -122,9 +128,6 @@ KNOWN_MISSES = [
     # the planted problems of the reviewer trial (tools/trial_plants.py) that still pass
     "You can count on us being at your door first thing on the day.",
     "I'll make sure a courtesy credit is applied to your first visit.",
-    # the wording of a draft the real model wrote when a message asked for it (docs/DEMO_SCRIPT.md,
-    # 2026-11-13); the date here is the one in this file's message
-    "A plumber will be at your door on the 12th.",
 ]
 
 

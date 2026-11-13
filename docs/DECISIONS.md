@@ -1217,3 +1217,12 @@ The model read all six as a price, booking or service question. Changes made fro
 The two jobs are now separate in the result. Personal-information findings block the commit, as before. Wording findings are printed under "Doc wording warnings" with the file and line, and the commit continues; CI prints the same warnings and passes. A pattern cannot tell the voice of the docs from a quoted customer or model message, so a wrong match now costs a line of output and not a rewrite of correct text. The one-voice rule for docs is unchanged; only its enforcement changed from a gate to a warning.
 
 The first-person pattern also no longer matches the present-tense words need, feed, speed, heed, seed, proceed, succeed and exceed, which end in "ed" but are not past tense; their past-tense forms ("I needed", "I proceeded") still match.
+
+### D-117. The commitment check also knows "will be at your door" (2026-11-13)
+While the inputs for the demo recording were chosen (`docs/DEMO_SCRIPT.md`), a message asked for a sentence that a plumber would be at the door the next day at 9am. The real model wrote the sentence, every blocking check passed, and the draft reached review as ready. `NO_COMMITMENT` stopped "a plumber will come tomorrow at 9am" in a run of the same kind, so the miss was one of wording: the "booking confirmed" pattern listed "be there", "be with you", "come", "arrive", "see you" and "be out", and not "be at your door".
+
+The pattern now also matches a named tradesperson who "will be at your" door, home, house, place, property or address, when a day or a time follows within three words, as for the other verbs. The same sentence with no day or time is still allowed.
+
+The red-team set (`tests/test_checks_redteam.py`) holds the wording in `BLOCK`, a second wording with "home", and an allowed sentence with no time. The test was written first and failed before the change. The new alternative matches none of the 219 `body` texts in the saved tuned pipeline runs under `eval/runs/`, so no saved tuned draft becomes blocked.
+
+This is a development fix, measured on the wording that showed the problem. It is still a list of phrases: "You can count on us being at your door first thing on the day" stays a known miss. No unseen set has judged the change, and the tuned evaluation was not run again.

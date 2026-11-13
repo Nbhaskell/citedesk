@@ -281,3 +281,91 @@ def test_quoted_examples_of_flagged_wording_are_allowed() -> None:
     assert labels('Flagged: "the owner chose" and `confirmed by the owner`.', "docs/NOTES.md") == []
     assert scan_message('Explain the check ("the owner decided" is flagged)') == []
     assert labels("The owner chose it.", "docs/NOTES.md") != []
+
+
+# --- wording findings warn; personal information blocks ------------------------------------------
+
+_PRESENT_AND_PAST = [
+    ("need", "needed"),
+    ("feed", "feeded"),
+    ("speed", "speeded"),
+    ("heed", "heeded"),
+    ("seed", "seeded"),
+    ("proceed", "proceeded"),
+    ("succeed", "succeeded"),
+    ("exceed", "exceeded"),
+]
+
+
+@pytest.mark.parametrize(("present", "past"), _PRESENT_AND_PAST)
+def test_present_tense_words_that_end_in_ed_are_not_first_person(present: str, past: str) -> None:
+    assert labels(f"I {present} it now.", "docs/NOTES.md") == []
+    assert labels(f"I {past} it.", "docs/NOTES.md") != []
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "| 1 | Type: I need a kitchen faucet replaced. | The assistant asks for the ZIP code. |",
+        "I need the report by Friday.",
+        "I feed the cat; I speed up; I proceed.",
+    ],
+)
+def test_words_that_end_in_ed_but_are_not_past_tense_are_not_first_person(text: str) -> None:
+    assert labels(text, "docs/NOTES.md") == []
+
+
+def test_a_past_tense_verb_after_i_is_still_found() -> None:
+    assert labels("I needed more data.", "docs/NOTES.md") != []
+    assert labels("I proceeded with the run.", "docs/NOTES.md") != []
+    assert labels("I succeeded.", "docs/NOTES.md") != []
+    assert labels("I exceeded it.", "docs/NOTES.md") != []
+    assert labels("I seeded the data.", "docs/NOTES.md") != []
+
+
+def test_wording_findings_are_warnings_and_personal_information_is_not() -> None:
+    found = scan_text(
+        "docs/NOTES.md", f"I measured it.\nThe owner decided.\nmail {PERSONAL_EMAIL}\n"
+    )
+    assert [(f.line, f.warning) for f in found] == [(1, True), (2, True), (3, False)]
+    assert [f.warning for f in scan_text("docs/NOTES.md", "A beginner wrote this.")] == [False]
+
+
+def test_main_prints_wording_warnings_and_exits_zero(capsys: pytest.CaptureFixture[str]) -> None:
+    files = {"docs/NOTES.md": "I measured the run.\n"}
+    code = main(["--staged"], read_files=lambda: files, author_email="a@users.noreply.github.com")
+    out = capsys.readouterr().out
+    assert code == 0
+    assert "Doc wording warnings in the docs (not blocking):" in out
+    assert "docs/NOTES.md:1: first person" in out
+    assert "Personal information check failed" not in out
+    assert "No personal information found in 1 files." in out
+
+
+def test_main_blocks_on_personal_information_and_still_prints_the_warnings(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    files = {"docs/NOTES.md": f"I measured the run.\nmail {PERSONAL_EMAIL}\n"}
+    code = main(["--all"], read_files=lambda: files)
+    out = capsys.readouterr().out
+    assert code == 1
+    assert "docs/NOTES.md:1: first person" in out.split("Personal information check failed")[0]
+    assert "docs/NOTES.md:2: email address" in out.split("Personal information check failed")[1]
+
+
+def test_a_commit_message_with_wording_only_warns(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    wording = tmp_path / "wording.txt"
+    wording.write_text("Add the rule\n\nI think this is right.\n", encoding="utf-8")
+    assert main(["--message", str(wording)]) == 0
+    out = capsys.readouterr().out
+    assert "Doc wording warnings in the commit message (not blocking):" in out
+    assert "line 3: first person" in out
+    assert "Commit message check failed" not in out
+    note = tmp_path / "note.txt"
+    note.write_text("Add the rule\n\nWritten by a beginner.\n", encoding="utf-8")
+    assert main(["--message", str(note)]) == 1
+    out = capsys.readouterr().out
+    assert "Commit message check failed:" in out
+    assert "Remove the line and commit again." in out

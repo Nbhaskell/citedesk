@@ -10,6 +10,10 @@ It is built to be checked, not trusted. The model reads and writes; plain code, 
 
 Part of a family of projects: [citeTally](https://github.com/Nbhaskell/citeTally), [citewise-markets](https://github.com/Nbhaskell/citewise-markets), [rag-project](https://github.com/Nbhaskell/rag-project), [citecheck](https://github.com/Nbhaskell/citecheck).
 
+A 61-second recording of a local run with the demo data and local `qwen3:8b`: a price question that becomes a checked draft with its sources, a draft in which the model wrote a promise the customer asked for and a check in plain code blocked it, and the approval, after which the reply is copied and nothing is sent. The waits are cut: for the message to show in the queue, for the model and the pipeline (about 22 and 25 seconds), and most of the 5 seconds in which an approval can be undone. No scene plays faster than normal speed. All customers and messages are invented. The steps are in [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md).
+
+https://github.com/user-attachments/assets/ba4770e7-1f06-473b-be1d-c1202662b328
+
 ![The review screen: message, how it was understood, the draft with its checks and sources](docs/screenshots/detail-review-1280.webp)
 
 More screens, every state at desktop and phone width: [docs/screenshots/](docs/screenshots/README.md). Those pictures were made with a scripted model, not a language model's wording (see that page).

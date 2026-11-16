@@ -8,7 +8,7 @@ Citedesk is an AI review desk for customer inquiries at a small service business
 
 It is built to be checked, not trusted. The model reads and writes; plain code, with unit tests, decides what is routed, what is escalated and what a draft may say. This README reports what was measured, including the targets it missed and a trial in which a reviewer missed every planted problem.
 
-Part of a family of projects: [citeTally](https://github.com/Nbhaskell/citeTally), [citewise-markets](https://github.com/Nbhaskell/citewise-markets), [rag-project](https://github.com/Nbhaskell/rag-project), [citecheck](https://github.com/Nbhaskell/citecheck).
+Part of a family of projects: [citetally](https://github.com/Nbhaskell/citetally), [citebook](https://github.com/Nbhaskell/citebook), [citewise-markets](https://github.com/Nbhaskell/citewise-markets), [rag-project](https://github.com/Nbhaskell/rag-project), [citecheck](https://github.com/Nbhaskell/citecheck).
 
 A 61-second recording of a local run with the demo data and local `qwen3:8b`: a price question that becomes a checked draft with its sources, a draft in which the model wrote a promise the customer asked for and a check in plain code blocked it, and the approval, after which the reply is copied and nothing is sent. The waits are cut: for the message to show in the queue, for the model and the pipeline (about 22 and 25 seconds), and most of the 5 seconds in which an approval can be undone. No scene plays faster than normal speed. All customers and messages are invented. The steps are in [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md).
 

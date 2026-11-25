@@ -1,29 +1,31 @@
 .intro {
-  margin: 0 0 var(--space-6);
-  color: var(--slate);
+  margin: 0 0 var(--cite-space-6);
+  color: var(--cite-muted);
 }
 
 .block {
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--cite-space-6);
 }
 
 .block h2 {
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--cite-space-3);
 }
 
 .facts {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);
-  gap: var(--space-2) var(--space-6);
+  gap: var(--cite-space-2) var(--cite-space-6);
   max-width: 42rem;
   margin: 0;
-  padding: var(--space-4);
-  background: var(--sheet);
-  border: 1px solid var(--rule);
+  padding: var(--cite-card-padding);
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-border);
+  border-radius: var(--cite-radius-lg);
+  box-shadow: var(--cite-shadow-card);
 }
 
 .facts dt {
-  color: var(--slate);
+  color: var(--cite-muted);
 }
 
 .facts dd {
@@ -32,19 +34,21 @@
 
 .services {
   max-width: 42rem;
-  margin: 0 0 var(--space-4);
+  margin: 0 0 var(--cite-space-4);
   padding: 0;
   list-style: none;
-  background: var(--sheet);
-  border: 1px solid var(--rule);
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-border);
+  border-radius: var(--cite-radius-lg);
+  box-shadow: var(--cite-shadow-card);
 }
 
 .service {
   display: grid;
   grid-template-columns: 14rem minmax(0, 1fr);
-  gap: var(--space-1) var(--space-4);
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--rule);
+  gap: var(--cite-space-1) var(--cite-space-4);
+  padding: var(--cite-space-3) var(--cite-space-4);
+  border-bottom: 1px solid var(--cite-rule);
 }
 
 .service:last-child {
@@ -58,7 +62,7 @@
 .detail {
   grid-column: 2;
   margin: 0;
-  color: var(--slate);
+  color: var(--cite-muted);
   font-size: var(--size-small);
 }
 
@@ -67,35 +71,37 @@
 }
 
 .ok {
-  color: var(--pass-ink);
+  color: var(--cite-success-text);
 }
 
 .bad {
-  color: var(--signal-ink);
+  color: var(--cite-danger-text);
 }
 
 .unknown {
-  color: var(--slate-ink);
+  color: var(--cite-neutral-text);
 }
 
 .checkRow {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--cite-space-4);
 }
 
 .button {
   min-height: var(--target);
-  padding: 0 var(--space-4);
-  background: var(--sheet);
-  border: 1px solid var(--edge);
-  border-radius: var(--radius);
+  padding: 0 var(--cite-space-4);
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-input-border);
+  border-radius: var(--cite-radius-md);
+  color: var(--cite-text);
+  font-weight: 600;
   cursor: pointer;
 }
 
 .button:hover:not(:disabled) {
-  background: var(--patina-mist);
+  background: var(--cite-canvas);
 }
 
 .button:disabled {
@@ -104,41 +110,47 @@
 
 .sample {
   margin: 0;
-  color: var(--slate);
+  color: var(--cite-muted);
   font-size: var(--size-small);
 }
 
 .caution {
   max-width: 42rem;
-  padding: var(--space-2) var(--space-3);
-  background: var(--amber-tint);
-  color: var(--amber-ink);
+  padding: var(--cite-space-2) var(--cite-space-3);
+  background: var(--cite-warning-bg);
+  border: 1px solid var(--cite-warning-line);
+  border-radius: var(--cite-radius-md);
+  color: var(--cite-warning-text);
 }
 
 .problem {
-  color: var(--signal-ink);
+  color: var(--cite-danger-text);
   font-weight: 700;
 }
 
 .table {
   width: 100%;
   max-width: 54rem;
-  border-collapse: collapse;
-  background: var(--sheet);
-  border: 1px solid var(--rule);
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-border);
+  border-radius: var(--cite-radius-lg);
+  box-shadow: var(--cite-shadow-card);
 }
 
 .table th,
 .table td {
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--rule);
+  padding: var(--cite-row-padding-y) var(--cite-space-3);
+  border-bottom: 1px solid var(--cite-rule);
   text-align: left;
   font-weight: 400;
   vertical-align: top;
 }
 
 .table thead th {
-  color: var(--slate);
+  border-bottom-color: var(--cite-border);
+  color: var(--cite-muted);
   font-weight: 700;
 }
 
@@ -150,7 +162,7 @@
 .switch {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--cite-space-3);
   min-height: var(--target);
 }
 
@@ -162,9 +174,9 @@
 .placeholder {
   display: block;
   height: 1rem;
-  margin-bottom: var(--space-3);
-  background: var(--rule);
-  border-radius: var(--radius);
+  margin-bottom: var(--cite-space-3);
+  background: var(--cite-border);
+  border-radius: var(--cite-radius-md);
 }
 
 @media (max-width: 40rem) {
@@ -182,6 +194,6 @@
   }
 
   .facts dd {
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--cite-space-3);
   }
 }

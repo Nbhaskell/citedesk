@@ -1,7 +1,6 @@
-import "@fontsource/atkinson-hyperlegible/400.css";
-import "@fontsource/atkinson-hyperlegible/700.css";
 import "@fontsource/source-serif-4/400.css";
 import "@fontsource/source-serif-4/600.css";
+import "./styles/cite-tokens.css";
 import "./styles/tokens.css";
 import "./styles/global.css";
 

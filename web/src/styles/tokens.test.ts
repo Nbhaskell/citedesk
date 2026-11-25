@@ -1,13 +1,25 @@
 import { describe, expect, it } from "vitest";
+import citeCss from "./cite-tokens.css?raw";
 import tokensCss from "./tokens.css?raw";
 
-function colours(): Record<string, string> {
+// Every CSS file of the app except the shared tokens: colours come only from --cite-* names.
+const appCss = import.meta.glob<string>(["../**/*.css", "!./cite-tokens.css"], {
+  query: "?raw",
+  import: "default",
+  eager: true,
+});
+
+function colours(block: string): Record<string, string> {
   const found: Record<string, string> = {};
-  for (const match of tokensCss.matchAll(/--([a-z0-9-]+):\s*(#[0-9a-f]{6})\b/gi)) {
+  for (const match of block.matchAll(/--cite-([a-z0-9-]+):\s*(#[0-9a-f]{6})\b/gi)) {
     found[match[1] as string] = match[2] as string;
   }
   return found;
 }
+
+// The light values are the first :root block; the forced dark block holds every dark value.
+const light = colours(citeCss.slice(0, citeCss.indexOf("@media")));
+const dark = { ...light, ...colours(citeCss.slice(citeCss.indexOf(':root[data-theme="dark"]'))) };
 
 function luminance(hex: string): number {
   const channel = (start: number) => {
@@ -18,46 +30,52 @@ function luminance(hex: string): number {
 }
 
 function contrast(a: string, b: string): number {
-  const [light, dark] = [luminance(a), luminance(b)].sort((x, y) => y - x) as [number, number];
-  return (light + 0.05) / (dark + 0.05);
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x) as [number, number];
+  return (hi + 0.05) / (lo + 0.05);
 }
 
-const palette = colours();
-const pick = (name: string): string => {
-  const value = palette[name];
-  if (!value) throw new Error(`token --${name} is missing`);
-  return value;
-};
-
-// [foreground, background]: WCAG 2.1 AA needs 4.5 for text.
+// [foreground, background] pairs this app puts together. WCAG 2.1 AA needs 4.5 for text.
 const TEXT_PAIRS: [string, string][] = [
-  ["ink", "paper"],
-  ["ink", "sheet"],
-  ["slate", "paper"],
-  ["slate", "sheet"],
-  ["patina", "paper"],
-  ["patina", "sheet"],
-  ["sheet", "patina"],
-  ["patina", "patina-mist"],
-  ["sheet", "signal"],
-  ["signal-ink", "signal-tint"],
-  ["amber-ink", "amber-tint"],
-  ["slate-ink", "slate-tint"],
-  ["pass-ink", "pass-tint"],
-  ["ink", "mark"],
+  ["text", "canvas"],
+  ["text", "surface"],
+  ["muted", "canvas"],
+  ["muted", "surface"],
+  ["muted", "warning-bg"],
+  ["link", "canvas"],
+  ["link", "surface"],
+  ["on-primary", "primary"],
+  ["on-primary", "primary-hover"],
+  ["on-primary", "danger-solid"],
+  ["danger-text", "danger-bg"],
+  ["danger-text", "surface"],
+  ["warning-text", "warning-bg"],
+  ["info-text", "info-bg"],
+  ["neutral-text", "neutral-bg"],
+  ["success-text", "surface"],
+  ["muted", "rule"],
+  ["text", "danger-bg"],
+  ["muted", "danger-bg"],
+  ["link", "info-bg"],
 ];
 
-// Boundaries, bands and the focus ring need 3 against what they sit on.
+// Boundaries of controls and the focus ring need 3 against what they sit on. Controls have a
+// Surface fill, so their border is checked against Surface (input-border on canvas is 2.92:1 in light).
 const NON_TEXT_PAIRS: [string, string][] = [
-  ["edge", "paper"],
-  ["edge", "sheet"],
-  ["ring", "paper"],
-  ["ring", "sheet"],
-  ["signal", "paper"],
-  ["amber", "paper"],
+  ["input-border", "surface"],
+  ["focus", "surface"],
+  ["focus", "canvas"],
 ];
 
-describe("design tokens", () => {
+describe.each([
+  ["light", light],
+  ["dark", dark],
+])("Cite tokens, %s theme", (_theme, palette) => {
+  const pick = (name: string): string => {
+    const value = palette[name];
+    if (!value) throw new Error(`token --cite-${name} is missing`);
+    return value;
+  };
+
   it.each(TEXT_PAIRS)("text %s on %s has at least 4.5:1", (fg, bg) => {
     expect(contrast(pick(fg), pick(bg))).toBeGreaterThanOrEqual(4.5);
   });
@@ -65,15 +83,15 @@ describe("design tokens", () => {
   it.each(NON_TEXT_PAIRS)("%s against %s has at least 3:1", (fg, bg) => {
     expect(contrast(pick(fg), pick(bg))).toBeGreaterThanOrEqual(3);
   });
+});
 
-  it("uses the values the design plan names", () => {
-    expect(palette).toMatchObject({
-      paper: "#f3f5f3",
-      ink: "#1f2a30",
-      patina: "#0d5c57",
-      signal: "#b3261e",
-      ring: "#1d5fd1",
-    });
+describe("app styles", () => {
+  it("reads every app CSS file", () => {
+    expect(Object.keys(appCss).length).toBeGreaterThan(5);
+  });
+
+  it.each(Object.entries(appCss))("%s types no colour value", (_path, css) => {
+    expect(css.match(/#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/gi)).toBeNull();
   });
 
   it("sets no text smaller than 16px", () => {
@@ -87,5 +105,11 @@ describe("design tokens", () => {
   it("keeps the touch target at 44px", () => {
     const match = /--target:\s*([\d.]+)rem/.exec(tokensCss);
     expect(Number(match?.[1]) * 16).toBeGreaterThanOrEqual(44);
+  });
+
+  it("uses no Cite type size below 16px", () => {
+    for (const css of Object.values(appCss)) {
+      expect(css).not.toMatch(/--cite-text-(label|small|button|body|title)\b/);
+    }
   });
 });

@@ -1,7 +1,7 @@
 /* Narrow first: one column in the order Understood as, Draft and actions, Sources, Original message. */
 .layout {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--cite-space-4);
   grid-template-columns: minmax(0, 1fr);
 }
 
@@ -46,8 +46,8 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0 var(--space-6);
-  margin-bottom: var(--space-3);
+  gap: 0 var(--cite-space-6);
+  margin-bottom: var(--cite-space-3);
 }
 
 .crumbs a {
@@ -60,8 +60,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0 var(--space-4);
-  color: var(--slate);
+  gap: 0 var(--cite-space-4);
+  color: var(--cite-muted);
   font-size: var(--size-small);
 }
 
@@ -69,8 +69,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-2);
-  margin-bottom: var(--space-4);
+  gap: var(--cite-space-2);
+  margin-bottom: var(--cite-space-4);
 }
 
 /* The link to the original message: shown only where that message is not already beside the draft. */
@@ -88,14 +88,22 @@
 }
 
 .panel {
-  margin-bottom: var(--space-4);
-  padding: var(--space-4);
-  background: var(--sheet);
-  border: 1px solid var(--rule);
+  margin-bottom: var(--cite-space-4);
+  padding: var(--cite-card-padding);
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-border);
+  border-radius: var(--cite-radius-lg);
+  box-shadow: var(--cite-shadow-card);
+}
+
+@media (max-width: 30rem) {
+  .panel {
+    padding: var(--cite-space-4);
+  }
 }
 
 .panel h3 {
-  margin: var(--space-4) 0 var(--space-1);
+  margin: var(--cite-space-4) 0 var(--cite-space-1);
   font-size: var(--size-small);
 }
 
@@ -104,18 +112,18 @@
 }
 
 .meta {
-  color: var(--slate);
+  color: var(--cite-muted);
   font-size: var(--size-small);
 }
 
 .faint {
-  color: var(--slate);
+  color: var(--cite-muted);
 }
 
 .label {
   display: block;
-  margin-bottom: var(--space-1);
-  color: var(--slate);
+  margin-bottom: var(--cite-space-1);
+  color: var(--cite-muted);
   font-size: var(--size-small);
   font-weight: 700;
 }
@@ -150,21 +158,22 @@ p .label {
 }
 
 .warning {
-  padding: var(--space-2) var(--space-3);
-  background: var(--amber-tint);
-  color: var(--amber-ink);
-  border-radius: var(--radius);
+  padding: var(--cite-space-2) var(--cite-space-3);
+  background: var(--cite-warning-bg);
+  color: var(--cite-warning-text);
+  border: 1px solid var(--cite-warning-line);
+  border-radius: var(--cite-radius-md);
 }
 
 .facts {
   margin: 0;
   display: grid;
   grid-template-columns: max-content 1fr;
-  gap: var(--space-1) var(--space-4);
+  gap: var(--cite-space-1) var(--cite-space-4);
 }
 
 .facts dt {
-  color: var(--slate);
+  color: var(--cite-muted);
 }
 
 .facts dd {
@@ -177,11 +186,12 @@ p .label {
 }
 
 .missing {
-  margin-top: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  background: var(--mark);
-  color: var(--ink);
-  border-radius: var(--radius);
+  margin-top: var(--cite-space-3);
+  padding: var(--cite-space-2) var(--cite-space-3);
+  background: var(--cite-warning-bg);
+  color: var(--cite-warning-text);
+  border: 1px solid var(--cite-warning-line);
+  border-radius: var(--cite-radius-md);
 }
 
 .missing h3 {
@@ -190,14 +200,15 @@ p .label {
 
 .missing ul {
   margin: 0;
-  padding-left: var(--space-4);
+  padding-left: var(--cite-space-4);
 }
 
 mark {
-  background: var(--mark);
-  color: var(--ink);
+  background: var(--cite-warning-bg);
+  color: var(--cite-warning-text);
   padding: 0 0.15em;
-  border-radius: 2px;
+  border-bottom: 2px solid var(--cite-warning-line);
+  border-radius: var(--cite-radius-sm) var(--cite-radius-sm) 0 0;
 }
 
 /* Checks: a word and a symbol say the result; the tint repeats it. */
@@ -206,30 +217,33 @@ mark {
   padding: 0;
   list-style: none;
   display: grid;
-  gap: var(--space-2);
+  gap: var(--cite-space-2);
 }
 
 .checks li {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius);
+  padding: var(--cite-space-2) var(--cite-space-3);
+  border: 1px solid var(--cite-rule);
+  border-radius: var(--cite-radius-md);
 }
 
+/* Only a check that needs attention is tinted; a passed check stays plain, with its word. */
 .check_failed {
-  background: var(--signal-tint);
-  color: var(--signal-ink);
+  background: var(--cite-danger-bg);
+  border-color: var(--cite-danger-line);
+  color: var(--cite-danger-text);
 }
 
 .check_warning {
-  background: var(--amber-tint);
-  color: var(--amber-ink);
+  background: var(--cite-warning-bg);
+  border-color: var(--cite-warning-line);
+  color: var(--cite-warning-text);
 }
 
-.check_passed {
-  background: var(--pass-tint);
-  color: var(--pass-ink);
+.check_passed .checkState {
+  color: var(--cite-success-text);
 }
 
 .checkState {
@@ -248,8 +262,8 @@ mark {
 }
 
 .source {
-  padding: var(--space-2) 0;
-  border-top: 1px solid var(--rule);
+  padding: var(--cite-space-2) 0;
+  border-top: 1px solid var(--cite-rule);
 }
 
 .source:first-child {
@@ -262,17 +276,17 @@ mark {
 
 .claims ul {
   margin: 0;
-  padding-left: var(--space-4);
+  padding-left: var(--cite-space-4);
 }
 
 .marker,
 .linkButton {
   min-height: var(--target);
   min-width: var(--target);
-  padding: 0 var(--space-2);
+  padding: 0 var(--cite-space-2);
   background: none;
   border: 0;
-  color: var(--patina);
+  color: var(--cite-link);
   text-decoration: underline;
   text-underline-offset: 0.15em;
   cursor: pointer;
@@ -283,10 +297,10 @@ mark {
   display: block;
   width: 100%;
   max-width: var(--measure);
-  padding: var(--space-3);
-  background: var(--sheet);
-  border: 1px solid var(--edge);
-  border-radius: var(--radius);
+  padding: var(--cite-space-3);
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-input-border);
+  border-radius: var(--cite-radius-md);
 }
 
 .editor {
@@ -296,90 +310,120 @@ mark {
 }
 
 .over {
-  color: var(--signal-ink);
+  color: var(--cite-danger-text);
   font-weight: 700;
 }
 
 .actions {
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--cite-space-4);
 }
 
 .buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
-  margin: var(--space-3) 0;
+  gap: var(--cite-space-3);
+  margin: var(--cite-space-3) 0;
 }
 
 .primary,
-.secondary {
+.secondary,
+.danger {
   min-height: var(--target);
-  padding: 0 var(--space-4);
-  border-radius: var(--radius);
-  font-weight: 700;
+  padding: 0 var(--cite-space-4);
+  border-radius: var(--cite-radius-md);
+  font-weight: 600;
   cursor: pointer;
 }
 
 .primary {
-  background: var(--patina);
-  border: 1px solid var(--patina);
-  color: #fff;
+  background: var(--cite-primary);
+  border: 1px solid var(--cite-primary);
+  color: var(--cite-on-primary);
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--cite-primary-hover);
 }
 
 .secondary {
-  background: var(--sheet);
-  border: 1px solid var(--edge);
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-input-border);
+  color: var(--cite-text);
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--cite-canvas);
+}
+
+.danger {
+  background: var(--cite-danger-solid);
+  border: 1px solid var(--cite-danger-solid);
+  color: var(--cite-on-primary);
+}
+
+.danger:hover:not(:disabled) {
+  background: var(--cite-danger-solid-hover);
 }
 
 .primary:disabled,
-.secondary:disabled {
-  opacity: 0.55;
+.secondary:disabled,
+.danger:disabled {
+  background: var(--cite-rule);
+  border-color: var(--cite-rule);
+  color: var(--cite-muted);
   cursor: not-allowed;
 }
 
 .inline {
-  margin: var(--space-3) 0;
-  padding: var(--space-3);
-  background: var(--sheet);
-  border: 1px solid var(--rule);
+  margin: var(--cite-space-3) 0;
+  padding: var(--cite-space-3);
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-border);
+  border-radius: var(--cite-radius-md);
 }
 
 .fieldError,
 .errorNote {
-  color: var(--signal-ink);
+  color: var(--cite-danger-text);
   font-weight: 700;
 }
 
 .errorNote {
-  padding: var(--space-2) var(--space-3);
-  background: var(--signal-tint);
-  border-radius: var(--radius);
+  padding: var(--cite-space-2) var(--cite-space-3);
+  background: var(--cite-danger-bg);
+  border: 1px solid var(--cite-danger-line);
+  border-radius: var(--cite-radius-md);
 }
 
 .undo {
-  padding: var(--space-2) var(--space-3);
-  background: var(--patina-mist);
-  border-radius: var(--radius);
+  padding: var(--cite-space-2) var(--cite-space-3);
+  background: var(--cite-info-bg);
+  color: var(--cite-info-text);
+  border-radius: var(--cite-radius-md);
 }
 
 .banner {
-  margin-bottom: var(--space-4);
-  padding: var(--space-4);
-  background: var(--sheet);
-  border: 1px solid var(--rule);
-  border-left-width: 8px;
+  margin-bottom: var(--cite-space-4);
+  padding: var(--cite-space-4) var(--cite-space-5);
+  background: var(--cite-warning-bg);
+  border: 1px solid var(--cite-warning-line);
+  border-radius: var(--cite-radius-lg);
+  color: var(--cite-warning-text);
 }
 
 .banner h2 {
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--cite-space-2);
 }
 
 .banner_stop {
-  border-left-color: var(--signal);
+  background: var(--cite-danger-bg);
+  border-color: var(--cite-danger-line);
+  color: var(--cite-danger-text);
 }
 
 .banner_info {
-  border-left-color: var(--patina);
+  background: var(--cite-info-bg);
+  color: var(--cite-info-text);
 }
 
 .notice {
@@ -391,10 +435,11 @@ mark {
 }
 
 .reference {
-  margin-bottom: var(--space-4);
-  padding: var(--space-3) var(--space-4);
-  background: var(--sheet);
-  border: 1px dashed var(--edge);
+  margin-bottom: var(--cite-space-4);
+  padding: var(--cite-space-3) var(--cite-space-4);
+  background: var(--cite-surface);
+  border: 1px dashed var(--cite-input-border);
+  border-radius: var(--cite-radius-lg);
 }
 
 .reference summary {
@@ -405,7 +450,7 @@ mark {
 }
 
 .history {
-  margin-top: var(--space-4);
+  margin-top: var(--cite-space-4);
 }
 
 .history summary {
@@ -418,9 +463,9 @@ mark {
 .bar {
   display: block;
   height: 1rem;
-  margin-bottom: var(--space-3);
-  background: var(--rule);
-  border-radius: var(--radius);
+  margin-bottom: var(--cite-space-3);
+  background: var(--cite-border);
+  border-radius: var(--cite-radius-md);
 }
 
 @media (max-width: 40rem) {
@@ -431,18 +476,18 @@ mark {
 }
 
 .aids {
-  margin-top: var(--space-4);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--rule);
+  margin-top: var(--cite-space-4);
+  padding-top: var(--cite-space-3);
+  border-top: 1px solid var(--cite-rule);
 }
 
 .aids h4 {
-  margin: var(--space-3) 0 var(--space-1);
+  margin: var(--cite-space-3) 0 var(--cite-space-1);
 }
 
 .aidList {
   margin: 0;
-  padding-left: var(--space-4);
+  padding-left: var(--cite-space-4);
 }
 
 .origin {
@@ -450,8 +495,15 @@ mark {
 }
 
 .warn {
-  padding: 0 var(--space-1);
-  background: var(--amber-tint);
-  color: var(--amber-ink);
+  padding: 0 var(--cite-space-1);
+  border-radius: var(--cite-radius-sm);
+  background: var(--cite-warning-bg);
+  color: var(--cite-warning-text);
   font-weight: 600;
+}
+
+@media print {
+  .layout {
+    display: block;
+  }
 }

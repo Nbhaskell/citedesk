@@ -10,37 +10,45 @@ html {
 
 body {
   margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-ui);
+  background: var(--cite-canvas);
+  color: var(--cite-text);
+  font-family: var(--cite-font);
   font-size: var(--size-body);
-  line-height: 1.5;
+  line-height: 1.55;
   font-variant-numeric: tabular-nums;
 }
 
 h1,
 h2,
 h3 {
-  margin: 0 0 var(--space-3);
+  margin: 0 0 var(--cite-space-3);
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: 0;
 }
 
 h1 {
-  font-size: var(--size-title);
+  font-size: var(--cite-text-headline);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 30rem) {
+  h1 {
+    font-size: 1.5rem;
+  }
 }
 
 h2 {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
 }
 
 p {
-  margin: 0 0 var(--space-3);
+  margin: 0 0 var(--cite-space-3);
 }
 
 a {
-  color: var(--patina);
+  color: var(--cite-link);
   text-underline-offset: 0.15em;
 }
 
@@ -54,8 +62,15 @@ textarea {
 
 /* Focus is visible on everything that can take it, and never hidden by an overflow. */
 :focus-visible {
-  outline: 3px solid var(--ring);
+  outline: 3px solid var(--cite-focus);
   outline-offset: 2px;
+}
+
+/* Fields: the border turns navy on focus, beside the focus outline. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  border-color: var(--cite-primary);
 }
 
 /* Programmatic focus on a region (after navigation) needs no ring: it is not a control. */
@@ -77,19 +92,19 @@ main:focus {
 
 .skip-link {
   position: absolute;
-  left: var(--space-2);
+  left: var(--cite-space-2);
   top: -4rem;
   z-index: 10;
-  padding: var(--space-3) var(--space-4);
-  background: var(--sheet);
-  border: 2px solid var(--ink);
-  border-radius: var(--radius);
-  color: var(--ink);
+  padding: var(--cite-space-3) var(--cite-space-4);
+  background: var(--cite-surface);
+  border: 2px solid var(--cite-text);
+  border-radius: var(--cite-radius-md);
+  color: var(--cite-text);
   font-weight: 700;
 }
 
 .skip-link:focus {
-  top: var(--space-2);
+  top: var(--cite-space-2);
 }
 
 /* Motion shows a change the person caused; with reduced motion it is instant. */
@@ -101,5 +116,24 @@ main:focus {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Print: one column, black text on white, no shadows or tints; external links show their address. */
+@media print {
+  :root {
+    color-scheme: light;
+  }
+
+  *,
+  *::before,
+  *::after {
+    background: none !important;
+    box-shadow: none !important;
+    color: black !important;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
   }
 }

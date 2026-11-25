@@ -3,77 +3,77 @@
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: var(--space-3) var(--space-6);
-  margin-bottom: var(--space-4);
+  gap: var(--cite-space-3) var(--cite-space-6);
+  margin-bottom: var(--cite-space-4);
 }
 
 .tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1);
+  gap: var(--cite-space-1);
 }
 
 .tab {
   min-height: var(--target);
   display: inline-flex;
   align-items: center;
-  padding: 0 var(--space-3);
-  border-bottom: 3px solid transparent;
-  color: var(--ink);
+  padding: 0 var(--cite-space-3);
+  border-bottom: 2px solid transparent;
+  color: var(--cite-text);
   text-decoration: none;
 }
 
 .tab:hover {
-  background: var(--sheet);
+  background: var(--cite-surface);
 }
 
 .tab[aria-current="page"] {
-  border-bottom-color: var(--patina);
-  font-weight: 700;
+  border-bottom-color: var(--cite-primary);
+  font-weight: 600;
 }
 
 .count {
-  margin-left: var(--space-1);
-  color: var(--slate);
+  margin-left: var(--cite-space-1);
+  color: var(--cite-muted);
   font-weight: 400;
 }
 
 .search {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--cite-space-1);
   min-width: min(100%, 18rem);
 }
 
 .search input {
   min-height: var(--target);
-  padding: 0 var(--space-3);
-  background: var(--sheet);
-  border: 1px solid var(--edge);
-  border-radius: var(--radius);
+  padding: 0 var(--cite-space-3);
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-input-border);
+  border-radius: var(--cite-radius-md);
 }
 
 .pill {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-4);
+  gap: var(--cite-space-3);
+  margin-bottom: var(--cite-space-4);
 }
 
 .pill > span {
-  padding: var(--space-1) var(--space-3);
-  background: var(--signal-tint);
-  color: var(--signal-ink);
-  border-radius: var(--radius);
-  font-weight: 700;
+  padding: 1px 9px;
+  background: var(--cite-danger-bg);
+  color: var(--cite-danger-text);
+  border-radius: var(--cite-radius-pill);
+  font-weight: 600;
 }
 
 .linkButton {
   min-height: var(--target);
-  padding: 0 var(--space-2);
+  padding: 0 var(--cite-space-2);
   background: none;
   border: 0;
-  color: var(--patina);
+  color: var(--cite-link);
   text-decoration: underline;
   text-underline-offset: 0.15em;
   cursor: pointer;
@@ -83,31 +83,34 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  background: var(--sheet);
-  border: 1px solid var(--rule);
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-border);
+  border-radius: var(--cite-radius-lg);
+  box-shadow: var(--cite-shadow-card);
 }
 
-/* The ticket stub: a coloured edge on the left. The word in the tag says the same thing. */
+.list > :first-child,
+.list > :first-child a {
+  border-radius: var(--cite-radius-lg) var(--cite-radius-lg) 0 0;
+}
+
+.list > :last-child,
+.list > :last-child a {
+  border-radius: 0 0 var(--cite-radius-lg) var(--cite-radius-lg);
+}
+
 .item {
-  border-bottom: 1px solid var(--rule);
-  border-left: 2px solid transparent;
+  border-bottom: 1px solid var(--cite-rule);
 }
 
 .item:last-child {
   border-bottom: 0;
 }
 
+/* Only an urgent row is tinted; the word in its tag says the same thing. */
 .edge_urgent {
-  border-left: 8px solid var(--signal);
+  background: var(--cite-danger-bg);
   font-weight: 700;
-}
-
-.edge_high {
-  border-left: 4px solid var(--amber);
-}
-
-.edge_normal {
-  border-left: 2px solid var(--edge);
 }
 
 .row {
@@ -115,14 +118,14 @@
   display: grid;
   grid-template-columns: 6rem 11rem minmax(0, 1fr) 10rem 6.5rem;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-4);
+  gap: var(--cite-space-3);
+  padding: var(--cite-space-2) var(--cite-space-4);
   color: inherit;
   text-decoration: none;
 }
 
 a.row:hover {
-  background: var(--patina-mist);
+  background: var(--cite-canvas);
 }
 
 .summary {
@@ -134,7 +137,7 @@ a.row:hover {
 .state,
 .sender,
 .age {
-  color: var(--slate);
+  color: var(--cite-muted);
   font-weight: 400;
 }
 
@@ -144,7 +147,7 @@ a.row:hover {
 
 .repeat {
   grid-column: 3 / -1;
-  color: var(--slate);
+  color: var(--cite-muted);
   font-size: var(--size-small);
   font-weight: 400;
 }
@@ -152,39 +155,50 @@ a.row:hover {
 .bar {
   display: block;
   height: 1rem;
-  background: var(--rule);
-  border-radius: var(--radius);
+  background: var(--cite-border);
+  border-radius: var(--cite-radius-md);
 }
 
 .message {
-  padding: var(--space-8) var(--space-4);
-  background: var(--sheet);
-  border: 1px solid var(--rule);
+  padding: var(--cite-card-padding);
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-border);
+  border-radius: var(--cite-radius-lg);
+  box-shadow: var(--cite-shadow-card);
 }
 
 .meta {
-  color: var(--slate);
+  color: var(--cite-muted);
   font-size: var(--size-small);
 }
 
 .button {
   min-height: var(--target);
-  padding: 0 var(--space-4);
-  background: var(--sheet);
-  border: 1px solid var(--edge);
-  border-radius: var(--radius);
+  padding: 0 var(--cite-space-4);
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-input-border);
+  border-radius: var(--cite-radius-md);
+  color: var(--cite-text);
+  font-weight: 600;
   cursor: pointer;
 }
 
+.button:disabled {
+  background: var(--cite-rule);
+  border-color: var(--cite-rule);
+  color: var(--cite-muted);
+  cursor: not-allowed;
+}
+
 .button:hover:not(:disabled) {
-  background: var(--patina-mist);
+  background: var(--cite-canvas);
 }
 
 .more {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  margin-top: var(--space-4);
+  gap: var(--cite-space-4);
+  margin-top: var(--cite-space-4);
 }
 
 @media (max-width: 52rem) {
@@ -195,8 +209,8 @@ a.row:hover {
       "summary summary summary"
       "sender sender age"
       "repeat repeat repeat";
-    gap: var(--space-1) var(--space-3);
-    padding: var(--space-3) var(--space-3);
+    gap: var(--cite-space-1) var(--cite-space-3);
+    padding: var(--cite-space-3) var(--cite-space-3);
   }
 
   .urgency {

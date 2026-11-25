@@ -10,11 +10,11 @@
   width: 100%;
   max-width: 80rem;
   margin: 0 auto;
-  padding: var(--space-6) var(--gutter);
+  padding: var(--cite-space-6) var(--cite-space-5);
 }
 
 @media (max-width: 40rem) {
   .main {
-    padding-top: var(--space-4);
+    padding-top: var(--cite-space-4);
   }
 }

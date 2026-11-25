@@ -5,8 +5,8 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: var(--space-6) var(--gutter);
-  background: rgb(31 42 48 / 60%);
+  padding: var(--cite-space-6) var(--cite-space-5);
+  background: var(--cite-scrim);
   overflow-y: auto;
 }
 
@@ -16,25 +16,28 @@
 
 .dialog {
   width: 100%;
-  max-width: 34rem;
-  padding: var(--space-6);
-  background: var(--sheet);
-  border: 2px solid var(--ink);
-  border-radius: var(--radius);
+  max-width: 32rem;
+  padding: var(--cite-space-5);
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-border);
+  border-radius: var(--cite-radius-lg);
+  box-shadow: var(--cite-shadow-overlay);
 }
 
 .off {
-  padding: var(--space-2) var(--space-3);
-  background: var(--amber-tint);
-  color: var(--amber-ink);
+  padding: var(--cite-space-2) var(--cite-space-3);
+  border: 1px solid var(--cite-warning-line);
+  border-radius: var(--cite-radius-md);
+  background: var(--cite-warning-bg);
+  color: var(--cite-warning-text);
 }
 
 .group {
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--cite-space-4);
 }
 
 .group h3 {
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--cite-space-2);
   font-size: var(--size-body);
 }
 
@@ -45,9 +48,9 @@
 .entry {
   display: grid;
   grid-template-columns: 4.5rem minmax(0, 1fr);
-  gap: var(--space-3);
+  gap: var(--cite-space-3);
   align-items: baseline;
-  padding: var(--space-1) 0;
+  padding: var(--cite-space-1) 0;
 }
 
 .entry dt,
@@ -58,22 +61,26 @@
 .key {
   display: inline-block;
   min-width: 2rem;
-  padding: 0 var(--space-2);
-  background: var(--paper);
-  border: 1px solid var(--edge);
-  border-radius: var(--radius);
-  font-family: var(--font-ui);
+  padding: 0 var(--cite-space-2);
+  background: var(--cite-canvas);
+  border: 1px solid var(--cite-input-border);
+  border-radius: var(--cite-radius-sm);
+  font-family: var(--cite-font);
   font-weight: 700;
   text-align: center;
 }
 
 .close {
   min-height: var(--target);
-  padding: 0 var(--space-6);
-  background: var(--patina);
-  border: 1px solid var(--patina);
-  border-radius: var(--radius);
-  color: #fff;
-  font-weight: 700;
+  padding: 0 var(--cite-space-4);
+  background: var(--cite-primary);
+  border: 1px solid var(--cite-primary);
+  border-radius: var(--cite-radius-md);
+  color: var(--cite-on-primary);
+  font-weight: 600;
   cursor: pointer;
+}
+
+.close:hover {
+  background: var(--cite-primary-hover);
 }

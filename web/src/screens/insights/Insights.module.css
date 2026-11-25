@@ -1,72 +1,82 @@
 .summary {
-  margin: 0 0 var(--space-6);
-  color: var(--slate);
+  margin: 0 0 var(--cite-space-6);
+  color: var(--cite-muted);
 }
 
 .block {
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--cite-space-6);
 }
 
 .block h2 {
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--cite-space-3);
 }
 
 .figures {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-  gap: var(--space-4);
+  gap: var(--cite-space-4);
 }
 
 .figure {
-  padding: var(--space-4);
-  background: var(--sheet);
-  border: 1px solid var(--rule);
+  padding: var(--cite-tile-padding);
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-border);
+  border-radius: var(--cite-radius-lg);
+  box-shadow: var(--cite-shadow-card);
 }
 
 .figureLabel {
-  margin: 0 0 var(--space-2);
+  margin: 0 0 var(--cite-space-2);
   font-size: var(--size-body);
   font-weight: 700;
 }
 
 .value {
   margin: 0;
-  font-size: var(--size-title);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-size: var(--cite-text-figure);
   font-weight: 700;
 }
 
 .sample {
-  margin: var(--space-1) 0 0;
-  color: var(--slate);
+  margin: var(--cite-space-1) 0 0;
+  color: var(--cite-muted);
   font-size: var(--size-small);
 }
 
 .caution {
-  margin: var(--space-2) 0 0;
-  padding: var(--space-1) var(--space-2);
-  background: var(--amber-tint);
-  color: var(--amber-ink);
+  margin: var(--cite-space-2) 0 0;
+  padding: var(--cite-space-1) var(--cite-space-2);
+  background: var(--cite-warning-bg);
+  border: 1px solid var(--cite-warning-line);
+  border-radius: var(--cite-radius-md);
+  color: var(--cite-warning-text);
   font-size: var(--size-small);
 }
 
 .table {
   width: 100%;
   max-width: 42rem;
-  border-collapse: collapse;
-  background: var(--sheet);
-  border: 1px solid var(--rule);
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-border);
+  border-radius: var(--cite-radius-lg);
+  box-shadow: var(--cite-shadow-card);
 }
 
 .table th,
 .table td {
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--rule);
+  padding: var(--cite-row-padding-y) var(--cite-space-3);
+  border-bottom: 1px solid var(--cite-rule);
   text-align: left;
   font-weight: 400;
 }
 
 .table thead th {
-  color: var(--slate);
+  border-bottom-color: var(--cite-border);
+  color: var(--cite-muted);
   font-weight: 700;
 }
 
@@ -89,59 +99,61 @@
   display: inline-block;
   width: 5rem;
   height: 0.75rem;
-  margin-right: var(--space-2);
+  margin-right: var(--cite-space-2);
   vertical-align: middle;
-  background: var(--rule);
-  border-radius: var(--radius);
+  background: var(--cite-border);
+  border-radius: var(--cite-radius-md);
   overflow: hidden;
 }
 
 .fill {
   display: block;
   height: 100%;
-  background: var(--patina);
+  background: var(--cite-primary);
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--cite-space-1);
   max-width: 28rem;
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--cite-space-3);
 }
 
 .field input {
   width: 8rem;
   min-height: var(--target);
-  padding: 0 var(--space-3);
-  background: var(--sheet);
-  border: 1px solid var(--edge);
-  border-radius: var(--radius);
+  padding: 0 var(--cite-space-3);
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-input-border);
+  border-radius: var(--cite-radius-md);
 }
 
 .field input[aria-invalid="true"] {
-  border-color: var(--signal);
-  border-width: 2px;
+  border-color: var(--cite-danger-solid);
 }
 
 .problem {
   margin: 0;
-  color: var(--signal-ink);
+  color: var(--cite-danger-text);
   font-weight: 700;
 }
 
 .empty {
-  padding: var(--space-8) var(--space-4);
-  background: var(--sheet);
-  border: 1px solid var(--rule);
+  padding: var(--cite-card-padding);
+  background: var(--cite-surface);
+  border: 1px solid var(--cite-border);
+  border-radius: var(--cite-radius-lg);
+  box-shadow: var(--cite-shadow-card);
+  color: var(--cite-muted);
 }
 
 .placeholder {
   display: block;
   height: 1rem;
-  margin-bottom: var(--space-2);
-  background: var(--rule);
-  border-radius: var(--radius);
+  margin-bottom: var(--cite-space-2);
+  background: var(--cite-border);
+  border-radius: var(--cite-radius-md);
 }
 
 @media (max-width: 40rem) {

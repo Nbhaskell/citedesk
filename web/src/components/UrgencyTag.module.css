@@ -1,8 +1,8 @@
 .tag {
   display: inline-block;
   min-width: 4.5rem;
-  padding: 0 var(--space-2);
-  border-radius: var(--radius);
+  padding: 0 var(--cite-space-2);
+  border-radius: var(--cite-radius-sm);
   font-size: var(--size-small);
   line-height: 1.75;
   text-align: center;
@@ -10,23 +10,23 @@
 
 /* The one loud tag. It is the only place capitals are used. */
 .urgent {
-  background: var(--signal);
-  color: #fff;
+  background: var(--cite-danger-bg);
+  color: var(--cite-danger-text);
   font-weight: 700;
   text-transform: uppercase;
 }
 
 .high {
-  background: var(--amber-tint);
-  color: var(--amber-ink);
+  background: var(--cite-warning-bg);
+  color: var(--cite-warning-text);
   font-weight: 700;
 }
 
 .normal {
-  background: var(--slate-tint);
-  color: var(--slate-ink);
+  background: var(--cite-neutral-bg);
+  color: var(--cite-neutral-text);
 }
 
 .low {
-  color: var(--slate);
+  color: var(--cite-muted);
 }

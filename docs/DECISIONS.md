@@ -1226,3 +1226,34 @@ The pattern now also matches a named tradesperson who "will be at your" door, ho
 The red-team set (`tests/test_checks_redteam.py`) holds the wording in `BLOCK`, a second wording with "home", and an allowed sentence with no time. The test was written first and failed before the change. The new alternative matches none of the 219 `body` texts in the saved tuned pipeline runs under `eval/runs/`, so no saved tuned draft becomes blocked.
 
 This is a development fix, measured on the wording that showed the problem. It is still a list of phrases: "You can count on us being at your door first thing on the day" stays a known miss. No unseen set has judged the change, and the tuned evaluation was not run again.
+
+### D-118. The web app uses the shared Cite design system v1.1 (2026-11-25)
+**What.** `DESIGN.md` (repository root) and `web/src/styles/cite-tokens.css` are unchanged copies of the shared Cite design system v1.1 (source: Citebrief commit fbaab7f, its D-035). `main.tsx` imports the tokens before the app styles. Every colour in the app CSS is a `--cite-*` token; `web/src/styles/tokens.test.ts` fails on a typed hex, `rgb()` or `hsl()` value in any app CSS file and checks the contrast of the pairs the app uses in the light and the dark theme. Prettier skips the tokens file so that it stays a byte copy. This is a visual change: no copy, link, route or flow changed.
+
+**Dark theme.** The tokens follow the system setting. The app has no theme switch and none was added, so nothing sets `data-theme`. Native controls follow through `color-scheme`. This replaces "light theme only" in `docs/UI_DESIGN_PLAN.md` section 3; the brief allows a dark theme.
+
+**Changes from `docs/UI_DESIGN_PLAN.md` section 3** (the Cite rules apply, because none of these is a text, link, flow or size rule):
+- The interface font is the system UI font; Atkinson Hyperlegible is removed.
+- Patina is replaced by the Cite navy for the main action and the current-page line, and by the Cite link blue for links.
+- The coloured left bands on queue rows (8px urgent, 4px high, 2px normal) and on the inquiry banners are removed (DESIGN.md allows no coloured side border thicker than 1px). An urgent row now has the Danger tint and keeps its bold text and its "Urgent" tag; the tag and the top-bar "urgent" link use the Danger tint and text, not solid red. The word still carries the level.
+- Panels are Cite cards (10px corners, 1px border, the card shadow) on the grey canvas, not boxes separated by rules.
+- A passed check is plain with its word in the success colour; only failed and warning checks are tinted (Lists of items that need attention).
+- The error state of a screen is a Warning banner.
+- The confirming "Delete" button uses the danger button (class only).
+- Print rules are added: one column, black on white, no shadows or tints, external links followed by their address.
+
+**Where the Citedesk rule wins over DESIGN.md:**
+
+| DESIGN.md | Citedesk | Reason |
+|---|---|---|
+| Body 0.9375rem; Small 0.8125rem, Label 0.72rem, buttons 0.875rem, Title 1rem | Body 17px, nothing under 16px, h2 1.125rem; Label type (small capitals) not used; the headline (1.75rem) is used for page titles | Brief section 3: body text at least 16px. The test still checks the 16px floor. |
+| Controls 36px, small buttons 32px | Every control at least 44px (`--target`); no small button | Brief section 7: targets at least 44px on touch. |
+| System font only, no web font | Customer text and drafts stay in Source Serif 4, 18px, 68 characters wide | UI plan section 3: the serif marks the words that are sent or were sent, so a draft never reads as an interface label. |
+| Page at most 72rem | 80rem | The inquiry page shows message, understanding and draft side by side from 70rem; the draft needs its 68-character line. |
+| Toast for a short confirmation | The undo notice stays in place under the decision buttons (Info tint), 5 seconds | The undo flow stays as built (D-053, D-056): the notice sits where the decision was taken and Escape undoes it; a toast would move it away from the buttons. |
+| Counts that filter a list are toggle buttons with `aria-pressed` | The queue filters stay links with `aria-current` and their URL | They are navigation: each has an address that can be shared and reloaded. They use the Tabs style. |
+| "Demo data" pill in the top bar, or the full sentence in the footer | The full sentence in the footer, as before | Rule 7 in `CLAUDE.md`. DESIGN.md allows this. |
+
+**Not used** (nothing in the app needs it): the bottom action bar, the upload drop zone, summary tiles at the top of a board, the read-only input.
+
+**Finding for the shared system.** `--cite-input-border` on `--cite-canvas` is 2.92:1 in the light theme, under the 3:1 for a control boundary. Citedesk controls have a Surface fill, where the border is 3.2:1, so the test checks the border against Surface only. The value is to be changed in Citebrief, not in the copy.

@@ -65,7 +65,7 @@ export function DeleteInquiry({ inquiryId }: { inquiryId: number }) {
             <button
               ref={confirmRef}
               type="button"
-              className={styles.secondary}
+              className={styles.danger}
               disabled={busy}
               onClick={() => void remove()}
             >

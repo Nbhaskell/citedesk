@@ -2,51 +2,62 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-2) var(--space-6);
-  padding: var(--space-2) var(--gutter);
-  background: var(--sheet);
-  border-bottom: 1px solid var(--rule);
+  gap: var(--cite-space-2) var(--cite-space-6);
+  padding: var(--cite-space-2) var(--cite-space-5);
+  background: var(--cite-surface);
+  border-bottom: 1px solid var(--cite-rule);
 }
 
 .brand {
   min-height: var(--target);
   display: inline-flex;
   align-items: center;
-  color: var(--ink);
+  gap: var(--cite-space-2);
+  color: var(--cite-text);
   font-size: 1.25rem;
   font-weight: 700;
   text-decoration: none;
 }
 
+/* The brand mark: a navy square, decoration only. */
+.brand::before {
+  content: "";
+  width: 1.4rem;
+  height: 1.4rem;
+  flex-shrink: 0;
+  background: var(--cite-primary);
+  border-radius: var(--cite-radius-md);
+}
+
 .nav {
   display: flex;
-  gap: var(--space-1);
+  gap: var(--cite-space-1);
 }
 
 .link {
   min-height: var(--target);
   display: inline-flex;
   align-items: center;
-  padding: 0 var(--space-3);
-  border-bottom: 3px solid transparent;
-  color: var(--ink);
+  padding: 0 var(--cite-space-3);
+  border-bottom: 2px solid transparent;
+  color: var(--cite-text);
   text-decoration: none;
 }
 
 .link:hover {
-  background: var(--paper);
+  background: var(--cite-canvas);
 }
 
 .link[aria-current="page"] {
-  border-bottom-color: var(--patina);
-  font-weight: 700;
+  border-bottom-color: var(--cite-primary);
+  font-weight: 600;
 }
 
 .right {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--cite-space-4);
 }
 
 /* The one loud element: an urgent item cannot be scrolled out of sight. */
@@ -54,23 +65,25 @@
   min-height: var(--target);
   display: inline-flex;
   align-items: center;
-  padding: 0 var(--space-4);
-  border-radius: var(--radius);
-  background: var(--signal);
-  color: #fff;
+  padding: 0 var(--cite-space-4);
+  border: 1px solid var(--cite-danger-line);
+  border-radius: var(--cite-radius-md);
+  background: var(--cite-danger-bg);
+  color: var(--cite-danger-text);
   font-weight: 700;
   text-decoration: none;
 }
 
 .quiet {
-  color: var(--slate);
+  color: var(--cite-muted);
 }
 
 .lost {
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius);
-  background: var(--amber-tint);
-  color: var(--amber-ink);
+  padding: var(--cite-space-1) var(--cite-space-3);
+  border: 1px solid var(--cite-warning-line);
+  border-radius: var(--cite-radius-md);
+  background: var(--cite-warning-bg);
+  color: var(--cite-warning-text);
 }
 
 @media (max-width: 40rem) {

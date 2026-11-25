@@ -1256,4 +1256,4 @@ This is a development fix, measured on the wording that showed the problem. It i
 
 **Not used** (nothing in the app needs it): the bottom action bar, the upload drop zone, summary tiles at the top of a board, the read-only input.
 
-**Finding for the shared system.** `--cite-input-border` on `--cite-canvas` is 2.92:1 in the light theme, under the 3:1 for a control boundary. Citedesk controls have a Surface fill, where the border is 3.2:1, so the test checks the border against Surface only. The value is to be changed in Citebrief, not in the copy.
+**Finding for the shared system.** `--cite-input-border` on `--cite-canvas` is 2.92:1 in the light theme, under the 3:1 for a control boundary. Citedesk controls have a Surface fill, where the border is 3.2:1, so the test checks the border against Surface only. The value is to be changed in Citebrief, not in the copy. Citebrief v1.1.1 (its D-036) changes the light value to #858b94: 3.12:1 on Canvas, 3.43:1 on Surface. The copies here are v1.1.1.
